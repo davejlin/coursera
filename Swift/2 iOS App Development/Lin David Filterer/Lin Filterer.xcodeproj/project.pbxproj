@@ -1,0 +1,307 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1808CA9A1BF3BEDD00C5F00C /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808CA991BF3BEDD00C5F00C /* Utilities.swift */; };
+		187B06E11BF8319900329DC2 /* SecondaryMenuCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B06E01BF8319900329DC2 /* SecondaryMenuCollectionView.swift */; };
+		188A5FED1BF2B22600AD6064 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 188A5FEC1BF2B22600AD6064 /* Main.storyboard */; };
+		188A5FEF1BF2B23700AD6064 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 188A5FEE1BF2B23700AD6064 /* LaunchScreen.storyboard */; };
+		18B50FF51BF7FECE002FABD1 /* FilterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B50FF41BF7FECE002FABD1 /* FilterCollectionViewCell.swift */; };
+		18C9B93E1BF185500064387E /* RGBAImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C9B93C1BF185500064387E /* RGBAImageFilter.swift */; };
+		18C9B93F1BF185500064387E /* RGBAImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C9B93D1BF185500064387E /* RGBAImageProcessor.swift */; };
+		4DC199981BB201E100AA75E7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC199971BB201E100AA75E7 /* AppDelegate.swift */; };
+		4DC1999A1BB201E100AA75E7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC199991BB201E100AA75E7 /* ViewController.swift */; };
+		4DC1999F1BB201E100AA75E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DC1999E1BB201E100AA75E7 /* Assets.xcassets */; };
+		4DC199AA1BB2049F00AA75E7 /* RGBAImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC199A91BB2049F00AA75E7 /* RGBAImage.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1808CA991BF3BEDD00C5F00C /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utilities.swift; path = "Lin Filterer/Utilities.swift"; sourceTree = SOURCE_ROOT; };
+		187B06E01BF8319900329DC2 /* SecondaryMenuCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SecondaryMenuCollectionView.swift; path = "Lin Filterer/SecondaryMenuCollectionView.swift"; sourceTree = SOURCE_ROOT; };
+		188A5FEC1BF2B22600AD6064 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = "Lin Filterer/Base.lproj/Main.storyboard"; sourceTree = SOURCE_ROOT; };
+		188A5FEE1BF2B23700AD6064 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = "Lin Filterer/Base.lproj/LaunchScreen.storyboard"; sourceTree = SOURCE_ROOT; };
+		18B50FF41BF7FECE002FABD1 /* FilterCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FilterCollectionViewCell.swift; path = "Lin Filterer/FilterCollectionViewCell.swift"; sourceTree = SOURCE_ROOT; };
+		18C9B93C1BF185500064387E /* RGBAImageFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RGBAImageFilter.swift; path = "Lin Filterer/RGBAImageFilter.swift"; sourceTree = SOURCE_ROOT; };
+		18C9B93D1BF185500064387E /* RGBAImageProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RGBAImageProcessor.swift; path = "Lin Filterer/RGBAImageProcessor.swift"; sourceTree = SOURCE_ROOT; };
+		4DC199941BB201E100AA75E7 /* Lin Filterer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lin Filterer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DC199971BB201E100AA75E7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "Lin Filterer/AppDelegate.swift"; sourceTree = SOURCE_ROOT; };
+		4DC199991BB201E100AA75E7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = "Lin Filterer/ViewController.swift"; sourceTree = SOURCE_ROOT; };
+		4DC1999E1BB201E100AA75E7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "Lin Filterer/Assets.xcassets"; sourceTree = SOURCE_ROOT; };
+		4DC199A31BB201E100AA75E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Lin Filterer/Info.plist"; sourceTree = SOURCE_ROOT; };
+		4DC199A91BB2049F00AA75E7 /* RGBAImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RGBAImage.swift; path = "Lin Filterer/RGBAImage.swift"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4DC199911BB201E100AA75E7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		187B06E21BF8324300329DC2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				187B06E01BF8319900329DC2 /* SecondaryMenuCollectionView.swift */,
+				18B50FF41BF7FECE002FABD1 /* FilterCollectionViewCell.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		4DC1998B1BB201E100AA75E7 = {
+			isa = PBXGroup;
+			children = (
+				4DC199961BB201E100AA75E7 /* Lin Filterer */,
+				4DC199951BB201E100AA75E7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4DC199951BB201E100AA75E7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4DC199941BB201E100AA75E7 /* Lin Filterer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4DC199961BB201E100AA75E7 /* Lin Filterer */ = {
+			isa = PBXGroup;
+			children = (
+				187B06E21BF8324300329DC2 /* Models */,
+				4DC199971BB201E100AA75E7 /* AppDelegate.swift */,
+				4DC199991BB201E100AA75E7 /* ViewController.swift */,
+				4DC199A91BB2049F00AA75E7 /* RGBAImage.swift */,
+				18C9B93C1BF185500064387E /* RGBAImageFilter.swift */,
+				18C9B93D1BF185500064387E /* RGBAImageProcessor.swift */,
+				4DC1999E1BB201E100AA75E7 /* Assets.xcassets */,
+				188A5FEC1BF2B22600AD6064 /* Main.storyboard */,
+				188A5FEE1BF2B23700AD6064 /* LaunchScreen.storyboard */,
+				4DC199A31BB201E100AA75E7 /* Info.plist */,
+				1808CA991BF3BEDD00C5F00C /* Utilities.swift */,
+			);
+			name = "Lin Filterer";
+			path = Filterer;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4DC199931BB201E100AA75E7 /* Lin Filterer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4DC199A61BB201E100AA75E7 /* Build configuration list for PBXNativeTarget "Lin Filterer" */;
+			buildPhases = (
+				4DC199901BB201E100AA75E7 /* Sources */,
+				4DC199911BB201E100AA75E7 /* Frameworks */,
+				4DC199921BB201E100AA75E7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Lin Filterer";
+			productName = Filterer;
+			productReference = 4DC199941BB201E100AA75E7 /* Lin Filterer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4DC1998C1BB201E100AA75E7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = UofT;
+				TargetAttributes = {
+					4DC199931BB201E100AA75E7 = {
+						CreatedOnToolsVersion = 7.0;
+					};
+				};
+			};
+			buildConfigurationList = 4DC1998F1BB201E100AA75E7 /* Build configuration list for PBXProject "Lin Filterer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4DC1998B1BB201E100AA75E7;
+			productRefGroup = 4DC199951BB201E100AA75E7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4DC199931BB201E100AA75E7 /* Lin Filterer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4DC199921BB201E100AA75E7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				188A5FEF1BF2B23700AD6064 /* LaunchScreen.storyboard in Resources */,
+				188A5FED1BF2B22600AD6064 /* Main.storyboard in Resources */,
+				4DC1999F1BB201E100AA75E7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4DC199901BB201E100AA75E7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				187B06E11BF8319900329DC2 /* SecondaryMenuCollectionView.swift in Sources */,
+				1808CA9A1BF3BEDD00C5F00C /* Utilities.swift in Sources */,
+				4DC1999A1BB201E100AA75E7 /* ViewController.swift in Sources */,
+				18C9B93F1BF185500064387E /* RGBAImageProcessor.swift in Sources */,
+				18C9B93E1BF185500064387E /* RGBAImageFilter.swift in Sources */,
+				4DC199AA1BB2049F00AA75E7 /* RGBAImage.swift in Sources */,
+				4DC199981BB201E100AA75E7 /* AppDelegate.swift in Sources */,
+				18B50FF51BF7FECE002FABD1 /* FilterCollectionViewCell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4DC199A41BB201E100AA75E7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4DC199A51BB201E100AA75E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4DC199A71BB201E100AA75E7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "$(SRCROOT)/Lin Filterer/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.uoft.Filterer;
+				PRODUCT_NAME = "Lin Filterer";
+			};
+			name = Debug;
+		};
+		4DC199A81BB201E100AA75E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "$(SRCROOT)/Lin Filterer/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.uoft.Filterer;
+				PRODUCT_NAME = "Lin Filterer";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4DC1998F1BB201E100AA75E7 /* Build configuration list for PBXProject "Lin Filterer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4DC199A41BB201E100AA75E7 /* Debug */,
+				4DC199A51BB201E100AA75E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4DC199A61BB201E100AA75E7 /* Build configuration list for PBXNativeTarget "Lin Filterer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4DC199A71BB201E100AA75E7 /* Debug */,
+				4DC199A81BB201E100AA75E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4DC1998C1BB201E100AA75E7 /* Project object */;
+}

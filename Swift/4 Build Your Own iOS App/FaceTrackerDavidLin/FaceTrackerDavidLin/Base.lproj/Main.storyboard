@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="FaceTrackerDavidLin" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Ed-6j-mRA" userLabel="FaceTrackerContainerView">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="548"/>
+                                <connections>
+                                    <segue destination="Sfd-Zh-ZlX" kind="embed" identifier="faceTrackerEmbed" id="fnW-Ie-CM2"/>
+                                </connections>
+                            </containerView>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="0Eo-fj-Ota">
+                                <rect key="frame" x="0.0" y="545" width="600" height="55"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pE7-gx-9Ev">
+                                        <rect key="frame" x="0.0" y="0.0" width="150" height="55"/>
+                                        <state key="normal" title="Santa" image="icon_santa"/>
+                                        <connections>
+                                            <action selector="onSantaButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="m88-bA-pDR"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fE6-Zd-iSp">
+                                        <rect key="frame" x="150" y="0.0" width="150" height="55"/>
+                                        <state key="normal" title="Pirate" image="icon_pirate"/>
+                                        <connections>
+                                            <action selector="onPirateButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="cmE-aT-Jup"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ldm-HP-e9i">
+                                        <rect key="frame" x="300" y="0.0" width="150" height="55"/>
+                                        <state key="normal" title="Lady" image="icon_lady"/>
+                                        <connections>
+                                            <action selector="onLadyButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JuW-LO-j7F"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jnG-gD-FKG">
+                                        <rect key="frame" x="450" y="0.0" width="150" height="55"/>
+                                        <state key="normal" title="Robot" image="icon_robot"/>
+                                        <connections>
+                                            <action selector="onRobotButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="X7q-X8-9Cn"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="55" id="e36-rO-gXK"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="0Eo-fj-Ota" firstAttribute="top" secondItem="8Ed-6j-mRA" secondAttribute="bottom" constant="-3" id="QRe-5w-YF2"/>
+                            <constraint firstItem="0Eo-fj-Ota" firstAttribute="leading" secondItem="8Ed-6j-mRA" secondAttribute="leading" id="SuP-97-4Ey"/>
+                            <constraint firstItem="8Ed-6j-mRA" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="YY5-Gv-Nd3"/>
+                            <constraint firstItem="0Eo-fj-Ota" firstAttribute="trailing" secondItem="8Ed-6j-mRA" secondAttribute="trailing" id="hJF-fb-Pnd"/>
+                            <constraint firstItem="8Ed-6j-mRA" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="lDk-Iu-uB7"/>
+                            <constraint firstAttribute="trailing" secondItem="8Ed-6j-mRA" secondAttribute="trailing" id="xQO-Xw-YKi"/>
+                            <constraint firstItem="8Ed-6j-mRA" firstAttribute="bottom" secondItem="wfy-db-euE" secondAttribute="top" constant="-52" id="xxH-3b-mLO"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="faceTrackerContainerView" destination="8Ed-6j-mRA" id="T1L-Np-c8K"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="245" y="337"/>
+        </scene>
+        <!--Face Tracker View Controller-->
+        <scene sceneID="K1O-qI-GDx">
+            <objects>
+                <viewController id="Sfd-Zh-ZlX" customClass="FaceTrackerViewController" customModule="FaceTracker" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="LG1-3k-3Gw"/>
+                        <viewControllerLayoutGuide type="bottom" id="IWJ-dy-pQg"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Je8-CR-P45">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="548"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="p5o-sS-76P" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="245" y="1140"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="icon_lady" width="227" height="181"/>
+        <image name="icon_pirate" width="330" height="255"/>
+        <image name="icon_robot" width="204" height="146"/>
+        <image name="icon_santa" width="139" height="98"/>
+    </resources>
+</document>
