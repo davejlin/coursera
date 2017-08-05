@@ -1,5 +1,10 @@
 package edu.coursera.parallel;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
 /**
@@ -83,8 +88,12 @@ public final class ReciprocalArraySum {
      * This class stub can be filled in to implement the body of each task
      * created to perform reciprocal array sum in parallel.
      */
-    private static class ReciprocalArraySumTask extends RecursiveAction {
-        /**
+    private static class ReciprocalArraySumTask extends RecursiveAction implements Callable {
+
+		private static final long serialVersionUID = 1L;
+		static int SEQUENTIAL_THRESHOLD = 0;
+        
+		/**
          * Starting index for traversal done by this task.
          */
         private final int startIndexInclusive;
@@ -125,8 +134,28 @@ public final class ReciprocalArraySum {
 
         @Override
         protected void compute() {
-            // TODO
+    			
+        		if (endIndexExclusive - startIndexInclusive <= SEQUENTIAL_THRESHOLD) {
+	        		for (int i = startIndexInclusive; i < endIndexExclusive; ++i) {
+	        			value += 1 / input[i];
+	        		}
+        		} else {
+        			int mid = (startIndexInclusive + endIndexExclusive) / 2;
+            		ReciprocalArraySumTask left = new ReciprocalArraySumTask(startIndexInclusive, mid, input);
+            		ReciprocalArraySumTask right = new ReciprocalArraySumTask(mid, endIndexExclusive, input);
+            		left.fork();
+            		right.compute();
+            		left.join();
+            		value = left.value + right.value;
+        		}
         }
+
+		@Override
+		public Object call() throws Exception {
+			// TODO Auto-generated method stub
+			compute();
+			return null;
+		}
     }
 
     /**
@@ -140,14 +169,30 @@ public final class ReciprocalArraySum {
      */
     protected static double parArraySum(final double[] input) {
         assert input.length % 2 == 0;
-
+    		
+		List<Callable<ReciprocalArraySumTask>> tasks = new ArrayList<Callable<ReciprocalArraySumTask>>();
+		
+		if (input.length > 1_000_000) {
+			ReciprocalArraySumTask.SEQUENTIAL_THRESHOLD = 2500;
+		} else {
+			ReciprocalArraySumTask.SEQUENTIAL_THRESHOLD = 900;
+		}
+        
+		int mid = input.length / 2;
+        ReciprocalArraySumTask task1 = new ReciprocalArraySumTask(0, mid, input);
+        ReciprocalArraySumTask task2 = new ReciprocalArraySumTask(mid, input.length, input);
+        
+        tasks.add(task1);
+        tasks.add(task2);
+        
+        ForkJoinPool.commonPool().invokeAll(tasks);
+        
         double sum = 0;
-
-        // Compute sum of reciprocals of array elements
-        for (int i = 0; i < input.length; i++) {
-            sum += 1 / input[i];
+        for (int i = 0; i < tasks.size(); ++i) {
+        		ReciprocalArraySumTask task = (ReciprocalArraySumTask)(tasks.get(i));
+        		sum += task.value;
         }
-
+        
         return sum;
     }
 
@@ -163,13 +208,29 @@ public final class ReciprocalArraySum {
      */
     protected static double parManyTaskArraySum(final double[] input,
             final int numTasks) {
+    	
+		if (input.length > 1_000_000) {
+			ReciprocalArraySumTask.SEQUENTIAL_THRESHOLD = 2500;
+		} else {
+			ReciprocalArraySumTask.SEQUENTIAL_THRESHOLD = 1500;
+		}
+    	
+    		List<Callable<ReciprocalArraySumTask>> tasks = new ArrayList<Callable<ReciprocalArraySumTask>>();
+    	
+    		for (int n = 0; n < numTasks; ++n) {
+    			int start = getChunkStartInclusive(n, numTasks, input.length);
+    			int end = getChunkEndExclusive(n, numTasks, input.length);
+    			tasks.add(new ReciprocalArraySumTask(start, end, input));
+    		}
+
+        ForkJoinPool.commonPool().invokeAll(tasks);
+
         double sum = 0;
-
-        // Compute sum of reciprocals of array elements
-        for (int i = 0; i < input.length; i++) {
-            sum += 1 / input[i];
+        for (int i = 0; i < tasks.size(); ++i) {
+        		ReciprocalArraySumTask task = (ReciprocalArraySumTask)(tasks.get(i));
+        		sum += task.value;
         }
-
+        
         return sum;
     }
 }
