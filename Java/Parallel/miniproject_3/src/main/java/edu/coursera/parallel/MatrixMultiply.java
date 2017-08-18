@@ -1,6 +1,6 @@
 package edu.coursera.parallel;
 
-import static edu.rice.pcdp.PCDP.forseq2d;
+import edu.rice.pcdp.PCDP;
 
 /**
  * Wrapper class for implementing matrix multiply efficiently in parallel.
@@ -22,10 +22,10 @@ public final class MatrixMultiply {
      */
     public static void seqMatrixMultiply(final double[][] A, final double[][] B,
             final double[][] C, final int N) {
-        forseq2d(0, N - 1, 0, N - 1, (i, j) -> {
-            C[i][j] = 0.0;
-            for (int k = 0; k < N; k++) {
-                C[i][j] += A[i][k] * B[k][j];
+    			PCDP.forseq2d(0, N - 1, 0, N - 1, (i, j) -> {
+	            C[i][j] = 0.0;
+	            for (int k = 0; k < N; k++) {
+	                C[i][j] += A[i][k] * B[k][j];
             }
         });
     }
@@ -44,10 +44,10 @@ public final class MatrixMultiply {
          * TODO Parallelize this outermost two-dimension sequential loop to
          * achieve performance improvement.
          */
-        forseq2d(0, N - 1, 0, N - 1, (i, j) -> {
-            C[i][j] = 0.0;
-            for (int k = 0; k < N; k++) {
-                C[i][j] += A[i][k] * B[k][j];
+    			PCDP.forall2dChunked(0, N - 1, 0, N - 1, (i, j) -> {
+	            C[i][j] = 0.0;
+	            for (int k = 0; k < N; k++) {
+	                C[i][j] += A[i][k] * B[k][j];
             }
         });
     }
