@@ -6,6 +6,7 @@ import edu.coursera.concurrent.boruvka.Edge;
 import edu.coursera.concurrent.boruvka.Component;
 
 import java.util.Queue;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -28,7 +29,50 @@ public final class ParBoruvka extends AbstractBoruvka<ParBoruvka.ParComponent> {
     @Override
     public void computeBoruvka(final Queue<ParComponent> nodesLoaded,
             final SolutionToBoruvka<ParComponent> solution) {
-        throw new UnsupportedOperationException();
+    	
+    		ParComponent n = null;
+    		
+    		while (!nodesLoaded.isEmpty() ) {
+    			n = nodesLoaded.poll();
+    			
+    			if (n == null || !n.lock.tryLock()) { continue; }
+    			
+    			if (n.isDead) {
+    				n.lock.unlock();
+    				continue;
+    			}
+    			
+    			final Edge<ParComponent> e = n.getMinEdge(); // get minimum edge
+    			if (e == null) {
+    		    		solution.setSolution(n);
+    				break; // done - graph contracted to a single node
+    			}
+    			
+    			final ParComponent other = e.getOther(n);
+    			
+    			if (!other.lock.tryLock()) {
+    				n.lock.unlock();
+    				nodesLoaded.add(n);
+    				continue;
+    			}
+    			
+    			if (other.isDead) {
+    				other.lock.unlock();
+    				n.lock.unlock();
+    				nodesLoaded.add(n);
+    				continue;
+    			}
+    			
+    			other.isDead = true;
+    			// merge node other into node e
+    			n.merge(other, e.weight());
+    			
+    			n.lock.unlock();
+    			other.lock.unlock();
+    			
+    			// add newly merged n back in the work-list
+    			nodesLoaded.add(n);
+    		}
     }
 
     /**
@@ -37,6 +81,8 @@ public final class ParBoruvka extends AbstractBoruvka<ParBoruvka.ParComponent> {
      * result of collapsing edges to form a component from multiple nodes.
      */
     public static final class ParComponent extends Component<ParComponent> {
+    		ReentrantLock lock = new ReentrantLock();
+    		
         /**
          *  A unique identifier for this component in the graph that contains
          *  it.
