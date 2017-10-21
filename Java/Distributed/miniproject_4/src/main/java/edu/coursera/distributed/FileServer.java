@@ -5,7 +5,10 @@ import java.net.Socket;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
 import java.io.File;
 
 /**
@@ -36,11 +39,51 @@ public final class FileServer {
          */
         while (true) {
 
-            // TODO Delete this once you start working on your solution.
-            throw new UnsupportedOperationException();
-
             // TODO 1) Use socket.accept to get a Socket object
+        		Socket s = socket.accept();
 
+        		Thread thread = new Thread(
+        				() -> {
+        					try {
+        						InputStream stream = s.getInputStream();
+        						InputStreamReader reader = new InputStreamReader(stream);
+        						BufferedReader buffered = new BufferedReader(reader);
+        						
+        						String line = buffered.readLine();
+        						assert line != null;
+        						assert line.startsWith("GET");
+        						final PCDPPath path = new PCDPPath(line.split(" ")[1]);
+        						
+        						String fileContents = fs.readFile(path);
+        						
+	        		        		OutputStream out = s.getOutputStream();
+	        		        		PrintWriter printer = new PrintWriter(out);
+	        		        		
+	        		        		if (fileContents == null) {
+	        		        			printer.write("HTTP/1.0 404 Not Found\r\n");
+	        		        			printer.write("Server: FileServer\r\n");
+	        		        			printer.write("\r\n");
+	        		        		}
+	        		        		else
+	        		        		{
+	        		        			printer.write("HTTP/1.0 200 OK\r\n");
+	        		        			printer.write("Server: FileServer\r\n");
+	        		        			printer.write("\r\n");
+	        		        			printer.write(fileContents + "\r\n");
+	        		        		}
+	        		        		
+	        		        		printer.flush();
+	        		        		printer.close();
+	        		        		out.close();
+	        		        		s.close();
+        					} catch (Exception e){
+        						
+        					}
+        				}
+        		);
+        		
+        		thread.start();
+        		
             /*
              * TODO 2) Now that we have a new Socket object, handle the parsing
              * of the HTTP message on that socket and returning of the requested
