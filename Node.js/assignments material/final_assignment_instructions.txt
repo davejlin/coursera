@@ -1,4 +1,5 @@
 In this assignment, you will be extending the router to support the ability to save and retrieve a list of favorite dishes by each of the registered users. All registered users in the system should have the ability to save any dish as their favorite dish, retrieve all their favorite dishes and remove one or all their favorite dishes.
+
 Step-By-Step Assignment Instructions
 
 Assignment Overview
@@ -43,3 +44,19 @@ Your assignment will be graded on the basis of the following review criteria:
     A new favoriteSchema and Favorites model has been correctly implemented to take advantage of Mongoose Population support to track the users and the list of favorite dishes using their ObjectIds in the favoriteSchema and Favorites model.
     The GET, POST and DELETE operations are well supported as per the specifications above
     The app.js has been updated to support the new route.
+
+==================================================================================
+
+favorites model:
+
+POST: /favorites/dishID
+__v: version # 1 (default)
+updatedAt: date time of favorite update (default)
+creatdAt: date time of favorite creation (default)
+_id: the id of the favorite
+user: the user id of the user making the favorite
+dishes []: an array of dish ids that are the user's favorite
+
+GET: /favorites/
+user: all user's information populated
+dishes: all dish information populated
