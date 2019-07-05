@@ -1,0 +1,24 @@
+{
+    "verbose": true,
+    "collectCoverage": true,
+    "setupFiles": [
+      "reflect-metadata"
+    ],
+    "collectCoverageFrom": [
+        "src/**/*.{ts}",
+        "!src/**/index.ts",
+        "!src/di/*"
+    ],
+    "coverageReporters": ["cobertura", "lcov", "text"],
+    "transform": {
+        "^.+\\.ts$": "ts-jest"
+    },
+    "testResultsProcessor": "jest-junit",
+    "testRegex": "/src/.+\\.test.ts$",
+    "moduleFileExtensions": ["ts", "js", "json", "node"],
+    "moduleNameMapper": {
+        "fs": "<rootDir>/mocks/fsMock.js",
+        "readline": "<rootDir>/mocks/readlineMock.js"
+    },
+    "testEnvironment": "node"
+}
