@@ -1,0 +1,27 @@
+{
+  "name": "vmtranslator",
+  "version": "1.0.0",
+  "description": "Virtual Machine Translator for Hack Language",
+  "main": "dist/VMTranslator.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "cleanall": "npm run clean && rm -rf node_modules && rm package-lock.json",
+    "start": "tsc && node dist/VMTranslator.js",
+    "runall": "npm run start files/BasicTest.vm && npm run start files/PointerTest.vm && npm run start files/StaticTest.vm && npm run start files/SimpleAdd.vm && npm run start files/StackTest.vm",
+    "copyall": "cp files/BasicTest.asm ../MemoryAccess/BasicTest/ && cp files/PointerTest.asm ../MemoryAccess/PointerTest/ && cp files/StaticTest.asm ../MemoryAccess/StaticTest/ && cp files/SimpleAdd.asm ../StackArithmetic/SimpleAdd/ && cp files/StackTest.asm ../StackArithmetic/StackTest/"
+  },
+  "keywords": [
+    "Hack",
+    "translator",
+    "virtual",
+    "machine",
+    "VMTranslator"
+  ],
+  "author": "David Lin",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "typescript": "^3.5.2"
+  },
+  "dependencies": {}
+}
