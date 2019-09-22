@@ -79,3 +79,8 @@ exports.MemorySegmentMap = {
     that: "THAT",
     this: "THIS"
 };
+var Descriptor;
+(function (Descriptor) {
+    Descriptor["continue"] = "continue";
+    Descriptor["return"] = "return";
+})(Descriptor = exports.Descriptor || (exports.Descriptor = {}));

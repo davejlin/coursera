@@ -79,3 +79,8 @@ export const MemorySegmentMap: { [key in MemorySegment]: string } = {
     that: "THAT",
     this: "THIS"
 };
+
+export enum Descriptor {
+    continue = "continue",
+    return = "return"
+}

@@ -21,7 +21,7 @@ class Processor {
             const { commandType, command, arg1, arg2 } = this.parser.parse(line);
             switch (commandType) {
                 case Constants_1.CommandType.arithmetic:
-                    processedLine += this.coder.writeArithmetic(command);
+                    processedLine += this.coder.writeArithmetic(command, filename);
                     break;
                 case Constants_1.CommandType.pop:
                 case Constants_1.CommandType.push:

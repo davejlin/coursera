@@ -3,12 +3,12 @@
      D=A
      @SP
      M=D
-     @bootstrap$ret.0
+     @bootstrap$return.0
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push bootstrap$ret.0
+     M=D        // push bootstrap$return.0
      @LCL
      D=M
      @SP
@@ -47,7 +47,7 @@
      M=D        // LCL = SP
      @Sys.init
      0;JMP
-(bootstrap$ret.0)
+(bootstrap$return.0)
 (bootstrapEnd)
      @bootstrapEnd
      0;JMP
@@ -77,13 +77,12 @@
      A=A-1
      D=M-D
      M=0
-     @75
-     D;JLT
-     @78
-     0;JMP
+     @Main$continue.1
+     D;JGE
      @SP
      A=M-1
      M=-1
+(Main$continue.1)
 // if-goto IF_TRUE
      @SP
      AM=M-1
@@ -191,12 +190,12 @@
      A=A-1
      M=M-D
 // call Main.fibonacci 1
-     @Main$ret.1
+     @Main$return.2
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Main$ret.1
+     M=D        // push Main$return.2
      @LCL
      D=M
      @SP
@@ -235,7 +234,7 @@
      M=D        // LCL = SP
      @Main.fibonacci
      0;JMP
-(Main$ret.1)
+(Main$return.2)
 // push argument 0
      @ARG
      D=M
@@ -260,12 +259,12 @@
      A=A-1
      M=M-D
 // call Main.fibonacci 1
-     @Main$ret.2
+     @Main$return.3
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Main$ret.2
+     M=D        // push Main$return.3
      @LCL
      D=M
      @SP
@@ -304,7 +303,7 @@
      M=D        // LCL = SP
      @Main.fibonacci
      0;JMP
-(Main$ret.2)
+(Main$return.3)
 // add
      @SP
      AM=M-1
@@ -381,12 +380,12 @@
      A=A-1
      M=D
 // call Main.fibonacci 1
-     @Sys$ret.3
+     @Sys$return.4
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.3
+     M=D        // push Sys$return.4
      @LCL
      D=M
      @SP
@@ -425,7 +424,7 @@
      M=D        // LCL = SP
      @Main.fibonacci
      0;JMP
-(Sys$ret.3)
+(Sys$return.4)
 // label WHILE
 (Sys.init:WHILE)
 // goto WHILE

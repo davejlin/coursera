@@ -3,12 +3,12 @@
      D=A
      @SP
      M=D
-     @bootstrap$ret.0
+     @bootstrap$return.0
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push bootstrap$ret.0
+     M=D        // push bootstrap$return.0
      @LCL
      D=M
      @SP
@@ -47,7 +47,7 @@
      M=D        // LCL = SP
      @Sys.init
      0;JMP
-(bootstrap$ret.0)
+(bootstrap$return.0)
 (bootstrapEnd)
      @bootstrapEnd
      0;JMP
@@ -80,12 +80,12 @@
      @THAT
      M=D
 // call Sys.main 0
-     @Sys$ret.1
+     @Sys$return.1
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.1
+     M=D        // push Sys$return.1
      @LCL
      D=M
      @SP
@@ -124,7 +124,7 @@
      M=D        // LCL = SP
      @Sys.main
      0;JMP
-(Sys$ret.1)
+(Sys$return.1)
 // pop temp 1
      @SP
      AM=M-1
@@ -262,12 +262,12 @@
      A=A-1
      M=D
 // call Sys.add12 1
-     @Sys$ret.2
+     @Sys$return.2
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.2
+     M=D        // push Sys$return.2
      @LCL
      D=M
      @SP
@@ -306,7 +306,7 @@
      M=D        // LCL = SP
      @Sys.add12
      0;JMP
-(Sys$ret.2)
+(Sys$return.2)
 // pop temp 0
      @SP
      AM=M-1

@@ -1,20 +1,17 @@
 import os = require("os");
-import { MemorySegment, MemorySegmentMap, CommandType, Command } from "./Constants";
+import { MemorySegment, MemorySegmentMap, CommandType, Command, Descriptor } from "./Constants";
 
 export class Coder {
-    private lineNumber = 0;
     private returnIndex = 0;
 
     constructor() {
         this.init();
     }
     public init() {
-        this.lineNumber = 0;
         this.returnIndex = 0;
     }
 
     public writeBootstrap() {
-        this.lineNumber += 6;
         return `// Bootstrap code
      @256
      D=A
@@ -30,7 +27,7 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
      * Returns the assembly code that implements the given arithmetic command.
      * @param command
      */
-    public writeArithmetic(command: string): string {
+    public writeArithmetic(command: string, filename: string): string {
         switch (command) {
             case Command.add:
                 return this.writeAddSubAndOr("D+M");
@@ -45,11 +42,11 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
             case Command.not:
                 return this.writeNegNot("!");
             case Command.eq:
-                return this.writeEqLtGt("JEQ");
+                return this.writeEqLtGt("JNE", filename); // use NE for EQ due to jump condition
             case Command.lt:
-                return this.writeEqLtGt("JLT");
+                return this.writeEqLtGt("JGE", filename); // use GE for LT due to jump condition
             case Command.gt:
-                return this.writeEqLtGt("JGT");
+                return this.writeEqLtGt("JLE", filename); // use LE for GT due to jump condition
             default:
                 return ``;
         }
@@ -80,19 +77,16 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     }
 
     public writeLabel(label: string, functionName: string, openSymbol: string = "(", closeSymbol: string = ")"): string {
-        this.lineNumber += 0; // labels definitions are not counted as a line
         const prefix = functionName.length > 0 ? `${functionName}:` : ``;
         return `${openSymbol}${prefix}${label}${closeSymbol}`;
     }
 
     public writeGoto(label: string, functionName: string): string {
-        this.lineNumber += 2;
         return `     @${this.writeLabel(label, functionName, "", "")}
      0;JMP`
     }
 
     public writeIfGoto(label: string, functionName: string): string {
-        this.lineNumber += 6;
         return `     @SP
      AM=M-1
      D=M
@@ -101,7 +95,6 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     }
 
     public writeFunction(functionName: string, index: string) {
-        this.lineNumber += 0; // function labels are not counted as a line
         let line = `(${functionName})`;
 
         let nArgs = Number(index);
@@ -116,38 +109,17 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     }
 
     public writeCall(functionName: string, nArgs: string, filename: string) {
-        this.lineNumber += 44;
-        const returnAddressLabel = this.getReturnAddressLabel(filename);
+        const returnAddressLabel = this.getLabelName(filename, Descriptor.return);
         return `     @${returnAddressLabel}
      D=A
      @SP
      AM=M+1
      A=A-1
      M=D        // push ${returnAddressLabel}
-     @${MemorySegmentMap[MemorySegment.local]}
-     D=M
-     @SP
-     AM=M+1
-     A=A-1
-     M=D      // push LCL
-     @${MemorySegmentMap[MemorySegment.argument]}
-     D=M
-     @SP
-     AM=M+1
-     A=A-1
-     M=D      // push ARG
-     @${MemorySegmentMap[MemorySegment.this]}
-     D=M
-     @SP
-     AM=M+1
-     A=A-1
-     M=D      // push THIS
-     @${MemorySegmentMap[MemorySegment.that]}
-     D=M
-     @SP
-     AM=M+1
-     A=A-1
-     M=D      // push THAT
+     ${this.pushPointerToStack(MemorySegment.local)}
+     ${this.pushPointerToStack(MemorySegment.argument)}
+     ${this.pushPointerToStack(MemorySegment.this)}
+     ${this.pushPointerToStack(MemorySegment.that)}
      @SP
      D=M
      @5
@@ -162,11 +134,10 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
      M=D        // LCL = SP
      @${functionName}
      0;JMP
-(${returnAddressLabel})`;
+${this.writeLabel(returnAddressLabel, "")}`;
     }
 
     public writeReturn(): string {
-        this.lineNumber += 27;
         const retAddr = "retAddr";
         const endFrame = "endFrame";
 
@@ -194,29 +165,37 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
      D=M
      @SP
      M=D+1      // SP = ARG[0] + 1
-     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.that], "1", "-")}
-     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.this], "2", "-")}
-     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.argument], "3", "-")}
-     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.local], "4", "-")}
+     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.that], "1")}
+     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.this], "2")}
+     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.argument], "3")}
+     ${this.writeSetValue(endFrame, MemorySegmentMap[MemorySegment.local], "4")}
      @${retAddr}
      A=M
      0;JMP      // goto retAddr`;
     }
 
-    private writeSetValue(from: string, to: string, addressOffset: string, operator: string) {
-        this.lineNumber += 8;
+    private writeSetValue(from: string, to: string, addressOffset: string) {
         return `@${from}
      D=M
      @${addressOffset}
-     D=D${operator}A
+     D=D-A
      A=D
      D=M
      @${to}
-     M=D        // ${to} = *(${from} ${operator} ${addressOffset})`
+     M=D        // ${to} = *(${from} - ${addressOffset})`
+    }
+
+    private pushPointerToStack(from: MemorySegment) {
+        const fromSegment = MemorySegmentMap[from];
+        return `@${fromSegment}
+     D=M
+     @SP
+     AM=M+1
+     A=A-1
+     M=D      // push ${fromSegment}`
     }
 
     private writeAddSubAndOr(directive: string): string {
-        this.lineNumber += 5;
         return `     @SP
      AM=M-1
      D=M
@@ -225,32 +204,29 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     }
 
     private writeNegNot(directive: string): string {
-        this.lineNumber += 3;
         return `     @SP
      A=M-1
      M=${directive}M`;
     }
 
-    private writeEqLtGt(directive: string): string {
+    private writeEqLtGt(directive: string, filename: string): string {
+        const continueLabel = this.getLabelName(filename, Descriptor.continue); 
         const returnString = `     @SP
      AM=M-1
      D=M
      A=A-1
      D=M-D
      M=0
-     @${this.lineNumber + 10}
+     @${continueLabel}
      D;${directive}
-     @${this.lineNumber + 13}
-     0;JMP
      @SP
      A=M-1
-     M=-1`;
-        this.lineNumber += 13;
+     M=-1
+${this.writeLabel(continueLabel, "")}`;
         return returnString;
     }
 
     private writePushConstant(index: string): string {
-        this.lineNumber += 6;
         return `     @${index}
      D=A
      @SP
@@ -268,14 +244,12 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     private writePointerThisOrThat(command: string, memorySegment: string): string {
         switch (command) {
             case CommandType.pop:
-                this.lineNumber += 5;
                 return `     @SP
      AM=M-1
      D=M
      @${MemorySegmentMap[memorySegment]}
      M=D`;
             case CommandType.push:
-                this.lineNumber += 6;
                 return `     @${MemorySegmentMap[memorySegment]}
      D=M
      @SP
@@ -288,7 +262,6 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     private writeLocalArgumentThisOrThat(command: string, memorySegment: string, index: string): string {
         switch (command) {
             case CommandType.pop:
-                    this.lineNumber += 12;
                     return `     @${MemorySegmentMap[memorySegment]}
      D=M
      @${index}
@@ -302,7 +275,6 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
      A=M
      M=D`;
             case CommandType.push:
-                this.lineNumber += 9;
                 return `     @${MemorySegmentMap[memorySegment]}
      D=M
      @${index}
@@ -318,14 +290,12 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     private writeTemp(command: string, index: string): string {
         switch (command) {
             case CommandType.pop:
-                this.lineNumber += 5;
                 return `     @SP
      AM=M-1
      D=M
      @${5 + Number(index)}
      M=D`;
             case CommandType.push:
-                this.lineNumber += 6;
                 return `     @${5 + Number(index)}
      D=M
      @SP
@@ -338,14 +308,12 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
     private writeStatic(command: string, index: string, filename: string) {
         switch (command) {
             case CommandType.pop:
-                this.lineNumber += 5;
                 return `     @SP
      AM=M-1
      D=M
      @${filename}.${index}
      M=D`;
             case CommandType.push:
-                this.lineNumber += 6;
                 return `     @${filename}.${index}
      D=M
      @SP
@@ -355,7 +323,7 @@ ${this.writeCall("Sys.init", "0", "bootstrap")}
         }
     }
 
-    private getReturnAddressLabel(filename: string) {
-        return `${filename}$ret.${this.returnIndex++}`
+    private getLabelName(filename: string, descriptor: string) {
+        return `${filename}$${descriptor}.${this.returnIndex++}`
     }
 }

@@ -3,12 +3,12 @@
      D=A
      @SP
      M=D
-     @bootstrap$ret.0
+     @bootstrap$return.0
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push bootstrap$ret.0
+     M=D        // push bootstrap$return.0
      @LCL
      D=M
      @SP
@@ -47,7 +47,7 @@
      M=D        // LCL = SP
      @Sys.init
      0;JMP
-(bootstrap$ret.0)
+(bootstrap$return.0)
 (bootstrapEnd)
      @bootstrapEnd
      0;JMP
@@ -434,12 +434,12 @@
      A=A-1
      M=D
 // call Class1.set 2
-     @Sys$ret.1
+     @Sys$return.1
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.1
+     M=D        // push Sys$return.1
      @LCL
      D=M
      @SP
@@ -478,7 +478,7 @@
      M=D        // LCL = SP
      @Class1.set
      0;JMP
-(Sys$ret.1)
+(Sys$return.1)
 // pop temp 0
      @SP
      AM=M-1
@@ -500,12 +500,12 @@
      A=A-1
      M=D
 // call Class2.set 2
-     @Sys$ret.2
+     @Sys$return.2
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.2
+     M=D        // push Sys$return.2
      @LCL
      D=M
      @SP
@@ -544,7 +544,7 @@
      M=D        // LCL = SP
      @Class2.set
      0;JMP
-(Sys$ret.2)
+(Sys$return.2)
 // pop temp 0
      @SP
      AM=M-1
@@ -552,12 +552,12 @@
      @5
      M=D
 // call Class1.get 0
-     @Sys$ret.3
+     @Sys$return.3
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.3
+     M=D        // push Sys$return.3
      @LCL
      D=M
      @SP
@@ -596,14 +596,14 @@
      M=D        // LCL = SP
      @Class1.get
      0;JMP
-(Sys$ret.3)
+(Sys$return.3)
 // call Class2.get 0
-     @Sys$ret.4
+     @Sys$return.4
      D=A
      @SP
      AM=M+1
      A=A-1
-     M=D        // push Sys$ret.4
+     M=D        // push Sys$return.4
      @LCL
      D=M
      @SP
@@ -642,7 +642,7 @@
      M=D        // LCL = SP
      @Class2.get
      0;JMP
-(Sys$ret.4)
+(Sys$return.4)
 // label WHILE
 (Sys.init:WHILE)
 // goto WHILE
