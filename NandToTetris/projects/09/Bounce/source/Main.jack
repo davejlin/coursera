@@ -1,9 +1,9 @@
 class Main {
     function void main() {
-        var Bounce game;    
-        let game = Bounce.new();
-        do game.run();
-        do game.dispose();
+        var Bounce bounce;    
+        let bounce = Bounce.new();
+        do bounce.run();
+        do bounce.dispose();
         return;
     }
 }

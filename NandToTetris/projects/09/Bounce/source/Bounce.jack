@@ -1,12 +1,19 @@
 class Bounce {
    field Ball ball;
-   field int direction;
-   field boolean atBoundary;
+   field Array balls;
+   field int nBalls;
 
    constructor Bounce new() {
-      let ball = Ball.new(5, 5, 5);
-      let direction = 0;
-      let atBoundary = true;
+      var int i;
+      let nBalls = 10;
+      let balls = Array.new(nBalls);
+
+      let i = 0;
+      while (i < nBalls) {
+         let balls[i] = Ball.new();
+         let i = i + 1;
+      }
+
       return this;
    }
 
@@ -16,36 +23,50 @@ class Bounce {
       return;
    }
 
-   method void moveBall() {
-      if (direction = 0) { 
-         let atBoundary = ball.moveUp(); 
+   method void moveBalls() {
+      var int i;
+      var Ball ball;
+      let i = 0;
+      while (i < nBalls) {
+         let ball = balls[i];
+         do ball.move();
+         let i = i + 1;
       }
-      if (direction = 1) { 
-         let atBoundary = ball.moveDown(); 
-      }
-      if (direction = 2) { 
-         let atBoundary = ball.moveLeft(); 
-      }
-      if (direction = 3) { 
-         let atBoundary = ball.moveRight(); 
-      }
-      do Sys.wait(2);
       return;
    }
 
-   method void run() {
-      var char key;
-      var boolean exit;
-      let exit = false;
-      
-      while (~exit) {
-         do moveBall();
+   method void bounceBalls() {
+      var int i, j;
+      var boolean touched;
+      var Ball ball, otherBall;
+      let i = 0;
+      while (i < nBalls) {
+         let ball = balls[i];
+         
+         let j = 0;
+         let touched = false;
+         while (j < nBalls) {
+            if (~(i = j)) {
+               let otherBall = balls[j];
+               let touched = ball.didTouch(otherBall);
+            }
 
-         if (atBoundary) {
-            let direction = Random.between(0, 4);
+            let j = j + 1;
+            if (touched) {
+               let j = nBalls;
+            }
          }
+         
+         let i = i + 1;
+      }
+      return;
+   }
 
-         if (key = 81)  { let exit = true; }     // q key to quit
+   method void run() {      
+      while (true) {
+         do moveBalls();
+         do bounceBalls();
+         do Sys.wait(0);
      }
      return;
    }
