@@ -1,0 +1,60 @@
+function PieceType.new 0
+push constant 1
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+push constant 0
+call String.charAt 2
+pop this 0
+push pointer 0
+return
+function PieceType.isRook 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 114
+eq
+return
+function PieceType.isKnight 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 110
+eq
+return
+function PieceType.isBishop 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 98
+eq
+return
+function PieceType.isKing 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 107
+eq
+return
+function PieceType.isQueen 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 113
+eq
+return
+function PieceType.isPawn 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 112
+eq
+return
+function PieceType.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

@@ -1,0 +1,78 @@
+class Ball {
+   field int x, y;
+   field int radius;
+
+   /** Constructs a new ball with a given location and radius <= 181. */
+   constructor Ball new(int Ax, int Ay, int Aradius) {
+      let x = Ax;
+      let y = Ay;
+      let radius = Aradius;
+      do draw();
+      return this;
+   }
+
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawCircle(x, y, radius);
+      return;
+   }
+
+   method void erase() {
+      do Screen.setColor(false);
+      do Screen.drawCircle(x, y, radius);
+      return;
+   }
+
+   method boolean moveUp() {
+      if (y > radius) {
+         do Screen.setColor(false);
+         do Screen.drawCircle(x, y, radius);
+         let y = y - 1;
+         do Screen.setColor(true);
+         do Screen.drawCircle(x, y, radius);
+         return false;
+      }
+      return true;
+   }
+
+   method boolean moveDown() {
+      if ((y + radius) < 254) {
+         do Screen.setColor(false);
+         do Screen.drawCircle(x, y, radius);
+         let y = y + 1;
+         do Screen.setColor(true);
+         do Screen.drawCircle(x, y, radius);
+         return false;
+      }
+      return true;
+   }
+
+   method boolean moveLeft() {
+      if (x > radius) {
+         do Screen.setColor(false);
+         do Screen.drawCircle(x, y, radius);
+         let x = x - 1;
+         do Screen.setColor(true);
+         do Screen.drawCircle(x, y, radius);
+         return false;
+      }
+      return true;
+   }
+
+   method boolean moveRight() {
+      if ((x + radius) < 510) {
+         do Screen.setColor(false);
+         do Screen.drawCircle(x, y, radius);
+         let x = x + 1;
+         do Screen.setColor(true);
+         do Screen.drawCircle(x, y, radius);
+         return false;
+      }
+      return true;
+   }
+}

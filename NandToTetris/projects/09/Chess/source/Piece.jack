@@ -1,0 +1,801 @@
+/**
+ * An instance of this class represents a piece on the chess board.
+ * A Piece has its type and color as part of its definition.
+ */
+class Piece {
+  field PieceType pieceType;
+  field boolean isBlack;
+
+  /**
+   * Constructs a Piece.
+   *
+   * @param {PieceType} pieceTypeParam The type of param to be constructed.
+   * @param {boolean} isBlackParam Whether the piece is black.
+   * @return {Piece} The Piece that got created.
+   */
+  constructor Piece new(String s, boolean isBlackParam) {
+    let pieceType = PieceType.new(s);
+    let isBlack = isBlackParam;
+    return this;
+  }
+
+  /**
+   * Changes the type of the piece to a new type.  This is useful when a pawn
+   * reaches the other side's end and should be transformed into a new piece.
+   *
+   * @param {PieceType} pieceTypeParam
+   */
+  method void set(PieceType pieceTypeParam) {
+    let pieceType = pieceTypeParam;
+    return;
+  }
+
+  /**
+   * @return {boolean} true if and only if the piece is white in color.
+   */
+  method boolean isWhite() {
+    return ~isBlack;
+  }
+
+  /**
+   * @return {boolean} true if and only if the piece is black in color.
+   */
+  method boolean isBlack() {
+    return isBlack;
+  }
+
+  /**
+   * @return {boolean} true if and only if the piece is a pawn.
+   */
+  method boolean isPawn() {
+    return (pieceType.isPawn());
+  }
+
+  /**
+   * @return {boolean} true if and only if the piece is a king.
+   */
+  method boolean isKing() {
+    return (pieceType.isKing());
+  }
+
+  /**
+   * Determines if it is valid to move piece from source to target in order to kill.
+   * It is assumed that the x and y coordinates are in [1, 8].
+   * It is also assumed that the target square has a piece of the opposite color.
+   * In particular, it is assumed that the target square does not have another piece of the same color.
+   *
+   * @param {int} sourceX The x-coordinate of the square from which the piece is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the piece is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the piece is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the piece is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the piece can be moved to kill.
+   */
+  method boolean canKill(int sourceX, int sourceY, int targetX, int targetY, Array board) {
+    var int xDiff, yDiff;
+
+    if (~(pieceType.isPawn())) {
+      return canMoveOrKill(sourceX, sourceY, targetX, targetY, board);
+    } else {
+      let xDiff = targetX - sourceX;
+      let yDiff = targetY - sourceY;
+      if (isBlack) {
+        return (yDiff = -1) & ((xDiff = 1) | (xDiff = -1));
+      } else {
+        return (yDiff = 1) & ((xDiff = 1) | (xDiff = -1));
+      }
+    }
+  }
+
+  /**
+   * Determines if it is valid to move piece from source to target to just move or to kill.
+   * It is assumed that the x and y coordinates are in [1, 8].
+   * It is also assumed that the target square is either empty (in which case it is just a move) or has a piece of the opposite color (in which case it is a kill).
+   * In particular, it is assumed that the target square does not have another piece of the same color.
+   *
+   * @param {int} sourceX The x-coordinate of the square from which the piece is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the piece is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the piece is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the piece is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the piece can be moved.
+   */
+  method boolean canMoveOrKill(int sourceX, int sourceY, int targetX, int targetY, Array board) {
+    if (pieceType.isPawn()) {
+      return canMoveOrKillPawn(sourceX, sourceY, targetX, targetY, board);
+    }
+
+    if (pieceType.isRook()) {
+      return canMoveOrKillRook(sourceX, sourceY, targetX, targetY, board);
+    }
+
+    if (pieceType.isKnight()) {
+      return canMoveOrKillKnight(sourceX, sourceY, targetX, targetY);
+    }
+
+    if (pieceType.isBishop()) {
+      return canMoveOrKillBishop(sourceX, sourceY, targetX, targetY, board);
+    }
+
+    if (pieceType.isQueen()) {
+      return canMoveOrKillQueen(sourceX, sourceY, targetX, targetY, board);
+    }
+
+    if (pieceType.isKing()) {
+      return canMoveOrKillKing(sourceX, sourceY, targetX, targetY);
+    }
+
+    return false;
+  }
+
+  /**
+   * Determines if the pawn can move from source to target, either just for moving, or for killing.  The target square does not have a piece of the same color.
+   *
+   * @param {int} sourceX The x-coordinate of the square from which the pawn is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the pawn is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the pawn is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the pawn is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the pawn can be moved.
+   */
+  method boolean canMoveOrKillPawn(int sourceX, int sourceY, int targetX, int targetY, Array board) {
+    var boolean isAtBeginning;
+    var int middleY;
+    var Array file;
+    var Piece piece;
+
+    if (isBlack) {
+      let isAtBeginning = (sourceY = 7);
+      if (isAtBeginning) {  // 4 moves possible
+        if (targetY = (sourceY - 2)) {
+          let file = board[targetX];
+          let piece = file[targetY];
+          if ((targetX = sourceX) & (piece = 0)) {
+            // there should be no intervening piece.
+            let middleY = (sourceY - 1);
+            let file = board[sourceX];
+            let piece = file[middleY];
+            return (piece = 0);
+          }
+          return false;
+        }
+        if (targetY = (sourceY - 1)) {
+          let file = board[targetX];
+          let piece = file[targetY];
+          if (targetX = sourceX) {
+            return (piece = 0);
+          } else {
+            return ((targetX = (sourceX - 1)) | (targetX = (sourceX + 1))) & (~(piece = 0));
+          }
+        }
+        return false;
+      } else {  // 3 moves possible
+        if (targetY = (sourceY - 1)) {
+          let file = board[targetX];
+          let piece = file[targetY];
+          if (targetX = sourceX) {
+            return (piece = 0);
+          } else {
+            return ((targetX = (sourceX - 1)) | (targetX = (sourceX + 1))) & (~(piece = 0));
+          }
+        }
+        return false;
+      }
+    } else {
+      let isAtBeginning = (sourceY = 2);
+      if (isAtBeginning) {  // 4 moves possible
+        if (targetY = (sourceY + 2)) {
+          let file = board[targetX];
+          let piece = file[targetY];
+          if ((targetX = sourceX) & (piece = 0)) {
+            // there should be no intervening piece.
+            let middleY = (sourceY + 1);
+            let file = board[sourceX];
+            let piece = file[middleY];
+            return (piece = 0);
+          }
+          return false;
+        }
+        if (targetY = (sourceY + 1)) {
+          let file = board[targetX];
+          let piece = file[targetY];
+          if (targetX = sourceX) {
+            return (piece = 0);
+          } else {
+            return ((targetX = (sourceX - 1)) | (targetX = (sourceX + 1))) & (~(piece = 0));
+          }
+        }
+        return false;
+      } else {  // 3 moves possible
+        if (targetY = (sourceY + 1)) {
+          let file = board[targetX];
+          let piece = file[targetY];
+          if (targetX = sourceX) {
+            return (piece = 0);
+          } else {
+            return ((targetX = (sourceX - 1)) | (targetX = (sourceX + 1))) & (~(piece = 0));
+          }
+        }
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Determines if the rook can be moved from source to target, either just for moving or for killing.  The target square does not have a piece of the same color.
+   *
+   * @param {int} sourceX The x-coordinate of the square from which the rook is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the rook is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the rook is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the rook is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the rook can be moved.
+   */
+  method boolean canMoveOrKillRook(int sourceX, int sourceY, int targetX, int targetY, Array board) {
+    var int xDiff, yDiff, middleX, middleY;
+    var Array file;
+    var Piece piece;
+
+    let xDiff = (targetX - sourceX);
+    let yDiff = (targetY - sourceY);
+
+    if ((xDiff = 0) & (~(yDiff = 0))) {
+      if (yDiff > 0) {
+        let middleY = sourceY + 1;
+      } else {
+        let middleY = sourceY - 1;
+      }
+      while (~(middleY = targetY)) {
+        let file = board[sourceX];
+        let piece = file[middleY];
+        if (~(piece = 0)) {
+          return false;
+        }
+        if (yDiff > 0) {
+          let middleY = middleY + 1;
+        } else {
+          let middleY = middleY - 1;
+        }
+      }
+      return true;
+    }
+    if ((~(xDiff = 0)) & (yDiff = 0)) {
+      if (xDiff > 0) {
+        let middleX = sourceX + 1;
+      } else {
+        let middleX = sourceX - 1;
+      }
+      while (~(middleX = targetX)) {
+        let file = board[middleX];
+        let piece = file[sourceY];
+        if (~(piece = 0)) {
+          return false;
+        }
+        if (xDiff > 0) {
+          let middleX = middleX + 1;
+        } else {
+          let middleX = middleX - 1;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+  
+  /**
+   * Determines if the knight can move from source to target, either just for moving, or for killing.  The target square does not have a piece of the same color.
+   * 
+   * @param {int} sourceX The x-coordinate of the square from which the knight is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the knight is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the knight is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the knight is to be moved.
+   * @return {boolean} true if and only if the knight can be moved.
+   */
+  method boolean canMoveOrKillKnight(int sourceX, int sourceY, int targetX, int targetY) {
+    var int xDiff, yDiff;
+
+    // Knight move variables: leftTop means two steps left followed by one step top.
+    var boolean topRight, topLeft, leftTop, leftBottom, bottomLeft, bottomRight, rightBottom, rightTop;
+
+    let xDiff = (targetX - sourceX);
+    let yDiff = (targetY - sourceY);
+    
+    let topRight = (yDiff = 2) & (xDiff = 1);
+    let topLeft = (yDiff = 2) & (xDiff = -1);
+    let rightTop = (xDiff = 2) & (yDiff = 1);
+    let rightBottom = (xDiff = 2) & (yDiff = -1);
+    let bottomRight = (yDiff = -2) & (xDiff = 1);
+    let bottomLeft = (yDiff = -2) & (xDiff = -1);
+    let leftBottom = (xDiff = -2) & (yDiff = -1);
+    let leftTop = (xDiff = -2) & (yDiff = 1);
+    return (((topRight | topLeft) | (rightTop | rightBottom)) |
+            ((bottomRight | bottomLeft) | (leftBottom | leftTop)));
+  }
+
+  /**
+   * Determines if a bishop can be moved from source to target, either just for moving or for killing.  The target square does not have a piece of the same color.
+   *
+   * @param {int} sourceX The x-coordinate of the square from which the bishop is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the bishop is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the bishop is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the bishop is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the bishop can be moved.
+   */
+  method boolean canMoveOrKillBishop(int sourceX, int sourceY, int targetX, int targetY, Array board) {
+    var int xDiff, yDiff;
+    var boolean topRight, topLeft, bottomRight, bottomLeft;
+
+    let xDiff = (targetX - sourceX);
+    let yDiff = (targetY - sourceY);
+
+    if ((~(xDiff = 0)) & (~(yDiff = 0))) {
+      let topRight = ((yDiff > 0) & (xDiff > 0)) & (xDiff = yDiff);
+      let bottomRight = ((yDiff < 0) & (xDiff > 0)) & ((-yDiff) = xDiff);
+      let topLeft = ((yDiff > 0) & (xDiff < 0)) & (yDiff = (-xDiff));
+      let bottomLeft = ((yDiff < 0) & (xDiff < 0)) & (xDiff = yDiff);
+      if (topRight) {
+        return canMoveOrKillDiagonally(sourceX, sourceY, targetX, targetY, 1, 1, board);
+      }
+      if (bottomRight) {
+        return canMoveOrKillDiagonally(sourceX, sourceY, targetX, targetY, 1, -1, board);
+      }
+      if (topLeft) {
+        return canMoveOrKillDiagonally(sourceX, sourceY, targetX, targetY, -1, 1, board);
+      }
+      if (bottomLeft) {
+        return canMoveOrKillDiagonally(sourceX, sourceY, targetX, targetY, -1, -1, board);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Determines if the queen can move from source to target, either just for moving, or for killing.  The target square does not have a piece of the same color.
+   * 
+   * @param {int} sourceX The x-coordinate of the square from which the queen is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the queen is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the queen is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the queen is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the king can be moved.
+   */
+  method boolean canMoveOrKillQueen(int sourceX, int sourceY, int targetX, int targetY, Array board) {
+    return canMoveOrKillBishop(sourceX, sourceY, targetX, targetY, board) | canMoveOrKillRook(sourceX, sourceY, targetX, targetY, board);
+  }
+
+
+  /**
+   * Determines if the king can move from source to target, either just for moving, or for killing.  The target square does not have a piece of the same color.
+   * 
+   * @param {int} sourceX The x-coordinate of the square from which the king is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the king is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the king is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the king is to be moved.
+   * @return {boolean} true if and only if the king can be moved.
+   */
+  method boolean canMoveOrKillKing(int sourceX, int sourceY, int targetX, int targetY) {
+    var int xDiff, yDiff;
+
+    let xDiff = (targetX - sourceX);
+    let yDiff = (targetY - sourceY);
+
+    if (sourceX = targetX) {
+      return (yDiff = 1) | (yDiff = -1);
+    } else {
+      return ((xDiff = 1) | (xDiff = -1)) & ((yDiff = 0) | ((yDiff = 1) | (yDiff = -1)));
+    }
+  }
+
+  /**
+   * Determines if the piece can be moved diagonally from source to target without any obstacle in between, either just for moving or for killing.
+   *
+   * @param {int} sourceX The x-coordinate of the square from which the piece is to be moved.
+   * @param {int} sourceY The y-coordinate of the square from which the piece is to be moved.
+   * @param {int} targetX The x-coordinate of the square to which the piece is to be moved.
+   * @param {int} targetY The y-coordinate of the square to which the piece is to be moved.
+   * @param {Array} board The board on which the game is being played.
+   * @return {boolean} true if and only if the piece can be moved from source to target and there is no obstacle in between.
+   */
+  method boolean canMoveOrKillDiagonally(int sourceX, int sourceY, int targetX, int targetY, int xInc, int yInc, Array board) {
+    var int middleX, middleY;
+    var Array file;
+    var Piece piece;
+
+    let middleX = sourceX + xInc;
+    let middleY = sourceY + yInc;
+    while (~(middleX = targetX)) {
+      let file = board[middleX];
+      let piece = file[middleY];
+      if (~(piece = 0)) {
+        return false;
+      }
+      let middleX = middleX + xInc;
+      let middleY = middleY + yInc;
+    }
+    return true;
+  }
+
+  /**
+   * Paints the piece at the given location.  The location is the top left
+   * corner of the 16x16 square in which the piece will be painted.  The
+   * location should be correctly chosen so that the piece is painted in the
+   * middle of a square of a board.
+   *
+   * @param {int} location A number from 0 to 8191 defining the offset on the
+   *     screen memory segment.
+   */
+  method void paint(int location) {
+    if (isBlack) {
+      if (pieceType.isRook()) {
+        do Piece.paintBlackRook(location);
+      }
+      if (pieceType.isKnight()) {
+        do Piece.paintBlackKnight(location);
+      }
+      if (pieceType.isBishop()) {
+        do Piece.paintBlackBishop(location);
+      }
+      if (pieceType.isQueen()) {
+        do Piece.paintBlackQueen(location);
+      }
+      if (pieceType.isKing()) {
+        do Piece.paintBlackKing(location);
+      }
+      if (pieceType.isPawn()) {
+        do Piece.paintBlackPawn(location);
+      }
+    }
+    if (~isBlack) {
+      if (pieceType.isRook()) {
+        do Piece.paintWhiteRook(location);
+      }
+      if (pieceType.isKnight()) {
+        do Piece.paintWhiteKnight(location);
+      }
+      if (pieceType.isBishop()) {
+        do Piece.paintWhiteBishop(location);
+      }
+      if (pieceType.isQueen()) {
+        do Piece.paintWhiteQueen(location);
+      }
+      if (pieceType.isKing()) {
+        do Piece.paintWhiteKing(location);
+      }
+      if (pieceType.isPawn()) {
+        do Piece.paintWhitePawn(location);
+      }
+    }
+    return;
+  }
+
+  /**
+   * Paints a black pawn at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintBlackPawn(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 0);
+    do Memory.poke(memoryAddress+32, 0);
+    do Memory.poke(memoryAddress+64, 960);
+    do Memory.poke(memoryAddress+96, 2016);
+    do Memory.poke(memoryAddress+128, 4080);
+    do Memory.poke(memoryAddress+160, 2016);
+    do Memory.poke(memoryAddress+192, 960);
+    do Memory.poke(memoryAddress+224, 4080);
+    do Memory.poke(memoryAddress+256, 8184);
+    do Memory.poke(memoryAddress+288, 960);
+    do Memory.poke(memoryAddress+320, 960);
+    do Memory.poke(memoryAddress+352, 960);
+    do Memory.poke(memoryAddress+384, 2016);
+    do Memory.poke(memoryAddress+416, 4080);
+    do Memory.poke(memoryAddress+448, 8184);
+    do Memory.poke(memoryAddress+480, 16380);
+    return;
+  }
+
+  /**
+   * Paints a white pawn at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintWhitePawn(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 0);
+    do Memory.poke(memoryAddress+32, 0);
+    do Memory.poke(memoryAddress+64, 960);
+    do Memory.poke(memoryAddress+96, 1056);
+    do Memory.poke(memoryAddress+128, 2064);
+    do Memory.poke(memoryAddress+160, 1056);
+    do Memory.poke(memoryAddress+192, 576);
+    do Memory.poke(memoryAddress+224, 3120);
+    do Memory.poke(memoryAddress+256, 7224);
+    do Memory.poke(memoryAddress+288, 576);
+    do Memory.poke(memoryAddress+320, 576);
+    do Memory.poke(memoryAddress+352, 576);
+    do Memory.poke(memoryAddress+384, 1056);
+    do Memory.poke(memoryAddress+416, 2064);
+    do Memory.poke(memoryAddress+448, 4104);
+    do Memory.poke(memoryAddress+480, 16380);
+    return;
+  }
+
+  /**
+   * Paints a black rook at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintBlackRook(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 31710);
+    do Memory.poke(memoryAddress+32, 31710);
+    do Memory.poke(memoryAddress+64, 32766);
+    do Memory.poke(memoryAddress+96, 32766);
+    do Memory.poke(memoryAddress+128, 16380);
+    do Memory.poke(memoryAddress+160, 8184);
+    do Memory.poke(memoryAddress+192, 4080);
+    do Memory.poke(memoryAddress+224, 4080);
+    do Memory.poke(memoryAddress+256, 8184);
+    do Memory.poke(memoryAddress+288, 8184);
+    do Memory.poke(memoryAddress+320, 8184);
+    do Memory.poke(memoryAddress+352, 16380);
+    do Memory.poke(memoryAddress+384, 16380);
+    do Memory.poke(memoryAddress+416, 32766);
+    do Memory.poke(memoryAddress+448, -1);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a white rook at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintWhiteRook(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 31710);
+    do Memory.poke(memoryAddress+32, 19026);
+    do Memory.poke(memoryAddress+64, 20082);
+    do Memory.poke(memoryAddress+96, 16386);
+    do Memory.poke(memoryAddress+128, 8196);
+    do Memory.poke(memoryAddress+160, 4104);
+    do Memory.poke(memoryAddress+192, 2064);
+    do Memory.poke(memoryAddress+224, 2064);
+    do Memory.poke(memoryAddress+256, 4104);
+    do Memory.poke(memoryAddress+288, 4104);
+    do Memory.poke(memoryAddress+320, 4104);
+    do Memory.poke(memoryAddress+352, 8196);
+    do Memory.poke(memoryAddress+384, 8196);
+    do Memory.poke(memoryAddress+416, 16386);
+    do Memory.poke(memoryAddress+448, -32767);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a white knight at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintWhiteKnight(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 1984);
+    do Memory.poke(memoryAddress+32, 2080);
+    do Memory.poke(memoryAddress+64, 4112);
+    do Memory.poke(memoryAddress+96, 8200);
+    do Memory.poke(memoryAddress+128, 16388);
+    do Memory.poke(memoryAddress+160, 16578);
+    do Memory.poke(memoryAddress+192, 16676);
+    do Memory.poke(memoryAddress+224, 8472);
+    do Memory.poke(memoryAddress+256, 4224);
+    do Memory.poke(memoryAddress+288, 4160);
+    do Memory.poke(memoryAddress+320, 4144);
+    do Memory.poke(memoryAddress+352, 8200);
+    do Memory.poke(memoryAddress+384, 16388);
+    do Memory.poke(memoryAddress+416, -32766);
+    do Memory.poke(memoryAddress+448, -32767);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a black knight at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintBlackKnight(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 1984);
+    do Memory.poke(memoryAddress+32, 4064);
+    do Memory.poke(memoryAddress+64, 8176);
+    do Memory.poke(memoryAddress+96, 16376);
+    do Memory.poke(memoryAddress+128, 32764);
+    do Memory.poke(memoryAddress+160, 32766);
+    do Memory.poke(memoryAddress+192, 32572);
+    do Memory.poke(memoryAddress+224, 16152);
+    do Memory.poke(memoryAddress+256, 8064);
+    do Memory.poke(memoryAddress+288, 8128);
+    do Memory.poke(memoryAddress+320, 8176);
+    do Memory.poke(memoryAddress+352, 16376);
+    do Memory.poke(memoryAddress+384, 32764);
+    do Memory.poke(memoryAddress+416, -2);
+    do Memory.poke(memoryAddress+448, -1);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a white bishop at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintWhiteBishop(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 448);
+    do Memory.poke(memoryAddress+32, 448);
+    do Memory.poke(memoryAddress+64, 448);
+    do Memory.poke(memoryAddress+96, 544);
+    do Memory.poke(memoryAddress+128, 1040);
+    do Memory.poke(memoryAddress+160, 1040);
+    do Memory.poke(memoryAddress+192, 2056);
+    do Memory.poke(memoryAddress+224, 2056);
+    do Memory.poke(memoryAddress+256, 4100);
+    do Memory.poke(memoryAddress+288, 4100);
+    do Memory.poke(memoryAddress+320, 2056);
+    do Memory.poke(memoryAddress+352, 2056);
+    do Memory.poke(memoryAddress+384, 1040);
+    do Memory.poke(memoryAddress+416, 1040);
+    do Memory.poke(memoryAddress+448, 8188);
+    do Memory.poke(memoryAddress+480, 16382);
+    return;
+  }
+
+  /**
+   * Paints a black bishop at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintBlackBishop(int location) {
+    var in memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 448);
+    do Memory.poke(memoryAddress+32, 448);
+    do Memory.poke(memoryAddress+64, 448);
+    do Memory.poke(memoryAddress+96, 992);
+    do Memory.poke(memoryAddress+128, 2032);
+    do Memory.poke(memoryAddress+160, 2032);
+    do Memory.poke(memoryAddress+192, 4088);
+    do Memory.poke(memoryAddress+224, 4088);
+    do Memory.poke(memoryAddress+256, 8188);
+    do Memory.poke(memoryAddress+288, 8188);
+    do Memory.poke(memoryAddress+320, 4088);
+    do Memory.poke(memoryAddress+352, 4088);
+    do Memory.poke(memoryAddress+384, 2032);
+    do Memory.poke(memoryAddress+416, 2032);
+    do Memory.poke(memoryAddress+448, 8188);
+    do Memory.poke(memoryAddress+480, 16382);
+    return;
+  }
+
+  /**
+   * Paints a white king at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintWhiteKing(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 384);
+    do Memory.poke(memoryAddress+32, 384);
+    do Memory.poke(memoryAddress+64, 4080);
+    do Memory.poke(memoryAddress+96, 4080);
+    do Memory.poke(memoryAddress+128, 384);
+    do Memory.poke(memoryAddress+160, 14748);
+    do Memory.poke(memoryAddress+192, 17826);
+    do Memory.poke(memoryAddress+224, -31807);
+    do Memory.poke(memoryAddress+256, -32383);
+    do Memory.poke(memoryAddress+288, -32383);
+    do Memory.poke(memoryAddress+320, 16770);
+    do Memory.poke(memoryAddress+352, 16386);
+    do Memory.poke(memoryAddress+384, 8196);
+    do Memory.poke(memoryAddress+416, 8184);
+    do Memory.poke(memoryAddress+448, 4104);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a black king at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintBlackKing(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 384);
+    do Memory.poke(memoryAddress+32, 384);
+    do Memory.poke(memoryAddress+64, 4080);
+    do Memory.poke(memoryAddress+96, 4080);
+    do Memory.poke(memoryAddress+128, 384);
+    do Memory.poke(memoryAddress+160, 14748);
+    do Memory.poke(memoryAddress+192, 32190);
+    do Memory.poke(memoryAddress+224, -1);
+    do Memory.poke(memoryAddress+256, -1);
+    do Memory.poke(memoryAddress+288, -1);
+    do Memory.poke(memoryAddress+320, 32766);
+    do Memory.poke(memoryAddress+352, 32766);
+    do Memory.poke(memoryAddress+384, 16380);
+    do Memory.poke(memoryAddress+416, 8184);
+    do Memory.poke(memoryAddress+448, 8184);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a white queen at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintWhiteQueen(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 7224);
+    do Memory.poke(memoryAddress+32, 5160);
+    do Memory.poke(memoryAddress+64, 7224);
+    do Memory.poke(memoryAddress+96, 2064);
+    do Memory.poke(memoryAddress+128, -5065);
+    do Memory.poke(memoryAddress+160, -22939);
+    do Memory.poke(memoryAddress+192, -6745);
+    do Memory.poke(memoryAddress+224, 30750);
+    do Memory.poke(memoryAddress+256, 12300);
+    do Memory.poke(memoryAddress+288, 4104);
+    do Memory.poke(memoryAddress+320, 4104);
+    do Memory.poke(memoryAddress+352, 2064);
+    do Memory.poke(memoryAddress+384, 1056);
+    do Memory.poke(memoryAddress+416, 2016);
+    do Memory.poke(memoryAddress+448, 30750);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  /**
+   * Paints a black queen at the given location.
+   *
+   * @param {int} location
+   */
+  function void paintBlackQueen(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 7224);
+    do Memory.poke(memoryAddress+32, 7224);
+    do Memory.poke(memoryAddress+64, 7224);
+    do Memory.poke(memoryAddress+96, 2064);
+    do Memory.poke(memoryAddress+128, -5065);
+    do Memory.poke(memoryAddress+160, -6553);
+    do Memory.poke(memoryAddress+192, -6169);
+    do Memory.poke(memoryAddress+224, 32766);
+    do Memory.poke(memoryAddress+256, 16380);
+    do Memory.poke(memoryAddress+288, 8184);
+    do Memory.poke(memoryAddress+320, 8184);
+    do Memory.poke(memoryAddress+352, 4080);
+    do Memory.poke(memoryAddress+384, 2016);
+    do Memory.poke(memoryAddress+416, 2016);
+    do Memory.poke(memoryAddress+448, 32766);
+    do Memory.poke(memoryAddress+480, -1);
+    return;
+  }
+
+  method void dispose() {
+    do pieceType.dispose();
+    do Memory.deAlloc(this);
+    return;
+  }
+}

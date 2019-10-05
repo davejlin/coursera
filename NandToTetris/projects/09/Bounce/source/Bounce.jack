@@ -1,0 +1,52 @@
+class Bounce {
+   field Ball ball;
+   field int direction;
+   field boolean atBoundary;
+
+   constructor Bounce new() {
+      let ball = Ball.new(5, 5, 5);
+      let direction = 0;
+      let atBoundary = true;
+      return this;
+   }
+
+   method void dispose() {
+      do ball.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   method void moveBall() {
+      if (direction = 0) { 
+         let atBoundary = ball.moveUp(); 
+      }
+      if (direction = 1) { 
+         let atBoundary = ball.moveDown(); 
+      }
+      if (direction = 2) { 
+         let atBoundary = ball.moveLeft(); 
+      }
+      if (direction = 3) { 
+         let atBoundary = ball.moveRight(); 
+      }
+      do Sys.wait(2);
+      return;
+   }
+
+   method void run() {
+      var char key;
+      var boolean exit;
+      let exit = false;
+      
+      while (~exit) {
+         do moveBall();
+
+         if (atBoundary) {
+            let direction = Random.between(0, 4);
+         }
+
+         if (key = 81)  { let exit = true; }     // q key to quit
+     }
+     return;
+   }
+}
