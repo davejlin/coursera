@@ -1,0 +1,2501 @@
+function Game.new 0
+push constant 11
+call Memory.alloc 1
+pop pointer 0
+push constant 119
+pop static 0
+push constant 32
+push constant 128
+call Math.multiply 2
+push constant 3
+add
+pop static 1
+push constant 0
+pop this 1
+push constant 1
+pop this 2
+push constant 1
+pop this 3
+push constant 1
+neg
+pop this 4
+push constant 1
+neg
+pop this 5
+push pointer 0
+call Game.initializeBoard 1
+pop temp 0
+push pointer 0
+call Game.paintBoard 1
+pop temp 0
+push pointer 0
+return
+function Game.initializeBoard 3
+push argument 0
+pop pointer 0
+push constant 9
+call Array.new 1
+pop this 0
+push constant 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 9
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+push constant 9
+call Array.new 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 1
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 114
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 114
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 110
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 110
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 3
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 98
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 98
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 4
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 113
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 113
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 107
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 107
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 5
+pop this 6
+push constant 1
+pop this 7
+push constant 5
+pop this 8
+push constant 8
+pop this 9
+push constant 6
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 98
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 98
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 110
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 110
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 114
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 2
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 7
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 112
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 8
+push local 2
+add
+push constant 1
+call String.new 1
+push constant 114
+call String.appendChar 2
+push constant 0
+not
+call Piece.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+pop local 0
+label WHILE_EXP1
+push local 0
+push constant 9
+lt
+not
+if-goto WHILE_END1
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 3
+pop local 1
+label WHILE_EXP2
+push local 1
+push constant 7
+lt
+not
+if-goto WHILE_END2
+push local 1
+push local 2
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP2
+label WHILE_END2
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP1
+label WHILE_END1
+push constant 0
+pop this 10
+push constant 0
+return
+function Game.paintBoard 2
+push argument 0
+pop pointer 0
+push constant 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 9
+lt
+not
+if-goto WHILE_END0
+push constant 1
+pop local 1
+label WHILE_EXP1
+push local 1
+push constant 9
+lt
+not
+if-goto WHILE_END1
+push pointer 0
+push local 0
+push local 1
+call Game.paintSquare 3
+pop temp 0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push pointer 0
+call Game.paintBoardBottomLeftBorders 1
+pop temp 0
+push constant 0
+return
+function Game.paintSteadyCheckmark 0
+push argument 0
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push static 1
+call Game.paintSteadyBlackCheckmark 1
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push static 1
+call Game.paintSteadyWhiteCheckmark 1
+pop temp 0
+label IF_END0
+push constant 0
+return
+function Game.eraseSteadyCheckmark 0
+push static 1
+call Game.paintWhiteSquare 1
+pop temp 0
+push constant 0
+return
+function Game.paintBlinkingCheckmark 1
+call Game.eraseSteadyCheckmark 0
+pop temp 0
+push constant 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 4
+lt
+not
+if-goto WHILE_END0
+push constant 333
+call Sys.wait 1
+pop temp 0
+push argument 0
+call Game.paintSteadyCheckmark 1
+pop temp 0
+push constant 333
+call Sys.wait 1
+pop temp 0
+call Game.eraseSteadyCheckmark 0
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Game.paintBoardBottomLeftBorders 0
+push argument 0
+pop pointer 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 120
+push constant 255
+push constant 375
+push constant 255
+call Screen.drawLine 4
+pop temp 0
+push constant 120
+push constant 0
+push constant 120
+push constant 255
+call Screen.drawLine 4
+pop temp 0
+push constant 0
+return
+function Game.paintSquare 10
+push argument 0
+pop pointer 0
+push argument 1
+push argument 2
+add
+push argument 1
+push argument 2
+add
+push constant 2
+call Math.divide 2
+push constant 2
+call Math.multiply 2
+sub
+push constant 0
+eq
+pop local 4
+push static 0
+push constant 1
+push argument 1
+push constant 1
+sub
+push constant 32
+call Math.multiply 2
+add
+add
+pop local 0
+push constant 255
+push argument 2
+push constant 32
+call Math.multiply 2
+sub
+push constant 1
+add
+pop local 2
+push static 0
+push argument 1
+push constant 32
+call Math.multiply 2
+add
+pop local 1
+push constant 255
+push argument 2
+push constant 1
+sub
+push constant 32
+call Math.multiply 2
+sub
+pop local 3
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push local 0
+push local 2
+push local 1
+push local 3
+call Screen.drawRectangle 4
+pop temp 0
+push pointer 0
+call Game.paintBoardBottomLeftBorders 1
+pop temp 0
+push argument 1
+push this 2
+eq
+not
+push argument 2
+push this 3
+eq
+not
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+push local 0
+push constant 1
+add
+push local 2
+push constant 1
+add
+push local 1
+push constant 1
+sub
+push local 3
+push constant 1
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+push pointer 0
+push local 0
+push constant 2
+add
+push local 2
+push constant 2
+add
+push local 1
+push constant 2
+sub
+push local 3
+push constant 2
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+label IF_FALSE0
+push argument 1
+push this 4
+eq
+not
+push argument 2
+push this 5
+eq
+not
+and
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+push local 0
+push constant 5
+add
+push local 2
+push constant 5
+add
+push local 1
+push constant 5
+sub
+push local 3
+push constant 5
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+push pointer 0
+push local 0
+push constant 6
+add
+push local 2
+push constant 6
+add
+push local 1
+push constant 6
+sub
+push local 3
+push constant 6
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+label IF_FALSE1
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push local 0
+push local 2
+push local 1
+push local 2
+call Screen.drawLine 4
+pop temp 0
+push local 1
+push local 2
+push local 1
+push local 3
+call Screen.drawLine 4
+pop temp 0
+push local 4
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 0
+push constant 1
+add
+pop local 5
+label WHILE_EXP0
+push local 5
+push local 1
+lt
+not
+if-goto WHILE_END0
+push local 2
+push constant 2
+add
+pop local 6
+label WHILE_EXP1
+push local 6
+push local 3
+lt
+not
+if-goto WHILE_END1
+push local 5
+push local 6
+call Screen.drawPixel 2
+pop temp 0
+push local 6
+push constant 2
+add
+pop local 6
+goto WHILE_EXP1
+label WHILE_END1
+push local 5
+push constant 2
+add
+pop local 5
+goto WHILE_EXP0
+label WHILE_END0
+label IF_FALSE2
+push argument 1
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 8
+push argument 2
+push local 8
+add
+pop pointer 1
+push that 0
+pop local 7
+push local 7
+push constant 0
+eq
+not
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push local 2
+push constant 8
+add
+push constant 32
+call Math.multiply 2
+push local 0
+push constant 8
+add
+push constant 16
+call Math.divide 2
+add
+pop local 9
+push local 7
+push local 9
+call Piece.paint 2
+pop temp 0
+label IF_FALSE3
+push argument 1
+push this 2
+eq
+push argument 2
+push this 3
+eq
+and
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+push local 0
+push constant 1
+add
+push local 2
+push constant 1
+add
+push local 1
+push constant 1
+sub
+push local 3
+push constant 1
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+push pointer 0
+push local 0
+push constant 2
+add
+push local 2
+push constant 2
+add
+push local 1
+push constant 2
+sub
+push local 3
+push constant 2
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+label IF_FALSE4
+push argument 1
+push this 4
+eq
+push argument 2
+push this 5
+eq
+and
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+push local 0
+push constant 5
+add
+push local 2
+push constant 5
+add
+push local 1
+push constant 5
+sub
+push local 3
+push constant 5
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+push pointer 0
+push local 0
+push constant 6
+add
+push local 2
+push constant 6
+add
+push local 1
+push constant 6
+sub
+push local 3
+push constant 6
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+label IF_FALSE5
+push constant 0
+return
+function Game.drawRectangleBorder 0
+push argument 0
+pop pointer 0
+push argument 1
+push argument 2
+push argument 3
+push argument 2
+call Screen.drawLine 4
+pop temp 0
+push argument 3
+push argument 2
+push argument 3
+push argument 4
+call Screen.drawLine 4
+pop temp 0
+push argument 3
+push argument 4
+push argument 1
+push argument 4
+call Screen.drawLine 4
+pop temp 0
+push argument 1
+push argument 4
+push argument 1
+push argument 2
+call Screen.drawLine 4
+pop temp 0
+push constant 0
+return
+function Game.isUnderCheck 6
+push argument 0
+pop pointer 0
+push this 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 8
+pop local 4
+push this 9
+pop local 5
+goto IF_END0
+label IF_FALSE0
+push this 6
+pop local 4
+push this 7
+pop local 5
+label IF_END0
+push constant 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 9
+lt
+not
+if-goto WHILE_END0
+push constant 1
+pop local 1
+label WHILE_EXP1
+push local 1
+push constant 9
+lt
+not
+if-goto WHILE_END1
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 1
+push local 2
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 3
+push constant 0
+eq
+not
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 1
+push local 3
+call Piece.isWhite 1
+and
+push this 1
+not
+push local 3
+call Piece.isBlack 1
+and
+or
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 3
+push local 0
+push local 1
+push local 4
+push local 5
+push this 0
+call Piece.canKill 6
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 0
+not
+return
+label IF_FALSE3
+label IF_FALSE2
+label IF_FALSE1
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Game.play 15
+push argument 0
+pop pointer 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+label WHILE_EXP0
+push constant 0
+not
+not
+if-goto WHILE_END0
+push pointer 0
+call Game.isUnderCheck 1
+pop this 10
+push this 10
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 1
+call Game.paintSteadyCheckmark 1
+pop temp 0
+label IF_FALSE0
+call Keyboard.readChar 0
+pop local 0
+push constant 0
+push constant 0
+call Output.moveCursor 2
+pop temp 0
+push this 2
+pop local 1
+push this 3
+pop local 2
+push local 0
+push constant 130
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 2
+push constant 1
+sub
+pop local 1
+label IF_FALSE1
+push local 0
+push constant 131
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push this 3
+push constant 1
+add
+pop local 2
+label IF_FALSE2
+push local 0
+push constant 132
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push this 2
+push constant 1
+add
+pop local 1
+label IF_FALSE3
+push local 0
+push constant 133
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push this 3
+push constant 1
+sub
+pop local 2
+label IF_FALSE4
+push local 1
+push constant 0
+gt
+push local 1
+push constant 9
+lt
+and
+push local 2
+push constant 0
+gt
+push local 2
+push constant 9
+lt
+and
+and
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push this 2
+pop local 3
+push this 3
+pop local 4
+push local 1
+pop this 2
+push local 2
+pop this 3
+push pointer 0
+push local 3
+push local 4
+call Game.paintSquare 3
+pop temp 0
+push pointer 0
+push this 2
+push this 3
+call Game.paintSquare 3
+pop temp 0
+label IF_FALSE5
+push local 0
+push constant 128
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push this 4
+push constant 1
+neg
+eq
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push this 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 9
+push this 3
+push local 9
+add
+pop pointer 1
+push that 0
+pop local 5
+push local 5
+push constant 0
+eq
+not
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
+push this 1
+push local 5
+call Piece.isBlack 1
+and
+pop local 7
+push this 1
+not
+push local 5
+call Piece.isWhite 1
+and
+pop local 8
+push local 8
+push local 7
+or
+if-goto IF_TRUE9
+goto IF_FALSE9
+label IF_TRUE9
+push this 2
+pop this 4
+push this 3
+pop this 5
+push pointer 0
+push this 4
+push this 5
+call Game.paintSquare 3
+pop temp 0
+label IF_FALSE9
+label IF_FALSE8
+goto IF_END7
+label IF_FALSE7
+push this 4
+push this 2
+eq
+push this 5
+push this 3
+eq
+and
+if-goto IF_TRUE10
+goto IF_FALSE10
+label IF_TRUE10
+push constant 0
+pop local 11
+push constant 0
+not
+pop local 12
+goto IF_END10
+label IF_FALSE10
+push constant 0
+pop local 11
+push constant 0
+pop local 12
+push this 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 9
+push this 3
+push local 9
+add
+pop pointer 1
+push that 0
+pop local 6
+push local 6
+push constant 0
+eq
+if-goto IF_TRUE11
+goto IF_FALSE11
+label IF_TRUE11
+push constant 0
+not
+pop local 11
+goto IF_END11
+label IF_FALSE11
+push local 6
+call Piece.isBlack 1
+push this 1
+not
+and
+pop local 11
+push local 11
+push local 6
+call Piece.isWhite 1
+push this 1
+and
+or
+pop local 11
+label IF_END11
+push this 4
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 10
+push this 5
+push local 10
+add
+pop pointer 1
+push that 0
+pop local 5
+push local 11
+push local 5
+push this 4
+push this 5
+push this 2
+push this 3
+push this 0
+call Piece.canMoveOrKill 6
+and
+pop local 11
+push local 11
+if-goto IF_TRUE12
+goto IF_FALSE12
+label IF_TRUE12
+push this 4
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 10
+push this 5
+push local 10
+add
+pop pointer 1
+push that 0
+pop local 5
+push this 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 9
+push this 3
+push local 9
+add
+pop pointer 1
+push that 0
+pop local 6
+push this 3
+push local 9
+add
+push local 5
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push this 5
+push local 10
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 5
+call Piece.isKing 1
+if-goto IF_TRUE13
+goto IF_FALSE13
+label IF_TRUE13
+push local 5
+call Piece.isWhite 1
+if-goto IF_TRUE14
+goto IF_FALSE14
+label IF_TRUE14
+push this 6
+pop local 13
+push this 7
+pop local 14
+push this 2
+pop this 6
+push this 3
+pop this 7
+goto IF_END14
+label IF_FALSE14
+push this 8
+pop local 13
+push this 9
+pop local 14
+push this 2
+pop this 8
+push this 3
+pop this 9
+label IF_END14
+label IF_FALSE13
+push pointer 0
+call Game.isUnderCheck 1
+if-goto IF_TRUE15
+goto IF_FALSE15
+label IF_TRUE15
+push constant 0
+pop local 11
+push this 1
+call Game.paintBlinkingCheckmark 1
+pop temp 0
+label IF_FALSE15
+push this 3
+push local 9
+add
+push local 6
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push this 5
+push local 10
+add
+push local 5
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 5
+call Piece.isKing 1
+if-goto IF_TRUE16
+goto IF_FALSE16
+label IF_TRUE16
+push local 5
+call Piece.isWhite 1
+if-goto IF_TRUE17
+goto IF_FALSE17
+label IF_TRUE17
+push local 13
+pop this 6
+push local 14
+pop this 7
+goto IF_END17
+label IF_FALSE17
+push local 13
+pop this 8
+push local 14
+pop this 9
+label IF_END17
+label IF_FALSE16
+label IF_FALSE12
+label IF_END10
+push local 11
+if-goto IF_TRUE18
+goto IF_FALSE18
+label IF_TRUE18
+push this 4
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 10
+push this 5
+push local 10
+add
+pop pointer 1
+push that 0
+pop local 5
+push this 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 9
+push this 3
+push local 9
+add
+pop pointer 1
+push that 0
+pop local 6
+push this 3
+push local 9
+add
+push local 5
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push this 5
+push local 10
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 6
+push constant 0
+eq
+not
+if-goto IF_TRUE19
+goto IF_FALSE19
+label IF_TRUE19
+push local 6
+call Piece.dispose 1
+pop temp 0
+label IF_FALSE19
+push local 5
+call Piece.isPawn 1
+push local 5
+call Piece.isBlack 1
+push this 3
+push constant 1
+eq
+and
+push local 5
+call Piece.isWhite 1
+push this 3
+push constant 8
+eq
+and
+or
+and
+if-goto IF_TRUE20
+goto IF_FALSE20
+label IF_TRUE20
+push this 3
+push local 9
+add
+push pointer 0
+push local 5
+call Piece.isBlack 1
+call Game.transformPawn 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 5
+call Piece.dispose 1
+pop temp 0
+label IF_FALSE20
+push this 3
+push local 9
+add
+pop pointer 1
+push that 0
+pop local 6
+push local 6
+call Piece.isKing 1
+if-goto IF_TRUE21
+goto IF_FALSE21
+label IF_TRUE21
+push local 6
+call Piece.isWhite 1
+if-goto IF_TRUE22
+goto IF_FALSE22
+label IF_TRUE22
+push this 2
+pop this 6
+push this 3
+pop this 7
+goto IF_END22
+label IF_FALSE22
+push this 2
+pop this 8
+push this 3
+pop this 9
+label IF_END22
+label IF_FALSE21
+label IF_FALSE18
+push local 12
+push local 11
+or
+if-goto IF_TRUE23
+goto IF_FALSE23
+label IF_TRUE23
+push this 4
+pop local 3
+push this 5
+pop local 4
+push constant 1
+neg
+pop this 4
+push constant 1
+neg
+pop this 5
+push pointer 0
+push local 3
+push local 4
+call Game.paintSquare 3
+pop temp 0
+label IF_FALSE23
+push local 11
+if-goto IF_TRUE24
+goto IF_FALSE24
+label IF_TRUE24
+push this 2
+pop local 3
+push this 3
+pop local 4
+push this 1
+if-goto IF_TRUE25
+goto IF_FALSE25
+label IF_TRUE25
+push constant 1
+pop this 2
+push constant 1
+pop this 3
+goto IF_END25
+label IF_FALSE25
+push constant 8
+pop this 2
+push constant 8
+pop this 3
+label IF_END25
+push pointer 0
+push local 3
+push local 4
+call Game.paintSquare 3
+pop temp 0
+push pointer 0
+push this 2
+push this 3
+call Game.paintSquare 3
+pop temp 0
+call Game.eraseSteadyCheckmark 0
+pop temp 0
+push this 1
+not
+pop this 1
+label IF_FALSE24
+label IF_END7
+label IF_FALSE6
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Game.transformPawn 10
+push argument 0
+pop pointer 0
+push constant 473
+pop local 8
+push local 8
+push constant 31
+add
+pop local 9
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push local 8
+push constant 0
+push local 9
+push constant 0
+call Screen.drawLine 4
+pop temp 0
+push local 8
+push constant 32
+push local 9
+push constant 32
+call Screen.drawLine 4
+pop temp 0
+push local 8
+push constant 64
+push local 9
+push constant 64
+call Screen.drawLine 4
+pop temp 0
+push local 8
+push constant 96
+push local 9
+push constant 96
+call Screen.drawLine 4
+pop temp 0
+push local 8
+push constant 128
+push local 9
+push constant 128
+call Screen.drawLine 4
+pop temp 0
+push local 8
+push constant 0
+push local 8
+push constant 128
+call Screen.drawLine 4
+pop temp 0
+push local 9
+push constant 0
+push local 9
+push constant 128
+call Screen.drawLine 4
+pop temp 0
+push constant 1
+call String.new 1
+push constant 114
+call String.appendChar 2
+push argument 1
+call Piece.new 2
+pop local 0
+push constant 1
+call String.new 1
+push constant 110
+call String.appendChar 2
+push argument 1
+call Piece.new 2
+pop local 1
+push constant 1
+call String.new 1
+push constant 98
+call String.appendChar 2
+push argument 1
+call Piece.new 2
+pop local 2
+push constant 1
+call String.new 1
+push constant 113
+call String.appendChar 2
+push argument 1
+call Piece.new 2
+pop local 3
+push local 0
+push constant 8
+push constant 32
+call Math.multiply 2
+push constant 30
+add
+call Piece.paint 2
+pop temp 0
+push local 1
+push constant 40
+push constant 32
+call Math.multiply 2
+push constant 30
+add
+call Piece.paint 2
+pop temp 0
+push local 2
+push constant 72
+push constant 32
+call Math.multiply 2
+push constant 30
+add
+call Piece.paint 2
+pop temp 0
+push local 3
+push constant 104
+push constant 32
+call Math.multiply 2
+push constant 30
+add
+call Piece.paint 2
+pop temp 0
+push constant 1
+pop local 4
+push constant 0
+pop local 5
+push constant 0
+pop local 7
+label WHILE_EXP0
+push local 7
+not
+not
+if-goto WHILE_END0
+push pointer 0
+push local 4
+push local 5
+push local 8
+push local 9
+call Game.redrawPawnTransformationCursor 5
+pop temp 0
+call Keyboard.readChar 0
+pop local 6
+push constant 0
+push constant 0
+call Output.moveCursor 2
+pop temp 0
+push local 6
+push constant 131
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 4
+push constant 1
+gt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 4
+pop local 5
+push local 4
+push constant 1
+sub
+pop local 4
+label IF_FALSE1
+label IF_FALSE0
+push local 6
+push constant 133
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 4
+push constant 4
+lt
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push local 4
+pop local 5
+push local 4
+push constant 1
+add
+pop local 4
+label IF_FALSE3
+label IF_FALSE2
+push local 6
+push constant 128
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 0
+not
+pop local 7
+label IF_FALSE4
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push local 8
+push constant 0
+push local 9
+push constant 128
+call Screen.drawRectangle 4
+pop temp 0
+push local 4
+push constant 1
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push local 1
+call Piece.dispose 1
+pop temp 0
+push local 2
+call Piece.dispose 1
+pop temp 0
+push local 3
+call Piece.dispose 1
+pop temp 0
+push local 0
+return
+label IF_FALSE5
+push local 4
+push constant 2
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push local 0
+call Piece.dispose 1
+pop temp 0
+push local 2
+call Piece.dispose 1
+pop temp 0
+push local 3
+call Piece.dispose 1
+pop temp 0
+push local 1
+return
+label IF_FALSE6
+push local 4
+push constant 3
+eq
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push local 0
+call Piece.dispose 1
+pop temp 0
+push local 1
+call Piece.dispose 1
+pop temp 0
+push local 3
+call Piece.dispose 1
+pop temp 0
+push local 2
+return
+label IF_FALSE7
+push local 4
+push constant 4
+eq
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
+push local 0
+call Piece.dispose 1
+pop temp 0
+push local 1
+call Piece.dispose 1
+pop temp 0
+push local 2
+call Piece.dispose 1
+pop temp 0
+push local 3
+return
+label IF_FALSE8
+push constant 0
+return
+function Game.redrawPawnTransformationCursor 1
+push argument 0
+pop pointer 0
+push argument 1
+push constant 32
+call Math.multiply 2
+push constant 1
+sub
+pop local 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+push argument 3
+push constant 1
+add
+push local 0
+push constant 30
+sub
+push argument 4
+push constant 1
+sub
+push local 0
+call Game.drawRectangleBorder 5
+pop temp 0
+push pointer 0
+push argument 3
+push constant 2
+add
+push local 0
+push constant 29
+sub
+push argument 4
+push constant 2
+sub
+push local 0
+push constant 1
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+push argument 2
+push constant 0
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 2
+push constant 32
+call Math.multiply 2
+push constant 1
+sub
+pop local 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push pointer 0
+push argument 3
+push constant 1
+add
+push local 0
+push constant 30
+sub
+push argument 4
+push constant 1
+sub
+push local 0
+call Game.drawRectangleBorder 5
+pop temp 0
+push pointer 0
+push argument 3
+push constant 2
+add
+push local 0
+push constant 29
+sub
+push argument 4
+push constant 2
+sub
+push local 0
+push constant 1
+sub
+call Game.drawRectangleBorder 5
+pop temp 0
+label IF_FALSE0
+push constant 0
+return
+function Game.paintSteadyBlackCheckmark 1
+push constant 16384
+push argument 0
+add
+pop local 0
+push local 0
+push constant 0
+add
+push constant 16384
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 8192
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 4096
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 2048
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 31744
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 15872
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 7936
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 3971
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push constant 1991
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push constant 1007
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 511
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 255
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 127
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 62
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 28
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push constant 8
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Game.paintSteadyWhiteCheckmark 1
+push constant 16384
+push argument 0
+add
+pop local 0
+push local 0
+push constant 0
+add
+push constant 16384
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 24576
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 28672
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 30720
+neg
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 17408
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 8704
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 4352
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 2179
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push constant 1093
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push constant 553
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 273
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 129
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 65
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 34
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 20
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push constant 8
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Game.paintWhiteSquare 1
+push constant 16384
+push argument 0
+add
+pop local 0
+push local 0
+push constant 0
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 32
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 64
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 96
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 128
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 160
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 192
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 224
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 256
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 288
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 320
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 352
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 384
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 416
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 448
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 480
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Game.dispose 4
+push argument 0
+pop pointer 0
+push constant 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 9
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push constant 1
+pop local 1
+label WHILE_EXP1
+push local 1
+push constant 0
+lt
+not
+if-goto WHILE_END1
+push local 1
+push local 2
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 3
+push constant 0
+eq
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 3
+call Piece.dispose 1
+pop temp 0
+label IF_FALSE0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push local 0
+pop local 0
+label WHILE_EXP2
+push local 0
+push constant 9
+lt
+not
+if-goto WHILE_END2
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 2
+call Array.dispose 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP2
+label WHILE_END2
+push this 0
+call Array.dispose 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

@@ -1,0 +1,292 @@
+/**
+ * Representation of the actual tetris board. The board the area
+ * where Tetrominos are falling from the top. It is a 10 x 16
+ * block wide area in the middle of the screen.
+ */
+class Board {
+
+  /** the board represented by a two dimensional array consisting of 10 columns and 16 rows. */
+  field Array blocks;
+
+  /** The currently moving blocks */
+  field Blocks current;
+
+  field int nextBlockType;
+
+  constructor Board new() {
+    let blocks = Array.new(10);
+    let blocks[0] = Array.new(16);
+    let blocks[1] = Array.new(16);
+    let blocks[2] = Array.new(16);
+    let blocks[3] = Array.new(16);
+    let blocks[4] = Array.new(16);
+    let blocks[5] = Array.new(16);
+    let blocks[6] = Array.new(16);
+    let blocks[7] = Array.new(16);
+    let blocks[8] = Array.new(16);
+    let blocks[9] = Array.new(16);
+    do clear();
+
+    let nextBlockType = 2;
+    let current = Blocks.new(nextBlockType);
+
+    return this;
+  }
+
+  method void clear() {
+    var int i;
+    var int j;
+    var Array column;
+    while(i < 10) {
+      let column = blocks[i];
+      while(j < 16) {
+        let column[j] = 0;
+        do BlockGraphics.draw(i, j, 0);
+        let j = j + 1;
+      }
+      let i = i + 1;
+      let j = 0;
+    }
+    return;
+  }
+
+  /**
+   * Adds the next block to the board.
+   * Returns true if adding a new block was successful and the
+   * game can continue and false if game over.
+   */
+  method boolean nextBlock() {
+    var boolen success;
+    do current.dispose();
+    let current = Blocks.new(nextBlockType);
+    let success = putBlocks(current);
+    do incrementNextBlockType();
+    return success;
+  }
+
+  method void incrementNextBlockType() {
+    if(nextBlockType < 8) {
+      let nextBlockType = nextBlockType + 1;
+    } else {
+      let nextBlockType = 2;
+    }
+    return;
+  }
+
+  /**
+   * Puts adds the block to the board as specified by the individual
+   * block coordinates.
+   * Returns true if putting true if all coordinates where free before
+   * putting the block and false otherwise.
+   */
+  method boolean putBlocks(Blocks blocks) {
+    var int i;
+    var Block block;
+    var boolean success;
+    let success = true;
+    while(i < 4) {
+      let block = blocks[i];
+      let success = success & putBlock(block.getX(), block.getY(), block.getType());
+      let i = i + 1;
+    }
+    return success;
+  }
+
+  method void clearBlocks(Blocks blocks) {
+    var int i;
+    var Block block;
+    while(i < 4) {
+      let block = blocks[i];
+      do putBlock(block.getX(), block.getY(), 0);
+      let i = i + 1;
+    }
+    return;
+  }
+
+  /**
+   * Puts the block specified by type at position (x,y).
+   * Returns true if position (x,y) was free before and
+   * false otherwise.
+   */
+  method boolean putBlock(int x, int y, int type) {
+    var Array column;
+    var int existingBlock;
+    let column = blocks[x];
+    let existingBlock = column[y];
+    let column[y] = type;
+    do BlockGraphics.draw(x, y, type);
+    return existingBlock = 0;
+  }
+
+  method int getBlock(int x, int y) {
+    var Array column;
+    if (x < 0) {
+      return -1;
+    }
+    if (x > 9) {
+      return -1;
+    }
+    if (y < 0) {
+      return - 1;
+    }
+    if (y > 15) {
+      return -1;
+    }
+    let column = blocks[x];
+    return column[y];
+  }
+
+  method boolean moveCurrentDown() {
+    if (canMoveDown()) {
+      do moveDown();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  method boolean canMoveDown() {
+    var Array bottomBlocks;
+    var Block block;
+    var int i;
+    var int blockBelow;
+    let bottomBlocks = current.getBottomBlocks();
+
+    while(i < 4) {
+      let block = bottomBlocks[i];
+      if (~(block = null)) {
+        let blockBelow = getBlock(block.getX(), block.getY() + 1);
+        if (~(blockBelow = 0)) {
+          return false;
+        }
+      }
+      let i = i + 1;
+    }
+    return true;
+  }
+
+  method void moveDown() {
+    do clearBlocks(current);
+    do current.incY();
+    do putBlocks(current);
+    return;
+  }
+
+  method boolean moveCurrentLeft() {
+    if (canMoveLeft()) {
+      do moveLeft();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  method boolean canMoveLeft() {
+    var Array leftMostBlocks;
+    var Block block;
+    var int i;
+    var int blockLeft;
+    let leftMostBlocks = current.getLeftMostBlocks();
+
+    while(i < 4) {
+      let block = leftMostBlocks[i];
+      if (~(block = null)) {
+        let blockLeft = getBlock(block.getX() - 1, block.getY());
+        if (~(blockLeft = 0)) {
+          return false;
+        }
+      }
+      let i = i + 1;
+    }
+    return true;
+  }
+
+  method void moveLeft() {
+    do clearBlocks(current);
+    do current.decX();
+    do putBlocks(current);
+    return;
+  }
+
+  method boolean moveCurrentRight() {
+    if (canMoveRight()) {
+      do moveRight();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  method boolean canMoveRight() {
+    var Array leftMostBlocks;
+    var Block block;
+    var int i;
+    var int blockLeft;
+    let leftMostBlocks = current.getRightMostBlocks();
+
+    while(i < 4) {
+      let block = leftMostBlocks[i];
+      if (~(block = null)) {
+        let blockLeft = getBlock(block.getX() + 1, block.getY());
+        if (~(blockLeft = 0)) {
+          return false;
+        }
+      }
+      let i = i + 1;
+    }
+    return true;
+  }
+
+  method void moveRight() {
+    do clearBlocks(current);
+    do current.incX();
+    do putBlocks(current);
+    return;
+  }
+
+  method boolean rotateCurrent() {
+    var Blocks rotatedBlocks;
+    let rotatedBlocks = current.rotatedBlocks();
+
+    if (allFree(rotatedBlocks)) {
+      do clearBlocks(current);
+      do current.dispose();
+      // we need to do another copy here, because rotatedBlocks will be removed
+      // from that stack after this method finishes, which would case current
+      // to be removed.
+      let current = Blocks.copy(rotatedBlocks);
+      do putBlocks(current);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  method boolean allFree(Blocks blocks) {
+    var boolean block0Free;
+    var boolean block1Free;
+    var boolean block2Free;
+    var boolean block3Free;
+
+    // after rotation some blocks might be in the same position, so we need
+    // two check whether the position is contained or whether the position
+    // is free
+    let block0Free = current.containsBlock(blocks[0]) | isFree(blocks[0]);
+    let block1Free = current.containsBlock(blocks[1]) | isFree(blocks[1]);
+    let block2Free = current.containsBlock(blocks[2]) | isFree(blocks[2]);
+    let block3Free = current.containsBlock(blocks[3]) | isFree(blocks[3]);
+
+    return block0Free & block1Free & block2Free & block3Free;
+  }
+
+  method boolean isFree(Block block) {
+    return getBlock(block.getX(), block.getY()) = 0;
+  }
+
+  method void dispose() {
+    do blocks.dispose();
+    do current.dispose();
+    do Memory.deAlloc(this);
+    return;
+  }
+}

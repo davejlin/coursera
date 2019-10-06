@@ -1,0 +1,257 @@
+/*
+Ball
+Author: David Lin
+*/
+class Ball {
+   field int x, y;
+   field int radius;
+   field int direction;
+   field boolean atBoundary;
+   field int xMax;
+   field int yMax;
+   field int xMaxHalf;
+   field int yMaxHalf;
+
+   /* Creates a new ball */ 
+   constructor Ball new() {
+      let xMax = 510;
+      let yMax = 254;
+      let xMaxHalf = xMax / 2;
+      let yMaxHalf = yMax / 2;
+      let radius = Random.between(1, 15);
+      let x = Random.between(radius, xMax - radius);
+      let y = Random.between(radius, yMax - radius);
+      do setNewDirection();
+      let atBoundary = false;
+      return this;
+   }
+
+   /* Disposes the ball */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /* Sets the ball in a random direction */
+   method void setNewDirection() {
+      let direction = Random.between(0, 8);
+      return;
+   }
+
+   /* Moves the ball */
+   method void move() {
+      if (atBoundary) {
+         do setNewDirection();
+      }
+
+      if (direction = 0) { 
+         let atBoundary = moveUp();
+         return;
+      }
+      if (direction = 1) { 
+         let atBoundary = moveDown();
+         return;
+      }
+      if (direction = 2) { 
+         let atBoundary = moveLeft();
+         return;
+      }
+      if (direction = 3) { 
+         let atBoundary = moveRight();
+         return; 
+      }
+      if (direction = 4) { 
+         let atBoundary = moveUpRight();
+         return;
+      }
+      if (direction = 5) { 
+         let atBoundary = moveUpLeft();
+         return;
+      }
+      if (direction = 6) { 
+         let atBoundary = moveDownRight();
+         return;
+      }
+      if (direction = 7) { 
+         let atBoundary = moveDownLeft();
+         return;
+      }
+      return;
+   }
+
+   /* Sets the direction in the opposite of its original direction */
+   method void setOppositeDirection() {
+      if (direction = 0) { 
+         let direction = 1;
+         return;
+      }
+      if (direction = 1) { 
+         let direction = 0;
+         return;
+      }
+      if (direction = 2) { 
+         let direction = 3;
+         return;
+      }
+      if (direction = 3) { 
+         let direction = 2;
+         return; 
+      }
+      if (direction = 4) { 
+         let direction = 7;
+         return;
+      }
+      if (direction = 5) { 
+         let direction = 6;
+         return;
+      }
+      if (direction = 6) { 
+         let direction = 5;
+         return;
+      }
+      if (direction = 7) { 
+         let direction = 4;
+         return;
+      }
+      return;
+   }
+
+   /* Checks if the ball touched another ball */
+   method boolean didTouch(Ball otherBall) {
+      var int oX, oY, oRadius, xDist, yDist, totalRadius;
+      let totalRadius = radius + otherBall.getRadius();
+
+      let xDist = Math.abs(x - otherBall.getX());
+      if (xDist > totalRadius) {
+         return false;
+      }
+
+      let yDist = Math.abs(y - otherBall.getY());
+      if (yDist > totalRadius) {
+         return false;
+      }
+
+      return true;
+   }
+
+   /* Draws the ball */
+   method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawCircle(x, y, radius);
+      return;
+   }
+
+   /* Erases the ball */
+   method void erase() {
+      do Screen.setColor(false);
+      do Screen.drawCircle(x, y, radius);
+      return;
+   }
+
+   /* Moves the ball one pixel up */
+   method boolean moveUp() {
+      if (y > radius) {
+         do erase();
+         let y = y - 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel down */
+   method boolean moveDown() {
+      if ((y + radius) < yMax) {
+         do erase();
+         let y = y + 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel left */
+   method boolean moveLeft() {
+      if (x > radius) {
+         do erase();
+         let x = x - 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel right */
+   method boolean moveRight() {
+      if ((x + radius) < xMax) {
+         do erase();
+         let x = x + 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel up and right */
+   method boolean moveUpRight() {
+      if (((x + radius) < xMax) & (y > radius)) {
+         do erase();
+         let x = x + 1;
+         let y = y - 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel up and left */
+   method boolean moveUpLeft() {
+      if ((x > radius) & (y > radius)) {
+         do erase();
+         let x = x - 1;
+         let y = y - 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel down and right */
+   method boolean moveDownRight() {
+      if (((x + radius) < xMax) & ((y + radius) < yMax)) {
+         do erase();
+         let x = x + 1;
+         let y = y + 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Moves the ball one pixel down and left */
+   method boolean moveDownLeft() {
+      if ((x > radius) & ((y + radius) < yMax)) {
+         do erase();
+         let x = x - 1;
+         let y = y + 1;
+         do draw();
+         return false;
+      }
+      return true;
+   }
+
+   /* Gets the ball's x coordinate */
+   method int getX() {
+      return x;
+   }
+
+   /* Gets the ball's y coordinate */
+   method int getY() {
+      return y;
+   }
+
+   /* Gets the ball's radius */
+   method int getRadius() {
+      return radius;
+   }
+}

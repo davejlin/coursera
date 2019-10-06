@@ -1,0 +1,17 @@
+/** Initializes the tetris game and starts running it */
+class Main {
+
+  function void main() {
+    var TetrisGame tetris;
+    var boolean exit;
+    while (~exit) {
+      let tetris = TetrisGame.new();
+      let exit = tetris.run() = 1;
+      do tetris.dispose();
+      if (~exit) { // game over, wait a little time before starting the new game
+        do Sys.wait(1000);
+      }
+    }
+    return;
+  }
+}

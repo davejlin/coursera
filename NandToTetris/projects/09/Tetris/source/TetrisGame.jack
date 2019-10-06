@@ -1,0 +1,98 @@
+class TetrisGame {
+
+  /**
+   * The direction the user wants to move the current blocks in.
+   * 0 = none
+   * 1 = move down
+   * 2 = right
+   * 3 = left
+   */
+  field int direction;
+  field Board board;
+  field int counter;
+
+  constructor TetrisGame new() {
+    let board = Board.new();
+    do Wall.draw(-1);
+    do Wall.draw(10);
+    do Controls.draw();
+    return this;
+  }
+
+  /**
+   * Main game loop.
+   * Handles user inputs, adding the next block and game over state.
+   * Method returns 0 if the user if game over and 1 if the user
+   * wants to exit.
+   */
+  method int run() {
+    var char key; // currently pressed key b the user
+    var boolean exit;
+    var boolean dropNext;
+    var boolean gameOver;
+    let exit = false;
+
+    do board.nextBlock();
+    while(~exit & ~gameOver) {
+      if (dropNext) {
+        do Sys.wait(250);
+        // Game over if we can't drop the next block
+        let gameOver = ~board.nextBlock();
+        let dropNext = false;
+      }
+
+      // waits for a key to be pressed
+      while((key = 0) & ~dropNext & ~gameOver) {
+        let key = Keyboard.keyPressed();
+        let dropNext = ~moveDown();
+      }
+
+      if (key = 81) { let exit = true; } // q pressed
+      if (key = 133) { let direction = 1; } // down arrow pressed
+      if (key = 132) { let direction = 2; } // right arrow pressed
+      if (key = 130) { let direction = 3; } // left arrow pressed
+      if (key = 32) { do board.rotateCurrent(); } // space pressed 
+
+      while((~(key = 0)) & ~dropNext & ~gameOver) {
+        let key = Keyboard.keyPressed();
+        do reactToMovement();
+        let dropNext = ~moveDown();
+      }
+      let direction = 0;
+    }
+
+    if (gameOver) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
+  /**
+   * While rotation happens only once per key press, the user
+   * can hold the arrow keys to let the block move rapidly.
+   */
+  method void reactToMovement() {
+    if (direction = 1) { do board.moveCurrentDown(); }
+    if (direction = 2) { do board.moveCurrentRight(); }
+    if (direction = 3) { do board.moveCurrentLeft(); }
+    return;
+  }
+
+  method boolean moveDown() {
+    do Sys.wait(65);
+    if (counter = 3) {
+      let counter = 0;
+      return board.moveCurrentDown();
+    } else {
+      let counter = counter + 1;
+      return true;
+    }
+  }
+
+  method void dispose() {
+    do board.dispose();
+    do Memory.deAlloc(this);
+    return;
+  }
+}

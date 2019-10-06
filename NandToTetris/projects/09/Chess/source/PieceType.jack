@@ -1,0 +1,77 @@
+/**
+ * An instance of this class can be used to define the type of a piece.
+ * A piece is specified by any string with lower case letters that starts
+ * with the appropriate character as given below:
+ *
+ * rook: r (114) e.g. "rook", "r"
+ * knight: n (110) e.g. "knight", "n"
+ * bishop: b (98) e.g. "bishop", "b"
+ * king: k (107) e.g. "king", "k"
+ * queen: q (113) e.g. "queen", "q"
+ * pawn: p (112) e.g. "pawn", "p"
+ */
+class PieceType {
+  field char type;
+
+  /**
+   * Constructs a PieceType using the first character of the given string.
+   * The string should have characters in lower case only, and the first
+   * letter of the string should indicate the piece being created.
+   *
+   * @return {PieceType} The PieceType that got created.
+   */
+  constructor PieceType new(String s) {
+    let type = s.charAt(0);
+    return this;
+  }
+
+  /**
+   * @return {boolean} true if and only if the type is a rook.
+   */
+  method boolean isRook() {
+    return (type = 114);
+  }
+
+  /**
+   * @return {boolean} true if and only if the type is a knight.
+   */
+  method boolean isKnight() {
+    return (type = 110);
+  }
+
+  /**
+   * @return {boolean} true if and only if the type is a bishop.
+   */
+  method boolean isBishop() {
+    return (type = 98);
+  }
+
+  /**
+   * @return {boolean} true if and only if the type is a king.
+   */
+  method boolean isKing() {
+    return (type = 107);
+  }
+
+  /**
+   * @return {boolean} true if and only if the type is a queen.
+   */
+  method boolean isQueen() {
+    return (type = 113);
+  }
+
+  /**
+   * @return {boolean} true if and only if the type is a pawn.
+   */
+  method boolean isPawn() {
+    return (type = 112);
+  }
+
+  /**
+   * Disposes an instance of PieceType.
+   */
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+}

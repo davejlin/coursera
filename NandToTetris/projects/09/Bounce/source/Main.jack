@@ -1,0 +1,13 @@
+/*
+    Main entry point 
+    Author: David Lin
+*/
+class Main {
+    function void main() {
+        var Bounce bounce;
+        let bounce = Bounce.new();
+        do bounce.run();
+        do bounce.dispose();
+        return;
+    }
+}

@@ -1,0 +1,781 @@
+/**
+ * An instance of this class is a game.
+ */
+class Game {
+  static int leftOffset;  // The offset from the left edge of the screen at which the left edge of the board will be displayed.
+  static int checkMarkLocation;  // The memory location on screen at which the check mark (that indicates whether the current player is under check) should be painted.
+
+  field Array board;  // The board on which the game will be played.  It is a 2-dimensional 9x9 array where [1..8] on either side is used. 
+  field boolean isBlacksTurn;  // true = black, false = white.
+  field int cursorX, cursorY;  // The current position of the cursor on the board.
+  field int sourceX, sourceY;  // The coordinates of the source square from which the move is to happen.
+  field int whiteKingX, whiteKingY, blackKingX, blackKingY;  // The coordinates of the king.  They are tracked so that checks can be tracked.
+  field boolean underCheck;  // Whether the king of the current player is under check.
+
+  /**
+   * Constructs a new Chess game.
+   */
+  constructor Game new() {
+    // Initialize static variables.
+    let leftOffset = 119;
+    let checkMarkLocation = 32 * 128 + 3;
+
+    // Initialize instance variables.
+    let isBlacksTurn = false;
+    let cursorX = 1;
+    let cursorY = 1;
+    let sourceX = -1;
+    let sourceY = -1;
+
+    // Perform the main initializations.
+    do initializeBoard();
+    do paintBoard();
+
+    // Return the initialized instance.
+    return this;
+  }
+
+  /**
+   * Initializes the board by creating the board, the pieces, and placing them in their initial positions on the board.
+   */
+  method void initializeBoard() {
+    var int i;
+    var int j;
+    var Array file;
+
+    let board = Array.new(9);
+    let i = 1;
+    while (i < 9) {
+      let board[i] = Array.new(9);
+      let i = i + 1;
+    }
+
+    // put the pieces on the board vertically, one file (i.e. vertical column) at a time.
+    let file = board[1];  // file a.
+    let file[1] = Piece.new("r", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("r", true);
+
+    let file = board[2];  // file b.
+    let file[1] = Piece.new("n", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("n", true);
+
+    let file = board[3];  // file c.
+    let file[1] = Piece.new("b", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("b", true);
+
+    let file = board[4];  // file d.
+    let file[1] = Piece.new("q", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("q", true);
+
+    let file = board[5];  // file e.
+    let file[1] = Piece.new("k", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("k", true);
+    // When placing kings, initialize their positions that get tracked throughout the game.
+    let whiteKingX = 5;
+    let whiteKingY = 1;
+    let blackKingX = 5;
+    let blackKingY = 8;
+
+    let file = board[6];  // file f.
+    let file[1] = Piece.new("b", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("b", true);
+
+    let file = board[7];  // file g.
+    let file[1] = Piece.new("n", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("n", true);
+
+    let file = board[8];  // file h.
+    let file[1] = Piece.new("r", false);
+    let file[2] = Piece.new("p", false);
+    let file[7] = Piece.new("p", true);
+    let file[8] = Piece.new("r", true);
+
+    // Initialize the other portions of the board with zeros, indicating that those squares have no pieces.
+    let i = 1;
+    while (i < 9) {
+      let file = board[i];
+      let j = 3;
+      while (j < 7) {
+        let file[j] = 0;
+        let j = j + 1;
+      }
+      let i = i + 1;
+    }
+
+    // The current player (whose turn it is) is not under check when the game begins.
+    let underCheck = false;
+
+    return;
+  }
+
+  /**
+   * Paints the chess board along with the pieces on the screen.
+   * The chess board is painted once and only once - at the beginning of the game.
+   * When the game progresses, only those squares that change are repainted.
+   */
+  method void paintBoard() {
+    var int i;
+    var int j;
+
+    let i = 1;
+    while (i < 9) {
+      let j = 1;
+      while (j < 9) {
+        do paintSquare(i, j);
+        let j = j + 1;
+      }
+      let i = i + 1;
+    }
+
+    // When each square paints itself, it draws its top and right borders.  Therefore, after all squares have painted themselves, the bottom and left borders of the board remain
+    // to be painted.
+    do paintBoardBottomLeftBorders();
+
+    return;
+  }
+
+  /**
+   * Paints a steady check mark.  This is done when the current player is under check.
+   *
+   * @param {boolean} isBlack Whether the check should be colored black.
+   */
+  function void paintSteadyCheckmark(boolean isBlack) {
+    if (isBlack) {
+      do Game.paintSteadyBlackCheckmark(checkMarkLocation);
+    } else {
+      do Game.paintSteadyWhiteCheckmark(checkMarkLocation);
+    }
+    return;
+  }
+
+  /**
+   * Erases a steady check mark.  This is done when a player is no longer under check.
+   */
+  function void eraseSteadyCheckmark() {
+    do Game.paintWhiteSquare(checkMarkLocation);
+    return;
+  }
+
+  /**
+   * Paints a blinking check mark.  It actually blinks thrice and then leaves the place erased.
+   *
+   * @param {boolean} isBlack Whether the check should be colored black.
+   */
+  function void paintBlinkingCheckmark(boolean isBlack) {
+    var int i;
+    do Game.eraseSteadyCheckmark();
+    let i = 1;
+    while (i < 4) {
+      do Sys.wait(333);
+      do Game.paintSteadyCheckmark(isBlack);
+      do Sys.wait(333);
+      do Game.eraseSteadyCheckmark();
+      let i = i + 1;
+    }
+    return;
+  }
+
+  /**
+   * Draws the bottom and left borders of the entire board.
+   */
+  method void paintBoardBottomLeftBorders() {
+    do Screen.setColor(true);
+    do Screen.drawLine(120, 255, 375, 255);  // bottom border.
+    do Screen.drawLine(120, 0, 120, 255);  // left border.
+    return;
+  }
+
+  /**
+   * Pixels on the screen being used for drawing the chess board.
+   * x is horizontal (leftOffset + ) :  1-32,   33-64,   65-96,    97-128, 129-160, 161-192, 193-224, 225-256   (left to right, a to h, fileLetter)
+   * y is vertical                   : 255-224, 223-192, 191-160, 159-128,  127-96,   95-64,   63-32,    31-0   (bottom to top, 1 to 8, rankNumber)
+   * board[a][5] is square a5 of the board, a being the fileLetter and 5 being
+   * the rankNumber.  a = 1, h = 8
+   *
+   * fileLetter is from 1 to 8.
+   * rankNumber is from 1 to 8.
+   */
+  method void paintSquare(int fileLetter, int rankNumber) {
+    var int leftX, rightX, topY, bottomY;
+    var boolean isEven;
+    var int x, y;
+    var Piece piece;
+    var Array file;
+    var int location;
+
+    let isEven = ((((fileLetter + rankNumber) - (((fileLetter + rankNumber) / 2) * 2))) = 0);
+
+    let leftX = leftOffset + (1 + ((fileLetter - 1) * 32));
+    let topY = (255 - ((rankNumber) * 32)) + 1;
+    let rightX = leftOffset + (fileLetter * 32);
+    let bottomY = 255 - ((rankNumber - 1) * 32);
+    
+    // First whiten the square; draw left and bottom borders of board.
+    do Screen.setColor(false);
+    do Screen.drawRectangle(leftX, topY, rightX, bottomY);
+    do paintBoardBottomLeftBorders();
+
+    // If this is NOT where the cursor is, remove an extra border that might be present.
+    if ((~(fileLetter = cursorX)) | (~(rankNumber = cursorY))) {
+      do Screen.setColor(false);
+      do drawRectangleBorder(leftX + 1, topY + 1, rightX - 1, bottomY - 1);
+      do drawRectangleBorder(leftX + 2, topY + 2, rightX - 2, bottomY - 2);
+    }
+    // If this is NOT what has been source, remove a source-border that might be present.
+    if ((~(fileLetter = sourceX)) & (~(rankNumber = sourceY))) {
+      do Screen.setColor(false);
+      do drawRectangleBorder(leftX + 5, topY + 5, rightX - 5, bottomY - 5);
+      do drawRectangleBorder(leftX + 6, topY + 6, rightX - 6, bottomY - 6);
+    }
+
+    do Screen.setColor(true);
+
+    // Draw top and right border.
+    do Screen.drawLine(leftX, topY, rightX, topY);
+    do Screen.drawLine(rightX, topY, rightX, bottomY);
+
+    // pixellate the screen if the square is black.
+    if (isEven) {
+      let x = leftX + 1;
+      while (x < rightX) {
+        let y = topY + 2;
+        while (y < bottomY) {
+          do Screen.drawPixel(x, y);
+          let y = y + 2;
+        }
+        let x = x + 2;
+      }
+    }
+
+    // draw the piece.
+    let file = board[fileLetter];
+    let piece = file[rankNumber];
+    if (~(piece = 0)) {
+      let location = ((topY + 8) * 32) + (((leftX + 8) / 16));
+      do piece.paint(location);
+    }
+
+    // If this is where the cursor is, draw an extra border.
+    if ((fileLetter = cursorX) & (rankNumber = cursorY)) {
+      do Screen.setColor(true);
+      do drawRectangleBorder(leftX + 1, topY + 1, rightX - 1, bottomY - 1);
+      do drawRectangleBorder(leftX + 2, topY + 2, rightX - 2, bottomY - 2);
+    }
+
+    // If this is what has been source, draw a source-border.
+    if ((fileLetter = sourceX) & (rankNumber = sourceY)) {
+      do Screen.setColor(true);
+      do drawRectangleBorder(leftX + 5, topY + 5, rightX - 5, bottomY - 5);
+      do drawRectangleBorder(leftX + 6, topY + 6, rightX - 6, bottomY - 6);
+    }
+
+    return;
+  }
+
+  /**
+   * Draws a rectangle with the border alone, unlike the drawRectangle function of Screen that fills the rectangle with color.
+   *
+   * @param {int} leftX
+   * @param {int} topY
+   * @param {int} rightX
+   * @param {int} bottomY
+   */
+  method void drawRectangleBorder(int leftX, int topY, int rightX,
+      int bottomY) {
+      do Screen.drawLine(leftX, topY, rightX, topY);
+      do Screen.drawLine(rightX, topY, rightX, bottomY);
+      do Screen.drawLine(rightX, bottomY, leftX, bottomY);
+      do Screen.drawLine(leftX, bottomY, leftX, topY);
+      return;
+  }
+
+  /**
+   * Determines if the current player, whose turn it is to play, is under check from the other player.
+   * For every piece p of the other player, we check if p can move into the square of the king of the current player in order to kill.
+   * If so, we declare that the current player is under check.
+   * Otherwise, we declare that the current player is not under check.
+   *
+   * @return {boolean} true if and only if the current player is under check; false otherwise.
+   */
+  method boolean isUnderCheck() {
+    var int i, j;
+    var Array file;
+    var Piece piece;
+    var int kingX, kingY;
+
+    if (isBlacksTurn) {
+      let kingX = blackKingX;
+      let kingY = blackKingY;
+    } else {
+      let kingX = whiteKingX;
+      let kingY = whiteKingY;
+    }
+
+    let i = 1;
+    while (i < 9) {
+      let j = 1;
+      while (j < 9) {
+        let file = board[i];
+        let piece = file[j];
+        if (~(piece = 0)) {
+          if ((isBlacksTurn & piece.isWhite()) | ((~isBlacksTurn) & piece.isBlack())) {
+            if (piece.canKill(i, j, kingX, kingY, board)) {
+              return true;
+            }
+          }
+        }
+        let j = j + 1;
+      }
+      let i = i + 1;
+    }
+    return false;
+  }
+
+  /**
+   * Plays the game!
+   */
+  method void play() {
+    var char currentInputChar;
+    var int nextX, nextY;
+    var int previousX, previousY;
+    var Piece sourcePiece, targetPiece;
+    var boolean isValidBlackTurn, isValidWhiteTurn;
+    var Array file, sourceFile;
+    var boolean canMoveOrKill, isUnSelection;
+    var int tempKingX, tempKingY;
+
+    do Screen.setColor(true);
+
+    while (true) {
+      // First, note if the player is under check.
+      let underCheck = isUnderCheck();
+      if (underCheck) {
+        do Game.paintSteadyCheckmark(isBlacksTurn);
+      }
+
+      // Read the character entered by the player.
+      let currentInputChar = Keyboard.readChar();
+      do Output.moveCursor(0, 0);
+
+      // If a character is an arrow character, deal with it.
+      let nextX = cursorX;
+      let nextY = cursorY;
+      if (currentInputChar = 130) {  // left arrow character as input.
+        let nextX = cursorX - 1;
+      }
+      if (currentInputChar = 131) {  // up arrow character as input.
+        let nextY = cursorY + 1;
+      }
+      if (currentInputChar = 132) {  // right arrow character as input.
+        let nextX = cursorX + 1;
+      }
+      if (currentInputChar = 133) {  // down arrow character as input
+        let nextY = cursorY - 1;
+      }
+      // If the movement is not inside the board, ignore it.
+      if (((nextX > 0) & (nextX < 9)) & ((nextY > 0) & (nextY < 9))) {
+        let previousX = cursorX;
+        let previousY = cursorY;
+        let cursorX = nextX;
+        let cursorY = nextY;
+        do paintSquare(previousX, previousY);
+        do paintSquare(cursorX, cursorY);
+      }
+
+      // If the input character is the "enter" or "newline" character, deal with it.
+      if (currentInputChar = 128) {  // newLine
+        if (sourceX = -1) {  // no piece so far has been chosen for moving.
+          let file = board[cursorX];
+          let sourcePiece = file[cursorY];
+          if (~(sourcePiece = 0)) {  // the square must have a piece.
+            let isValidBlackTurn = isBlacksTurn & (sourcePiece.isBlack());
+            let isValidWhiteTurn = (~(isBlacksTurn)) & (sourcePiece.isWhite());
+            if (isValidWhiteTurn | isValidBlackTurn) {  // piece must be of the same color.
+              let sourceX = cursorX;
+              let sourceY = cursorY;
+              do paintSquare(sourceX, sourceY);
+            }
+          }
+        } else {  // a piece has already been chosen for moving; move to this place if possible.
+          if ((sourceX = cursorX) & (sourceY = cursorY)) {  // if source and target are same, no movement but only unselection should happen.
+            let canMoveOrKill = false;
+            let isUnSelection = true;
+          } else {  // possible movement - not an unselection.
+            let canMoveOrKill = false;
+            let isUnSelection = false;
+            // target square should be empty, or a piece of the opposite color.
+            let file = board[cursorX];
+            let targetPiece = file[cursorY];
+            if (targetPiece = 0) {  // move
+              let canMoveOrKill = true;
+            } else {  // kill
+              let canMoveOrKill = ((targetPiece.isBlack()) & (~isBlacksTurn));
+              let canMoveOrKill = canMoveOrKill | ((targetPiece.isWhite()) & isBlacksTurn);
+            }
+
+            // target square should be a valid move for the piece type.  This does not consider checks.
+            let sourceFile = board[sourceX];
+            let sourcePiece = sourceFile[sourceY];
+            let canMoveOrKill = canMoveOrKill & sourcePiece.canMoveOrKill(sourceX, sourceY, cursorX, cursorY, board);
+
+            // further, the move should not cause the current player to go under check.
+            // for this, we move, check, and revert.  The actual move happens in the next if condition.
+            if (canMoveOrKill) {
+              let sourceFile = board[sourceX];
+              let sourcePiece = sourceFile[sourceY];
+              let file = board[cursorX];
+              let targetPiece = file[cursorY];
+              let file[cursorY] = sourcePiece;
+              let sourceFile[sourceY] = 0;
+              if (sourcePiece.isKing()) {
+                if (sourcePiece.isWhite()) {
+                  let tempKingX = whiteKingX;
+                  let tempKingY = whiteKingY;
+                  let whiteKingX = cursorX;
+                  let whiteKingY = cursorY;
+                } else {
+                  let tempKingX = blackKingX;
+                  let tempKingY = blackKingY;
+                  let blackKingX = cursorX;
+                  let blackKingY = cursorY;
+                }
+              }
+              if (isUnderCheck()) {
+                let canMoveOrKill = false;
+                do Game.paintBlinkingCheckmark(isBlacksTurn);
+              }
+              let file[cursorY] = targetPiece;
+              let sourceFile[sourceY] = sourcePiece;
+              if (sourcePiece.isKing()) {
+                if (sourcePiece.isWhite()) {
+                  let whiteKingX = tempKingX;
+                  let whiteKingY = tempKingY;
+                } else {
+                  let blackKingX = tempKingX;
+                  let blackKingY = tempKingY;
+                }
+              }
+            }
+          }
+
+          // Now, actually move the pieces.
+          if (canMoveOrKill) {
+            let sourceFile = board[sourceX];
+            let sourcePiece = sourceFile[sourceY];
+            let file = board[cursorX];
+            let targetPiece = file[cursorY];
+            let file[cursorY] = sourcePiece;
+            let sourceFile[sourceY] = 0;
+            if (~(targetPiece = 0)) {  // a kill.
+              do targetPiece.dispose();
+            }
+
+            // If a pawn reaches the opposite end, transform it.
+            if (sourcePiece.isPawn() & ((sourcePiece.isBlack() & (cursorY = 1)) | (sourcePiece.isWhite() & (cursorY = 8)))) {
+              let file[cursorY] = transformPawn(sourcePiece.isBlack());
+              do sourcePiece.dispose();
+            }
+
+            // If the king moves, note the new position.
+            let targetPiece = file[cursorY];
+            if (targetPiece.isKing()) {
+              if (targetPiece.isWhite()) {
+                let whiteKingX = cursorX;
+                let whiteKingY = cursorY;
+              } else {
+                let blackKingX = cursorX;
+                let blackKingY = cursorY;
+              }
+            }
+          }
+
+          // remove source-box.
+          if (isUnSelection | canMoveOrKill) {
+            let previousX = sourceX;
+            let previousY = sourceY;
+            let sourceX = -1;
+            let sourceY = -1;
+            do paintSquare(previousX, previousY);
+          }
+
+          // take cursor to the other corner, paint change of cursor, and flip the turn.
+          if (canMoveOrKill) {
+            let previousX = cursorX;
+            let previousY = cursorY;
+            if (isBlacksTurn) { //  BLACK
+              let cursorX = 1;
+              let cursorY = 1;
+            } else {  // WHITE
+              let cursorX = 8;
+              let cursorY = 8;
+            }
+            // remove cursor box from previous cursor position.
+            do paintSquare(previousX, previousY);
+            // paint cursor box in new cursor position.
+            do paintSquare(cursorX, cursorY);
+
+            do Game.eraseSteadyCheckmark();
+
+            let isBlacksTurn = (~(isBlacksTurn));
+          }
+        }
+      }
+    }
+
+    return;
+  }
+
+  /**
+   * Draw four 32x32 boxes in the top right corner of the screen with a cursor box.
+   * The four boxes show the four types of pieces into which the pawn is to be transformed.
+   * The user can move the cursor up or down to select a type.
+   * When the user presses enter, the new piece type gets selected.
+   *
+   * @param {boolean} isBlack
+   */
+  method Piece transformPawn(boolean isBlack) {
+    var Piece rook, knight, bishop, queen;
+    var int pieceIndex, previousPieceIndex;
+    var char currentInputChar;
+    var boolean pieceChosen;
+    var int leftEdge, rightEdge;
+
+    let leftEdge = 473;
+    let rightEdge = leftEdge + 31;
+
+    do Screen.setColor(true);
+    do Screen.drawLine(leftEdge,   0, rightEdge,  0);
+    do Screen.drawLine(leftEdge,  32, rightEdge,  32);  // box 1
+    do Screen.drawLine(leftEdge,  64, rightEdge,  64);  // box 2
+    do Screen.drawLine(leftEdge,  96, rightEdge,  96);  // box 3
+    do Screen.drawLine(leftEdge, 128, rightEdge, 128);  // box 4
+    do Screen.drawLine(leftEdge,   0,  leftEdge, 128);  // vertical line on left
+    do Screen.drawLine(rightEdge,  0, rightEdge, 128);  // vertical line on right
+
+    let rook = Piece.new("r", isBlack);
+    let knight = Piece.new("n", isBlack);
+    let bishop = Piece.new("b", isBlack);
+    let queen = Piece.new("q", isBlack);
+
+    do rook.paint(   (8 * 32) + 30);
+    do knight.paint((40 * 32) + 30);
+    do bishop.paint((72 * 32) + 30);
+    do queen.paint((104 * 32) + 30);
+
+    let pieceIndex = 1;
+    let previousPieceIndex = 0;
+    let pieceChosen = false;
+    while (~(pieceChosen)) {
+      do redrawPawnTransformationCursor(pieceIndex, previousPieceIndex, leftEdge, rightEdge);
+      let currentInputChar = Keyboard.readChar();
+      do Output.moveCursor(0, 0);
+
+      if (currentInputChar = 131) {  // up arrow
+        if (pieceIndex > 1) {
+          let previousPieceIndex = pieceIndex;
+          let pieceIndex = pieceIndex - 1;
+        }
+      }
+      if (currentInputChar = 133) {  // down arrow
+        if (pieceIndex < 4) {
+          let previousPieceIndex = pieceIndex;
+          let pieceIndex = pieceIndex + 1;
+        }
+      }
+      if (currentInputChar = 128) {  // new line
+        let pieceChosen = true;
+      }
+    }
+
+    // Erase the selection panel.
+    do Screen.setColor(false);
+    do Screen.drawRectangle(leftEdge, 0, rightEdge, 128);
+
+    if (pieceIndex = 1) {
+      do knight.dispose();
+      do bishop.dispose();
+      do queen.dispose();
+      return rook;
+    }
+    if (pieceIndex = 2) {
+      do rook.dispose();
+      do bishop.dispose();
+      do queen.dispose();
+      return knight;
+    }
+    if (pieceIndex = 3) {
+      do rook.dispose();
+      do knight.dispose();
+      do queen.dispose();
+      return bishop;
+    }
+    if (pieceIndex = 4) {
+      do rook.dispose();
+      do knight.dispose();
+      do bishop.dispose();
+      return queen;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Redraws the cursor used in the pawn transformation panel.
+   *
+   * @param {int} pieceIndex The index of the piece among the four possible pieces into which the pawn should be transformed.
+   * @param {int} previousPieceIndex
+   * @param {int} leftEdge
+   * @param {int} rightEdge
+   */
+  method void redrawPawnTransformationCursor(int pieceIndex, int previousPieceIndex, int leftEdge, int rightEdge) {
+    var int y;
+
+    let y = ((pieceIndex * 32) - 1);
+    do Screen.setColor(true);
+    do drawRectangleBorder(leftEdge + 1, y - 30, rightEdge - 1, y);
+    do drawRectangleBorder(leftEdge + 2, y - 29, rightEdge - 2, y - 1);
+
+    if (previousPieceIndex > 0) {
+      let y = ((previousPieceIndex * 32) - 1);
+      do Screen.setColor(false);
+      do drawRectangleBorder(leftEdge + 1, y - 30, rightEdge - 1, y);
+      do drawRectangleBorder(leftEdge + 2, y - 29, rightEdge - 2, y - 1);
+    }
+    return;
+  }
+
+  /**
+   * Paints a steady (not blinking) black check mark at the given location to indicate that the current player is under check.
+   *
+   * @param {int} location
+   */
+  function void paintSteadyBlackCheckmark(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, -16384);
+    do Memory.poke(memoryAddress+32, -8192);
+    do Memory.poke(memoryAddress+64, -4096);
+    do Memory.poke(memoryAddress+96, -2048);
+    do Memory.poke(memoryAddress+128, 31744);
+    do Memory.poke(memoryAddress+160, 15872);
+    do Memory.poke(memoryAddress+192, 7936);
+    do Memory.poke(memoryAddress+224, 3971);
+    do Memory.poke(memoryAddress+256, 1991);
+    do Memory.poke(memoryAddress+288, 1007);
+    do Memory.poke(memoryAddress+320, 511);
+    do Memory.poke(memoryAddress+352, 255);
+    do Memory.poke(memoryAddress+384, 127);
+    do Memory.poke(memoryAddress+416, 62);
+    do Memory.poke(memoryAddress+448, 28);
+    do Memory.poke(memoryAddress+480, 8);
+    return;
+  }
+
+  /**
+   * Paints a steady (not blinking) white check mark at the given location to indicate that the current player is under check.
+   *
+   * @param {int} location
+   */
+  function void paintSteadyWhiteCheckmark(int location) {
+    var int memoryAddress;
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, -16384);
+    do Memory.poke(memoryAddress+32, -24576);
+    do Memory.poke(memoryAddress+64, -28672);
+    do Memory.poke(memoryAddress+96, -30720);
+    do Memory.poke(memoryAddress+128, 17408);
+    do Memory.poke(memoryAddress+160, 8704);
+    do Memory.poke(memoryAddress+192, 4352);
+    do Memory.poke(memoryAddress+224, 2179);
+    do Memory.poke(memoryAddress+256, 1093);
+    do Memory.poke(memoryAddress+288, 553);
+    do Memory.poke(memoryAddress+320, 273);
+    do Memory.poke(memoryAddress+352, 129);
+    do Memory.poke(memoryAddress+384, 65);
+    do Memory.poke(memoryAddress+416, 34);
+    do Memory.poke(memoryAddress+448, 20);
+    do Memory.poke(memoryAddress+480, 8);
+    return;
+  }
+
+  /**
+   * Paints a filled white square at the given location.  This is used to erase the checkmark.
+   *
+   * @param {int} location
+   */
+  function void paintWhiteSquare(int location) {
+    var int memoryAddress;
+
+    let memoryAddress = 16384+location;
+    do Memory.poke(memoryAddress+0, 0);
+    do Memory.poke(memoryAddress+32, 0);
+    do Memory.poke(memoryAddress+64, 0);
+    do Memory.poke(memoryAddress+96, 0);
+    do Memory.poke(memoryAddress+128, 0);
+    do Memory.poke(memoryAddress+160, 0);
+    do Memory.poke(memoryAddress+192, 0);
+    do Memory.poke(memoryAddress+224, 0);
+    do Memory.poke(memoryAddress+256, 0);
+    do Memory.poke(memoryAddress+288, 0);
+    do Memory.poke(memoryAddress+320, 0);
+    do Memory.poke(memoryAddress+352, 0);
+    do Memory.poke(memoryAddress+384, 0);
+    do Memory.poke(memoryAddress+416, 0);
+    do Memory.poke(memoryAddress+448, 0);
+    do Memory.poke(memoryAddress+480, 0);
+    return;
+  }
+
+  /**
+   * Disposes off a Game object.
+   */
+  method void dispose() {
+    var int i, j;
+    var Array file;
+    var Piece piece;
+
+    // dispose all remaining pieces.
+    let i = 1;
+    while (i < 9) {
+      let file = board[i];
+      let j = 1;
+      while (j < 0) {
+        let piece = file[j];
+        if (~(piece = 0)) {
+          do piece.dispose();
+        }
+        let j = j + 1;
+      }
+      let i = i + 1;
+    }
+
+    // dispose all ranks.
+    let i = i;
+    while (i < 9) {
+      let file = board[i];
+      do file.dispose();
+      let i = i + 1;
+    }
+
+    // dispose the board.
+    do board.dispose();
+
+    // dellocate this object.
+    do Memory.deAlloc(this);
+    return;
+  }
+}

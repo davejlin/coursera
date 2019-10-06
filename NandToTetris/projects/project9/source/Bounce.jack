@@ -1,0 +1,116 @@
+/*
+   Bounce
+   Author: David Lin
+   Creates nBalls number of balls of random sizes and trajectory directions.
+   When balls touch, they bounce.
+   To exit, press any key
+*/
+class Bounce {
+   field Array balls;
+   field int nBalls;
+
+   /* Creates a new Bounce instance */
+   constructor Bounce new() {
+      var int i, j;
+      var Ball ball, lastBall;
+      do Screen.setColor(true);
+      let nBalls = 25;
+      let balls = Array.new(nBalls);
+
+      let i = 0;
+      while (i < nBalls) {
+         let ball = Ball.new();
+
+         if (isUniqueBallPosition(ball, i)) {
+            let balls[i] = ball;
+            do ball.draw();
+            let i = i + 1;
+         } else {
+            do ball.dispose();
+         }
+      }
+
+      return this;
+   }
+
+   /* Disposes of the instance */
+   method void dispose() {
+      var int i;
+      var Ball ball;
+      let i = 0;
+      while (i < nBalls) {
+         let ball = balls[i];
+         do ball.dispose();
+         let i = i + 1;
+      }
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /* Run loop */
+   method void run() {
+      var char key;  // the key currently pressed by the user 
+      while (key = 0) {
+         do moveBalls();
+         do bounceBalls();
+         // do Sys.wait(0); // adds artificial delay for smoother graphics in certain configurations
+         let key = Keyboard.keyPressed();
+     }
+     return;
+   }
+
+   /* Moves all balls one timestep forward */
+   method void moveBalls() {
+      var int i;
+      var Ball ball;
+      let i = 0;
+      while (i < nBalls) {
+         let ball = balls[i];
+         do ball.move();
+         let i = i + 1;
+      }
+      return;
+   }
+
+   /* Checks if any balls touched and if so, bounce them */
+   method void bounceBalls() {
+      var int i, j;
+      var Ball ball, otherBall;
+      let i = 0;
+      while (i < (nBalls - 1)) {
+         let ball = balls[i];
+         
+         let j = i + 1;
+         while (j < nBalls) {
+            let otherBall = balls[j];
+            if (ball.didTouch(otherBall)) {
+               do ball.setOppositeDirection();
+               do otherBall.setOppositeDirection();
+               do ball.move();
+               do otherBall.move();
+            }
+
+            let j = j + 1;
+         }
+         
+         let i = i + 1;
+      }
+      return;
+   }
+
+   /* Checks if a ball is unique */
+   method boolean isUniqueBallPosition(Ball ball, int indexArrayMax) {
+      var int i;
+      var Ball otherBall;
+      let i = 0;
+      while (i < indexArrayMax) {
+         let otherBall = balls[i];
+         if (ball.didTouch(otherBall)) {
+            return false;
+         }
+         let i = i + 1;
+      }
+
+      return true;
+   } 
+}

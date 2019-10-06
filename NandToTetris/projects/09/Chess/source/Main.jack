@@ -1,0 +1,36 @@
+/**
+ * This is a program to play the chess game.
+ *
+ * The way to play this game is as follows:
+ * 1) When the game is started, the board will appear in the center of the screen.
+ * 2) The game is played in turns; white-player completes a valid move, followed by the black-player completing a successful valid move, and so on.
+ * 3) The "cursor" is present on the board to make moves.  It is indicated by a black bordered square in a square of the board.
+ * 4) The cursor is moved around (without moving any pieces) by using the arrow keys.
+ * 5) When a piece is to be moved, the cursor is to be moved to the square of the piece; then the piece is to be selected by pressing "enter"; then the cursor is to be moved to the
+ *    destination square into which the piece is to be moved; then again "enter" key is to be pressed there.
+ * 6) Only valid moves really happen; invalid moves just don't happen and the piece remains selected until a valid move is made, or the piece is unselected by moving the cursor
+ *    to the square of the selected piece and pressing "enter".  This is useful when a wrong piece is selected by mistake.
+ * 7) When a pawn reaches the other end of the board, a panel of four pieces appears on the right side of the screen from which the player has to make to choice to choose one of the
+ *    four possible transformations.  The game continues only after the choice has been made.
+ * 8) 'Check' is supported and when a player is under check, a 'checkmark' appears on the left of the screen in the same color as the player undre check.
+ *    When a move by a player 'checks' the other player, the 'checkmark' appears.
+ *    When a player is under 'check', only those moves that remove the 'check' are permitted.
+ *    When a player under 'check' makes a valid move to get out of the 'check', the 'checkmark' disappears.
+ *    A player cannot make a move that will expose the king of the same player to be under 'check' by the opposite player.  In other words, a move that exposes the king to be killed
+ *    is not permitted.
+ * 
+ * The limitations of this game is as follows:
+ * 1) Moves are irreversible.  A piece can be selected and unselected again, but if a selected piece is made to move in a valid manner, that move cannot be reversed.
+ * 2) Castling is not supported.
+ * 3) There is no detection of stalemate or checkmate - the game never ends automatically.  When a player has been checkmated or stalemated, the players have to realize that it is
+ *    so and stop the game.
+ */
+class Main {
+  function void main() {
+    var Game game;
+    let game = Game.new();
+    do game.play();
+    do game.dispose();
+    return;
+  }
+}

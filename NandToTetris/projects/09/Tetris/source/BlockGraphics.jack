@@ -1,0 +1,226 @@
+class BlockGraphics {
+
+  function void draw(int x, int y, int type) {
+    var int baseAddress;
+    let baseAddress = BlockGraphics.calculateBaseAddress(x, y);
+    if(type = 0) {
+      do BlockGraphics.clear(baseAddress);
+    }
+    if(type = 1) {
+      do BlockGraphics.drawWall(baseAddress);
+    }
+    if(type = 2) {
+      do BlockGraphics.drawO(baseAddress);
+    }
+    if(type = 3) {
+      do BlockGraphics.drawS(baseAddress);
+    }
+    if(type = 4) {
+      do BlockGraphics.drawZ(baseAddress);
+    }
+    if(type = 5) {
+      do BlockGraphics.drawL(baseAddress);
+    }
+    if(type = 6) {
+      do BlockGraphics.drawJ(baseAddress);
+    }
+    if(type = 7) {
+      do BlockGraphics.drawT(baseAddress);
+    }
+    if(type = 8) {
+      do BlockGraphics.drawI(baseAddress);
+    }
+
+
+    return;
+  }
+
+  function int calculateBaseAddress(int x, int y) {
+    // calculate base address for poke operations
+    // 16.384 -> base address of screen memory map
+    // 10 -> board offset
+    // x -> x position of the block
+    // y * 512 -> one row has 512 bits
+    return 16384 + 10 + x + (y * 512);
+  }
+
+  function void clear(int baseAddress) {
+    do Memory.poke(baseAddress+0, 0);
+    do Memory.poke(baseAddress+32, 0);
+    do Memory.poke(baseAddress+64, 0);
+    do Memory.poke(baseAddress+96, 0);
+    do Memory.poke(baseAddress+128, 0);
+    do Memory.poke(baseAddress+160, 0);
+    do Memory.poke(baseAddress+192, 0);
+    do Memory.poke(baseAddress+224, 0);
+    do Memory.poke(baseAddress+256, 0);
+    do Memory.poke(baseAddress+288, 0);
+    do Memory.poke(baseAddress+320, 0);
+    do Memory.poke(baseAddress+352, 0);
+    do Memory.poke(baseAddress+384, 0);
+    do Memory.poke(baseAddress+416, 0);
+    do Memory.poke(baseAddress+448, 0);
+    do Memory.poke(baseAddress+480, 0);
+    return;
+  }
+
+  function void drawO(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -32767);
+    do Memory.poke(baseAddress+64, -32767);
+    do Memory.poke(baseAddress+96, -24583);
+    do Memory.poke(baseAddress+128, -24583);
+    do Memory.poke(baseAddress+160, -24583);
+    do Memory.poke(baseAddress+192, -24583);
+    do Memory.poke(baseAddress+224, -24583);
+    do Memory.poke(baseAddress+256, -24583);
+    do Memory.poke(baseAddress+288, -24583);
+    do Memory.poke(baseAddress+320, -24583);
+    do Memory.poke(baseAddress+352, -24583);
+    do Memory.poke(baseAddress+384, -24583);
+    do Memory.poke(baseAddress+416, -32767);
+    do Memory.poke(baseAddress+448, -32767);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawS(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -1);
+    do Memory.poke(baseAddress+64, -1);
+    do Memory.poke(baseAddress+96, -1);
+    do Memory.poke(baseAddress+128, -1);
+    do Memory.poke(baseAddress+160, -1);
+    do Memory.poke(baseAddress+192, -1);
+    do Memory.poke(baseAddress+224, -385);
+    do Memory.poke(baseAddress+256, -385);
+    do Memory.poke(baseAddress+288, -1);
+    do Memory.poke(baseAddress+320, -1);
+    do Memory.poke(baseAddress+352, -1);
+    do Memory.poke(baseAddress+384, -1);
+    do Memory.poke(baseAddress+416, -1);
+    do Memory.poke(baseAddress+448, -1);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawZ(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -1);
+    do Memory.poke(baseAddress+64, -16381);
+    do Memory.poke(baseAddress+96, -16381);
+    do Memory.poke(baseAddress+128, -16381);
+    do Memory.poke(baseAddress+160, -16381);
+    do Memory.poke(baseAddress+192, -15421);
+    do Memory.poke(baseAddress+224, -15421);
+    do Memory.poke(baseAddress+256, -15421);
+    do Memory.poke(baseAddress+288, -15421);
+    do Memory.poke(baseAddress+320, -16381);
+    do Memory.poke(baseAddress+352, -16381);
+    do Memory.poke(baseAddress+384, -16381);
+    do Memory.poke(baseAddress+416, -16381);
+    do Memory.poke(baseAddress+448, -1);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawL(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -32767);
+    do Memory.poke(baseAddress+64, -16387);
+    do Memory.poke(baseAddress+96, -16387);
+    do Memory.poke(baseAddress+128, -16387);
+    do Memory.poke(baseAddress+160, -16387);
+    do Memory.poke(baseAddress+192, -16387);
+    do Memory.poke(baseAddress+224, -16387);
+    do Memory.poke(baseAddress+256, -16387);
+    do Memory.poke(baseAddress+288, -16387);
+    do Memory.poke(baseAddress+320, -16387);
+    do Memory.poke(baseAddress+352, -16387);
+    do Memory.poke(baseAddress+384, -16387);
+    do Memory.poke(baseAddress+416, -16387);
+    do Memory.poke(baseAddress+448, -32767);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawJ(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -32767);
+    do Memory.poke(baseAddress+64, -27307);
+    do Memory.poke(baseAddress+96, -24575);
+    do Memory.poke(baseAddress+128, -28683);
+    do Memory.poke(baseAddress+160, -20495);
+    do Memory.poke(baseAddress+192, -29643);
+    do Memory.poke(baseAddress+224, -21455);
+    do Memory.poke(baseAddress+256, -29643);
+    do Memory.poke(baseAddress+288, -21455);
+    do Memory.poke(baseAddress+320, -28683);
+    do Memory.poke(baseAddress+352, -20495);
+    do Memory.poke(baseAddress+384, -32763);
+    do Memory.poke(baseAddress+416, -21847);
+    do Memory.poke(baseAddress+448, -32767);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawT(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -32767);
+    do Memory.poke(baseAddress+64, -32767);
+    do Memory.poke(baseAddress+96, -28671);
+    do Memory.poke(baseAddress+128, -26623);
+    do Memory.poke(baseAddress+160, -25599);
+    do Memory.poke(baseAddress+192, -25087);
+    do Memory.poke(baseAddress+224, -25855);
+    do Memory.poke(baseAddress+256, -26239);
+    do Memory.poke(baseAddress+288, -26431);
+    do Memory.poke(baseAddress+320, -26527);
+    do Memory.poke(baseAddress+352, -24591);
+    do Memory.poke(baseAddress+384, -24583);
+    do Memory.poke(baseAddress+416, -32767);
+    do Memory.poke(baseAddress+448, -32767);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawI(int baseAddress) {
+    do Memory.poke(baseAddress+0, -1);
+    do Memory.poke(baseAddress+32, -21845);
+    do Memory.poke(baseAddress+64, -10923);
+    do Memory.poke(baseAddress+96, -21845);
+    do Memory.poke(baseAddress+128, -10923);
+    do Memory.poke(baseAddress+160, -21845);
+    do Memory.poke(baseAddress+192, -10923);
+    do Memory.poke(baseAddress+224, -21845);
+    do Memory.poke(baseAddress+256, -10923);
+    do Memory.poke(baseAddress+288, -21845);
+    do Memory.poke(baseAddress+320, -10923);
+    do Memory.poke(baseAddress+352, -21845);
+    do Memory.poke(baseAddress+384, -10923);
+    do Memory.poke(baseAddress+416, -21845);
+    do Memory.poke(baseAddress+448, -10923);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+
+  function void drawWall(int baseAddress) {
+    do Memory.poke(baseAddress+0, 2056);
+    do Memory.poke(baseAddress+32, 2056);
+    do Memory.poke(baseAddress+64, 2056);
+    do Memory.poke(baseAddress+96, -1);
+    do Memory.poke(baseAddress+128, -32640);
+    do Memory.poke(baseAddress+160, -32640);
+    do Memory.poke(baseAddress+192, -32640);
+    do Memory.poke(baseAddress+224, -1);
+    do Memory.poke(baseAddress+256, 2056);
+    do Memory.poke(baseAddress+288, 2056);
+    do Memory.poke(baseAddress+320, 2056);
+    do Memory.poke(baseAddress+352, -1);
+    do Memory.poke(baseAddress+384, 128);
+    do Memory.poke(baseAddress+416, 128);
+    do Memory.poke(baseAddress+448, 128);
+    do Memory.poke(baseAddress+480, -1);
+    return;
+  }
+}

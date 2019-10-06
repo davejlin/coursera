@@ -1,0 +1,14 @@
+/** Library class for drawing a vertical wall limiting the game board */
+class Wall {
+
+  /** Draws a wahl at position (x,0) to (x, 256) */
+  function void draw(int x) {
+    var Block block;
+    var int i;
+    while(i < 16) {
+      do BlockGraphics.draw(x, i, 1);
+      let i = i + 1;
+    }
+    return;
+  }
+}
