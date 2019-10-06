@@ -1,0 +1,65 @@
+/** Description of a block including it's type and position. */
+class Block {
+
+  field int x;
+  field int y;
+  field int type;
+
+  constructor Block new(int aX, int aY, int aType) {
+    let x = aX;
+    let y = aY;
+    let type = aType;
+    return this;
+  }
+
+  method int getX() {
+    return x;
+  }
+
+  method void setX(int aX) {
+    let x = aX;
+    return;
+  }
+
+  method void incX() {
+    let x = x + 1;
+    return;
+  }
+
+  method void decX() {
+    let x = x - 1;
+    return;
+  }
+
+  method int getY() {
+    return y;
+  }
+
+  method void setY(int aY) {
+    let y = aY;
+    return;
+  }
+
+  method void incY() {
+    let y = y + 1;
+    return;
+  }
+
+  method int getType() {
+    return type;
+  }
+
+  method void setType(int aType) {
+    let type = aType;
+    return;
+  }
+
+  method Block copy() {
+    return Block.new(x, y, type);
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+}

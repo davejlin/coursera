@@ -1,13 +1,21 @@
 function Ball.new 0
-push constant 7
+push constant 9
 call Memory.alloc 1
 pop pointer 0
 push constant 510
 pop this 5
 push constant 254
 pop this 6
+push this 5
+push constant 2
+call Math.divide 2
+pop this 7
+push this 6
+push constant 2
+call Math.divide 2
+pop this 8
 push constant 1
-push constant 5
+push constant 15
 call Random.between 2
 pop this 2
 push this 2
@@ -28,9 +36,6 @@ pop temp 0
 push constant 0
 pop this 4
 push pointer 0
-call Ball.draw 1
-pop temp 0
-push pointer 0
 return
 function Ball.dispose 0
 push argument 0
@@ -40,26 +45,12 @@ call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
-function Ball.setNewDirection 1
+function Ball.setNewDirection 0
 push argument 0
 pop pointer 0
 push constant 0
 push constant 8
 call Random.between 2
-pop local 0
-label WHILE_EXP0
-push this 3
-push local 0
-eq
-not
-if-goto WHILE_END0
-push constant 0
-push constant 8
-call Random.between 2
-pop local 0
-goto WHILE_EXP0
-label WHILE_END0
-push local 0
 pop this 3
 push constant 0
 return
@@ -172,6 +163,99 @@ return
 label IF_FALSE8
 push constant 0
 return
+function Ball.setOppositeDirection 0
+push argument 0
+pop pointer 0
+push this 3
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+pop this 3
+push constant 0
+return
+label IF_FALSE0
+push this 3
+push constant 1
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+pop this 3
+push constant 0
+return
+label IF_FALSE1
+push this 3
+push constant 2
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 3
+pop this 3
+push constant 0
+return
+label IF_FALSE2
+push this 3
+push constant 3
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 2
+pop this 3
+push constant 0
+return
+label IF_FALSE3
+push this 3
+push constant 4
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 7
+pop this 3
+push constant 0
+return
+label IF_FALSE4
+push this 3
+push constant 5
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push constant 6
+pop this 3
+push constant 0
+return
+label IF_FALSE5
+push this 3
+push constant 6
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push constant 5
+pop this 3
+push constant 0
+return
+label IF_FALSE6
+push this 3
+push constant 7
+eq
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push constant 4
+pop this 3
+push constant 0
+return
+label IF_FALSE7
+push constant 0
+return
 function Ball.didTouch 6
 push argument 0
 pop pointer 0
@@ -210,12 +294,6 @@ label IF_TRUE1
 push constant 0
 return
 label IF_FALSE1
-push pointer 0
-call Ball.setNewDirection 1
-pop temp 0
-push argument 1
-call Ball.setNewDirection 1
-pop temp 0
 push constant 0
 not
 return
@@ -255,26 +333,15 @@ gt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 1
 push constant 1
 sub
 pop this 1
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -293,26 +360,15 @@ lt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 1
 push constant 1
 add
 pop this 1
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -329,26 +385,15 @@ gt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 0
 push constant 1
 sub
 pop this 0
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -367,26 +412,15 @@ lt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 0
 push constant 1
 add
 pop this 0
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -409,13 +443,8 @@ and
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 0
 push constant 1
@@ -425,14 +454,8 @@ push this 1
 push constant 1
 sub
 pop this 1
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -453,13 +476,8 @@ and
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 0
 push constant 1
@@ -469,14 +487,8 @@ push this 1
 push constant 1
 sub
 pop this 1
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -501,13 +513,8 @@ and
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 0
 push constant 1
@@ -517,14 +524,8 @@ push this 1
 push constant 1
 add
 pop this 1
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return
@@ -547,13 +548,8 @@ and
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.erase 1
 pop temp 0
 push this 0
 push constant 1
@@ -563,14 +559,8 @@ push this 1
 push constant 1
 add
 pop this 1
-push constant 0
-not
-call Screen.setColor 1
-pop temp 0
-push this 0
-push this 1
-push this 2
-call Screen.drawCircle 3
+push pointer 0
+call Ball.draw 1
 pop temp 0
 push constant 0
 return

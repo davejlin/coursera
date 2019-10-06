@@ -1,0 +1,1118 @@
+function BlockGraphics.draw 1
+push argument 0
+push argument 1
+call BlockGraphics.calculateBaseAddress 2
+pop local 0
+push argument 2
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+call BlockGraphics.clear 1
+pop temp 0
+label IF_FALSE0
+push argument 2
+push constant 1
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 0
+call BlockGraphics.drawWall 1
+pop temp 0
+label IF_FALSE1
+push argument 2
+push constant 2
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 0
+call BlockGraphics.drawO 1
+pop temp 0
+label IF_FALSE2
+push argument 2
+push constant 3
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push local 0
+call BlockGraphics.drawS 1
+pop temp 0
+label IF_FALSE3
+push argument 2
+push constant 4
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push local 0
+call BlockGraphics.drawZ 1
+pop temp 0
+label IF_FALSE4
+push argument 2
+push constant 5
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push local 0
+call BlockGraphics.drawL 1
+pop temp 0
+label IF_FALSE5
+push argument 2
+push constant 6
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push local 0
+call BlockGraphics.drawJ 1
+pop temp 0
+label IF_FALSE6
+push argument 2
+push constant 7
+eq
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
+push local 0
+call BlockGraphics.drawT 1
+pop temp 0
+label IF_FALSE7
+push argument 2
+push constant 8
+eq
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
+push local 0
+call BlockGraphics.drawI 1
+pop temp 0
+label IF_FALSE8
+push constant 0
+return
+function BlockGraphics.calculateBaseAddress 0
+push constant 16384
+push constant 10
+add
+push argument 0
+add
+push argument 1
+push constant 512
+call Math.multiply 2
+add
+return
+function BlockGraphics.clear 0
+push argument 0
+push constant 0
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 0
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawO 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawS 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 385
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 385
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawZ 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 15421
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 15421
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 15421
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 15421
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 16381
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawL 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 16387
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawJ 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 27307
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 24575
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 28683
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 20495
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 29643
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 21455
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 29643
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 21455
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 28683
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 20495
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 32763
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 21847
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawT 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 28671
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 26623
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 25599
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 25087
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 25855
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 26239
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 26431
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 26527
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 24591
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 24583
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 32767
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawI 0
+push argument 0
+push constant 0
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 21845
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 10923
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function BlockGraphics.drawWall 0
+push argument 0
+push constant 0
+add
+push constant 2056
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 32
+add
+push constant 2056
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 64
+add
+push constant 2056
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 96
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 128
+add
+push constant 32640
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 160
+add
+push constant 32640
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 192
+add
+push constant 32640
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 224
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 256
+add
+push constant 2056
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 288
+add
+push constant 2056
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 320
+add
+push constant 2056
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 352
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 384
+add
+push constant 128
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 416
+add
+push constant 128
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 448
+add
+push constant 128
+call Memory.poke 2
+pop temp 0
+push argument 0
+push constant 480
+add
+push constant 1
+neg
+call Memory.poke 2
+pop temp 0
+push constant 0
+return

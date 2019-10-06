@@ -1,0 +1,108 @@
+function Random.seed 0
+push argument 0
+pop static 0
+push constant 0
+return
+function Random.mod 0
+push argument 0
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+neg
+pop argument 0
+label IF_FALSE0
+label WHILE_EXP0
+push argument 0
+push constant 1
+add
+push argument 1
+gt
+not
+if-goto WHILE_END0
+push argument 0
+push argument 1
+sub
+pop argument 0
+goto WHILE_EXP0
+label WHILE_END0
+push argument 0
+return
+function Random.next 0
+push constant 7919
+push constant 17
+push static 0
+call Math.multiply 2
+add
+pop static 0
+push static 0
+return
+function Random.between 1
+push argument 1
+push argument 0
+sub
+pop local 0
+call Random.next 0
+push local 0
+call Random.mod 2
+push argument 0
+add
+return
+function Random.generateValues 1
+push constant 0
+pop static 1
+push argument 2
+pop static 2
+push static 2
+call Array.new 1
+pop static 3
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push static 2
+lt
+not
+if-goto WHILE_END0
+push local 0
+push static 3
+add
+push argument 0
+push argument 1
+call Random.between 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Random.getNextGeneratedValue 1
+push static 1
+push static 2
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+pop static 1
+label IF_FALSE0
+push static 1
+push static 3
+add
+pop pointer 1
+push that 0
+pop local 0
+push static 1
+push constant 1
+add
+pop static 1
+push local 0
+return

@@ -1,0 +1,238 @@
+function Bounce.new 4
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 25
+pop this 1
+push this 1
+call Array.new 1
+pop this 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 1
+lt
+not
+if-goto WHILE_END0
+call Ball.new 0
+pop local 2
+push pointer 0
+push local 2
+push local 0
+call Bounce.isUniqueBallPosition 3
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push this 0
+add
+push local 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 2
+call Ball.draw 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto IF_END0
+label IF_FALSE0
+push local 2
+call Ball.dispose 1
+pop temp 0
+label IF_END0
+goto WHILE_EXP0
+label WHILE_END0
+push pointer 0
+return
+function Bounce.dispose 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 1
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 1
+call Ball.dispose 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function Bounce.run 1
+push argument 0
+pop pointer 0
+label WHILE_EXP0
+push local 0
+push constant 0
+eq
+not
+if-goto WHILE_END0
+push pointer 0
+call Bounce.moveBalls 1
+pop temp 0
+push pointer 0
+call Bounce.bounceBalls 1
+pop temp 0
+call Keyboard.keyPressed 0
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Bounce.moveBalls 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 1
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 1
+call Ball.move 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Bounce.bounceBalls 4
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 1
+push constant 1
+sub
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 0
+push constant 1
+add
+pop local 1
+label WHILE_EXP1
+push local 1
+push this 1
+lt
+not
+if-goto WHILE_END1
+push local 1
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 2
+push local 3
+call Ball.didTouch 2
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 2
+call Ball.setOppositeDirection 1
+pop temp 0
+push local 3
+call Ball.setOppositeDirection 1
+pop temp 0
+push local 2
+call Ball.move 1
+pop temp 0
+push local 3
+call Ball.move 1
+pop temp 0
+label IF_FALSE0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Bounce.isUniqueBallPosition 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push argument 2
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 1
+push argument 1
+push local 1
+call Ball.didTouch 2
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+not
+return

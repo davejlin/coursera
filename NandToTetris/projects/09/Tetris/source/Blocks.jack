@@ -1,0 +1,386 @@
+/** A group of four moving blocks */
+class Blocks {
+
+  field Block block0;
+  field Block block1;
+  field Block block2;
+  field Block block3;
+  field int type;
+  field int rotation;
+
+  constructor Blocks new(int aType) {
+    let type = aType;
+    let rotation = 0;
+    if (isO()) {
+      let block0 = Block.new(4, 0, type);
+      let block1 = Block.new(5, 0, type);
+      let block2 = Block.new(4, 1, type);
+      let block3 = Block.new(5, 1, type);
+    }
+    if(isS()) {
+      let block0 = Block.new(5, 0, type);
+      let block1 = Block.new(6, 0, type);
+      let block2 = Block.new(4, 1, type);
+      let block3 = Block.new(5, 1, type);
+    }
+    if(isZ()) {
+      let block0 = Block.new(4, 0, type);
+      let block1 = Block.new(5, 0, type);
+      let block2 = Block.new(5, 1, type);
+      let block3 = Block.new(6, 1, type);
+    }
+    if(isL()) {
+      let block0 = Block.new(6, 0, type);
+      let block1 = Block.new(4, 1, type);
+      let block2 = Block.new(5, 1, type);
+      let block3 = Block.new(6, 1, type);
+    }
+    if(isJ()) {
+      let block0 = Block.new(4, 0, type);
+      let block1 = Block.new(4, 1, type);
+      let block2 = Block.new(5, 1, type);
+      let block3 = Block.new(6, 1, type);
+    }
+    if(isT()) {
+      let block0 = Block.new(5, 0, type);
+      let block1 = Block.new(4, 1, type);
+      let block2 = Block.new(5, 1, type);
+      let block3 = Block.new(6, 1, type);
+    }
+    if(isI()) {
+      let block0 = Block.new(3, 0, type);
+      let block1 = Block.new(4, 0, type);
+      let block2 = Block.new(5, 0, type);
+      let block3 = Block.new(6, 0, type);
+    }
+
+    return this;
+  }
+
+  constructor Blocks fromComponents(Block aBlock0, Block aBlock1, Block aBlock2, Block aBlock3, int aType, int aRotation) {
+    let block0 = aBlock0;
+    let block1 = aBlock1;
+    let block2 = aBlock2;
+    let block3 = aBlock3;
+    let type = aType;
+    let rotation = aRotation;
+    return this;
+  }
+
+  constructor Blocks copy(Blocks aBlocks) {
+    var Block aBlock0;
+    var Block aBlock1;
+    var Block aBlock2;
+    var Block aBlock3;
+
+    let aBlock0 = aBlocks[0];
+    let aBlock1 = aBlocks[1];
+    let aBlock2 = aBlocks[2];
+    let aBlock3 = aBlocks[3];
+
+    let block0 = aBlock0.copy();
+    let block1 = aBlock1.copy();
+    let block2 = aBlock2.copy();
+    let block3 = aBlock3.copy();
+
+    let type = aBlocks[4];
+    let rotation = aBlocks[5];
+
+    return this;
+  }
+
+  method boolean isO() {
+    return type = 2;
+  }
+
+  method boolean isS() {
+    return type = 3;
+  }
+
+  method boolean isZ() {
+    return type = 4;
+  }
+
+  method boolean isL() {
+    return type = 5;
+  }
+
+  method boolean isJ() {
+    return type = 6;
+  }
+
+  method boolean isT() {
+    return type = 7;
+  }
+
+  method boolean isI() {
+    return type = 8;
+  }
+
+  /**
+   * Returns an array containing all blocks that have no block above them.
+   * The array will always have length 4 with potentially null entries at
+   * the end.
+   */
+  method Array getBottomBlocks() {
+    var Array result;
+    var int i;
+    let result = Array.new(4);
+
+    if(~(containsPosition(block0.getX(), block0.getY() + 1))) {
+      let result[i] = block0;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block1.getX(), block1.getY() + 1))) {
+      let result[i] = block1;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block2.getX(), block2.getY() + 1))) {
+      let result[i] = block2;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block3.getX(), block3.getY() + 1))) {
+      let result[i] = block3;
+      let i = i + 1;
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns an array containing all blocks that have no block left of them.
+   * The array will always have length 4 with potentially null entries at
+   * the end.
+   */
+  method Array getLeftMostBlocks() {
+    var Array result;
+    var int i;
+    let result = Array.new(4);
+
+    if(~(containsPosition(block0.getX() - 1, block0.getY()))) {
+      let result[i] = block0;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block1.getX() - 1, block1.getY()))) {
+      let result[i] = block1;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block2.getX() - 1, block2.getY()))) {
+      let result[i] = block2;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block3.getX() - 1, block3.getY()))) {
+      let result[i] = block3;
+      let i = i + 1;
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns an array containing all blocks that have no block right of them.
+   * The array will always have length 4 with potentially null entries at
+   * the end.
+   */
+  method Array getRightMostBlocks() {
+    var Array result;
+    var int i;
+    let result = Array.new(4);
+
+    if(~(containsPosition(block0.getX() + 1, block0.getY()))) {
+      let result[i] = block0;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block1.getX() + 1, block1.getY()))) {
+      let result[i] = block1;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block2.getX() + 1, block2.getY()))) {
+      let result[i] = block2;
+      let i = i + 1;
+    }
+    if(~(containsPosition(block3.getX() + 1, block3.getY()))) {
+      let result[i] = block3;
+      let i = i + 1;
+    }
+
+    return result;
+  }
+
+  /**
+   * Manual implementation of the standard Tetris roation logic as described in
+   * https://gamedev.stackexchange.com/a/17978.
+   * This implementation does not calculation of the next coordinates. It simply
+   * keeps track of the four rotation states and for each rotation the coordinates
+   * are hard coded.
+   */
+  method Blocks rotatedBlocks() {
+    var int nextRotation;
+    var int xOffset;
+    var int yOffset;
+
+    let nextRotation = nextRotation();
+    let xOffset = block1.getX();
+    let yOffset = block1.getY();
+
+    if (isO()) {
+      return rotated(block0.copy(), block1.copy(), block2.copy(), block3.copy());
+    }
+    if (isS()) {
+      if (nextRotation = 0) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(2 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type));
+      }
+      if (nextRotation = 1) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 2) {
+        return rotated(Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(0 + xOffset, 2 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 3) {
+        return rotated(Block.new(0 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+    }
+    if (isZ()) {
+      if (nextRotation = 0) {
+        return rotated(Block.new(0 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type));
+      }
+      if (nextRotation = 1) {
+        return rotated(Block.new(2 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 2) {
+        return rotated(Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type), Block.new(2 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 3) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(0 + xOffset, 2 + yOffset, type));
+      }
+    }
+    if (isL()) {
+      if (nextRotation = 0) {
+        return rotated(Block.new(2 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type));
+      }
+      if (nextRotation = 1) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type), Block.new(2 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 2) {
+        return rotated(Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(0 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 3) {
+        return rotated(Block.new(0 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+    }
+    if (isJ()) {
+      if (nextRotation = 0) {
+        return rotated(Block.new(0 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type));
+      }
+      if (nextRotation = 1) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(2 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 2) {
+        return rotated(Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 3) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(0 + xOffset, 2 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+    }
+    if (isT()) {
+      if (nextRotation = 0) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type));
+      }
+      if (nextRotation = 1) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 2) {
+        return rotated(Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 3) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type));
+      }
+    }
+    if (isI()) {
+      if (nextRotation = 0) {
+        return rotated(Block.new(0 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(3 + xOffset, 1 + yOffset, type));
+      }
+      if (nextRotation = 1) {
+        return rotated(Block.new(2 + xOffset, 0 + yOffset, type), Block.new(2 + xOffset, 1 + yOffset, type), Block.new(2 + xOffset, 2 + yOffset, type), Block.new(2 + xOffset, 3 + yOffset, type));
+      }
+      if (nextRotation = 2) {
+        return rotated(Block.new(0 + xOffset, 2 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type), Block.new(2 + xOffset, 2 + yOffset, type), Block.new(3 + xOffset, 2 + yOffset, type));
+      }
+      if (nextRotation = 3) {
+        return rotated(Block.new(1 + xOffset, 0 + yOffset, type), Block.new(1 + xOffset, 1 + yOffset, type), Block.new(1 + xOffset, 2 + yOffset, type), Block.new(1 + xOffset, 3 + yOffset, type));
+      }
+    }
+
+    do Sys.error("Reached end of rotatedBlocks without rotating!");
+    return null;
+  }
+
+  method Blocks rotated(Block aBlock0, Block aBlock1, Block aBlock2, Block aBlock3) {
+    return Blocks.fromComponents(aBlock0, aBlock1, aBlock2, aBlock3, type, nextRotation());
+  }
+
+  method int nextRotation() {
+    if (rotation = 3) {
+      return 0;
+    } else {
+      return rotation + 1;
+    }
+  }
+
+  /**
+   * Checks whether one of the contained blocks has the position
+   * specified by x and y.
+   */
+  method boolean containsPosition(int x, int y) {
+    if ((block0.getX() = x) & block0.getY() = y) {
+      return true;
+    }
+    if ((block1.getX() = x) & block1.getY() = y) {
+      return true;
+    }
+    if ((block2.getX() = x) & block2.getY() = y) {
+      return true;
+    }
+    if ((block3.getX() = x) & block3.getY() = y) {
+      return true;
+    }
+    return false;
+  }
+
+  method boolean containsBlock(Block block) {
+    return containsPosition(block.getX(), block.getY()) & (type = block.getType());
+  }
+
+  method void incY() {
+    do block0.incY();
+    do block1.incY();
+    do block2.incY();
+    do block3.incY();
+    return;
+  }
+
+  method void incX() {
+    do block0.incX();
+    do block1.incX();
+    do block2.incX();
+    do block3.incX();
+    return;
+  }
+
+  method void decX() {
+    do block0.decX();
+    do block1.decX();
+    do block2.decX();
+    do block3.decX();
+    return;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(block0);
+    do Memory.deAlloc(block1);
+    do Memory.deAlloc(block2);
+    do Memory.deAlloc(block3);
+    do Memory.deAlloc(this);
+    return;
+  }
+}

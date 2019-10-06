@@ -1,0 +1,212 @@
+function Set.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push argument 2
+pop this 2
+push argument 3
+pop this 3
+push pointer 0
+return
+function Set.getEscapeIterationsNumber 5
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+push constant 0
+pop local 3
+push constant 0
+pop local 4
+push constant 0
+pop local 1
+push constant 0
+pop local 2
+label WHILE_EXP0
+push local 0
+push this 1
+lt
+push local 1
+push local 1
+call Math.multiply 2
+push local 2
+add
+push local 2
+call Math.multiply 2
+push this 0
+lt
+and
+not
+if-goto WHILE_END0
+push local 1
+push constant 0
+eq
+push local 2
+push constant 0
+eq
+or
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 1
+push local 1
+call Math.multiply 2
+push local 2
+sub
+push local 2
+call Math.multiply 2
+pop local 3
+push constant 2
+push local 1
+call Math.multiply 2
+push local 2
+call Math.multiply 2
+pop local 4
+label IF_FALSE0
+push local 3
+push argument 1
+add
+pop local 1
+push local 4
+push argument 2
+add
+pop local 2
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push local 0
+return
+function Set.getColorForIteration 0
+push argument 0
+pop pointer 0
+push argument 1
+push this 1
+push constant 2
+call Math.divide 2
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+return
+goto IF_END0
+label IF_FALSE0
+push constant 0
+return
+label IF_END0
+function Set.getColorForCoordinates 0
+push argument 0
+pop pointer 0
+push pointer 0
+push pointer 0
+push argument 1
+push argument 2
+call Set.getEscapeIterationsNumber 3
+call Set.getColorForIteration 2
+return
+function Set.draw 2
+push argument 0
+pop pointer 0
+call Screen.clearScreen 0
+pop temp 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 0
+pop local 0
+push constant 0
+pop local 1
+label WHILE_EXP0
+push local 1
+push this 3
+lt
+not
+if-goto WHILE_END0
+label WHILE_EXP1
+push local 0
+push this 2
+lt
+not
+if-goto WHILE_END1
+push pointer 0
+push local 0
+push local 1
+call Set.getColorForCoordinates 3
+push constant 1
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+push local 1
+call Screen.drawPixel 2
+pop temp 0
+label IF_FALSE0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP1
+label WHILE_END1
+push constant 0
+pop local 0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Set.incMaxIterations 0
+push argument 0
+pop pointer 0
+push this 1
+push constant 1
+add
+pop this 1
+push constant 0
+return
+function Set.decMaxIterations 0
+push argument 0
+pop pointer 0
+push this 1
+push constant 1
+sub
+pop this 1
+push constant 0
+return
+function Set.incMaxValue 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 1
+add
+pop this 0
+push constant 0
+return
+function Set.decMaxValue 0
+push argument 0
+pop pointer 0
+push this 0
+push constant 1
+sub
+pop this 0
+push constant 0
+return
+function Set.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
