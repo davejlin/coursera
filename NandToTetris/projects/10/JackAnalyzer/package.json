@@ -5,8 +5,8 @@
   "main": "dist/JackAnalyzer.js",
   "scripts": {
     "clean": "rm -rf dist",
-    "cleanall": "npm run clean && npm run cleanxml && rm -rf node_modules && rm package-lock.json",
-    "cleanxml":  "rm -rf files/ArrayTest/*.xml && rm -rf files/ExpressionLessSquare/*.xml && rm -rf files/Square/*.xml",
+    "cleanall": "npm run clean && npm run cleanxml && rm -rf node_modules && rm -rf package-lock.json",
+    "cleanxml": "rm -rf files/ArrayTest/*.xml && rm -rf files/ExpressionLessSquare/*.xml && rm -rf files/Square/*.xml",
     "start": "tsc && node dist/JackAnalyzer.js"
   },
   "keywords": [
