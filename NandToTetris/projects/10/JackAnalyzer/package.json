@@ -1,0 +1,26 @@
+{
+  "name": "jackanalyzer",
+  "version": "1.0.0",
+  "description": "Jack Language Compiler I: Syntax Analyzer",
+  "main": "dist/JackAnalyzer.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "cleanall": "npm run clean && npm run cleanxml && rm -rf node_modules && rm package-lock.json",
+    "cleanxml":  "rm -rf files/ArrayTest/*.xml && rm -rf files/ExpressionLessSquare/*.xml && rm -rf files/Square/*.xml",
+    "start": "tsc && node dist/JackAnalyzer.js"
+  },
+  "keywords": [
+    "Jack",
+    "compiler",
+    "syntax",
+    "analyzer",
+    "JackAnalyzer"
+  ],
+  "author": "David Lin",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "typescript": "^3.5.2"
+  },
+  "dependencies": {}
+}
