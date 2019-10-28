@@ -5,15 +5,32 @@
 
 // (derived from projects/09/Square/Main.jack, with testing additions)
 
-/** Initializes a new Square Dance game and starts running it. */
+/* Initializes a 
+ * new Square
+ *
+ */
+
+/* Initializes a new Square */
+/** Initializes a new Square */
+
+/** Initializes a 
+ * new Square
+ *
+ */
+
+/*** Initializes a 
+ * new Square
+ *
+ */
+
 class Main {
     static boolean test;    // Added for testing -- there is no static keyword
                             // in the Square files.
     function void main() {
       var SquareGame game;
-      let game = SquareGame.new();
+      /* ok */ let /* test */ game = /* hi  this is an inline conmment smidfdf */SquareGame.new();
       do game.run();
-      do game.dispose();
+      do game./*comment*/dispose();
       return;
     }
 

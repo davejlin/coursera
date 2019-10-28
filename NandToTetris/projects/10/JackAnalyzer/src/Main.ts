@@ -1,10 +1,12 @@
 import { File } from "./File";
+import { JackTokenizer } from "./JackTokenizer";
 import os = require("os");
 import fs = require("fs");
 
 export class Main {
     constructor(
-        private file: File
+        private file: File,
+        private tokenizer: JackTokenizer
     ) {}
 
     public async run(input: string): Promise<void> {
@@ -26,7 +28,7 @@ export class Main {
             const fileName = this.getFilename(inputFile);
 
             readInterface.on("line", line => {
-                const processedLine = `${fileName}`;
+                const processedLine = this.tokenizer.tokenizeLine(line);
                 if (processedLine) {
                     this.file.appendLine(`${processedLine}`, writeStream);
                 }
