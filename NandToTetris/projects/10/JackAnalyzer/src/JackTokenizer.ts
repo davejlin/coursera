@@ -6,8 +6,14 @@ export class JackTokenizer {
 
     public tokenizeLine(line: string): string {
         let returnString = "";
-        const cleanLine = this.parser.clean(line);
-        returnString = cleanLine;
+        const tokens = this.parser.getTokens(line);
+        if (tokens) {
+            tokens.forEach(token => {
+                if (token) {
+                    returnString += "<" + token + ">";
+                }
+            })
+        }
         return returnString;
     }
 }

@@ -15,4 +15,14 @@ export class Parser {
         cleanedLine = cleanedLine.replace(/^[\/\*].*$/g, ''); // API comments
         return cleanedLine.trim();
     }
+
+    /**
+     * Returns tokens
+     * @param {string} line command line
+     * @returns {string[]} array of tokens
+     */
+    public getTokens(line: string): string[] {
+        let cleanedLine = this.clean(line);
+        return cleanedLine.match(/\w+|".*"|\S/g);
+    }
 }
