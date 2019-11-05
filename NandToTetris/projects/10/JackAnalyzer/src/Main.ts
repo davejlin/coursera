@@ -16,7 +16,9 @@ export class Main {
         for (let file of files) {
             const outputFile = this.file.getOutFilePath(file);
             const writeStream = await this.file.init(outputFile);
+            await this.file.appendLine(`<tokens>`, writeStream);
             await this.processFile(file, writeStream);
+            await this.file.appendLine(`</tokens>${os.EOL}`, writeStream);
             await this.file.closeStream(writeStream);
             console.log(`Outputted to ${outputFile}${os.EOL}`);
         }
@@ -27,10 +29,10 @@ export class Main {
             const { readStream, readInterface } = this.file.getReadStreamAndInterface(inputFile);
             const fileName = this.getFilename(inputFile);
 
-            readInterface.on("line", line => {
+            readInterface.on("line", async line => {
                 const processedLine = this.tokenizer.tokenizeLine(line);
                 if (processedLine) {
-                    this.file.appendLine(`${processedLine}`, writeStream);
+                    await this.file.appendLine(`${processedLine}`, writeStream);
                 }
             });
 

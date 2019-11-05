@@ -17,7 +17,7 @@ export class Main {
 
         const bootstrap = this.processor.init();
         if (hasSys) {
-            this.file.appendLine(bootstrap, writeStream);
+            await this.file.appendLine(bootstrap, writeStream);
         }
 
         for (let file of files) {
@@ -33,10 +33,10 @@ export class Main {
             const { readStream, readInterface } = this.file.getReadStreamAndInterface(inputFile);
             const fileName = this.getFilename(inputFile);
 
-            readInterface.on("line", line => {
+            readInterface.on("line", async line => {
                 const processedLine = this.processor.process(line, fileName);
                 if (processedLine) {
-                    this.file.appendLine(`${processedLine}`, writeStream);
+                    await this.file.appendLine(`${processedLine}`, writeStream);
                 }
             });
 

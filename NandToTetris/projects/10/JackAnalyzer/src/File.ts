@@ -53,13 +53,26 @@ export class File {
         return { readStream, readInterface };
     }
 
-    public appendLine(line: string, writeStream: fs.WriteStream) {
-        if (this.firstLine) {
-            writeStream.write(line);
-            this.firstLine = false;
-        } else {
-            writeStream.write(os.EOL + line);
-        }
+    public async appendLine(line: string, writeStream: fs.WriteStream): Promise<void> {
+        return new Promise(resolve => {
+            if (this.firstLine) {
+                writeStream.write(line, error => {
+                    if (error) {
+                        console.log(`File: appendLine error: ${error}`);
+                    } else {
+                        this.firstLine = false;
+                    }
+                    resolve();
+                });
+            } else {
+                writeStream.write(os.EOL + line, error => {
+                    if (error) {
+                        console.log(`File: appendLine error: ${error}`);
+                    }
+                    resolve();
+                });
+            }
+        })
     }
 
     public async closeStream<T extends Stream>(stream: T): Promise<void> {

@@ -44,10 +44,10 @@ export class Assembler {
         return new Promise (resolve => {
             const readInterface = this.file.getReadInterface(inputFile);
 
-            readInterface.on("line", line => {
+            readInterface.on("line", async line => {
                 const processedLine = this.processor.process(line);
                 if (processedLine) {
-                    this.file.appendLine(`${processedLine}`);
+                    await this.file.appendLine(processedLine);
                 }
             });
 

@@ -31,13 +31,25 @@ export class File {
         });
     }
 
-    public appendLine(line: string) {
-        if (this.firstLine) {
-            this.outStream.write(line);
-            this.firstLine = false;
-        } else {
-            this.outStream.write(os.EOL + line);
-        }
+    public async appendLine(line: string): Promise<void> {
+        return new Promise(resolve => {
+            if (this.firstLine) {
+                this.outStream.write(line, error => {
+                    if (error) {
+                        console.log(`File: appendLine error: ${error}`);
+                    }
+                    resolve();
+                });
+                this.firstLine = false;
+            } else {
+                this.outStream.write(os.EOL + line, error => {
+                    if (error) {
+                        console.log(`File: appendLine error: ${error}`);
+                    }
+                    resolve();
+                });
+            }
+        });
     }
 
     public async closeFiles(): Promise<void> {

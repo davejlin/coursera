@@ -24,10 +24,10 @@ export class Main {
             this.processor.init();
             const readInterface = this.file.getReadInterface(inputFile);
 
-            readInterface.on("line", line => {
+            readInterface.on("line", async line => {
                 const processedLine = this.processor.process(line, this.getFilename(filename));
                 if (processedLine) {
-                    this.file.appendLine(`${processedLine}`);
+                    await this.file.appendLine(`${processedLine}`);
                 }
             });
 

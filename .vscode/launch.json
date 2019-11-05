@@ -1,0 +1,43 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "name": "vscode-jest-tests-single",
+        "request": "launch",
+        "program": "${workspaceFolder}/NandToTetris/projects/06/assembler/node_modules/jest/bin/jest",
+        "args": [
+          "--runInBand",
+          "--config=${workspaceFolder}/NandToTetris/projects/06/assembler/jest.json",
+          "-i",
+          "${relativeFile}",
+          "-t",
+          "${selectedText}",
+          "--collectCoverage=false"
+        ],
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "skipFiles": [
+            "${workspaceFolder}/NandToTetris/projects/06/assembler/node_modules/**/*.js",
+            "<node_internals>/**/*.js"
+          ]
+      },
+      {
+        "type": "node",
+        "name": "vscode-jest-tests",
+        "request": "launch",
+        "args": [
+          "--runInBand",
+          "--config=jest.json",
+        ],
+        "cwd": "${workspaceFolder}/NandToTetris/projects/06/assembler/",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "program": "${workspaceFolder}/NandToTetris/projects/06/assembler/node_modules/jest/bin/jest"
+      }
+    ]
+  }

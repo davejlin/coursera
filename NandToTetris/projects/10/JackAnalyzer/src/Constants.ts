@@ -2,10 +2,20 @@ export const commentSymbolType1 = "//";
 export const commentSymbolType2 = "/*";
 export const spaceSymbol = " ";
 export const emptySymbol = "";
+export const quoteSymbol = "\"";
 
 export enum FileSuffix {
     jack = "jack",
     xml = "xml"
+}
+
+export enum TokenType {
+    keyword = "keyword",
+    symbol = "symbol",
+    identifier = "identifier",
+    integerConstant = "integerConstant",
+    stringConstant = "stringConstant",
+    unknown = "unknown"
 }
 
 export enum Keyword {
@@ -60,4 +70,42 @@ export enum Symbol {
     openBrace = "{",
     closeBrace = "}",
     openParenths = "(",
+    closedParenths = ")",
+    openBracket = "[",
+    closeBracket = "]",
+    period = ".",
+    comma = ",",
+    semicolon = ";",
+    plus = "+",
+    minus = "-",
+    asterick = "*",
+    slash = "/",
+    amperstand = "&",
+    pipe = "|",
+    lt = "<",
+    gt = ">",
+    eq = "=",
+    tilda = "~"
 }
+
+export const Symbols: string[] = [
+    Symbol.openBrace,
+    Symbol.closeBrace,
+    Symbol.openParenths,
+    Symbol.closedParenths,
+    Symbol.openBracket,
+    Symbol.closeBracket,
+    Symbol.period,
+    Symbol.comma,
+    Symbol.semicolon,
+    Symbol.plus,
+    Symbol.minus,
+    Symbol.asterick,
+    Symbol.slash,
+    Symbol.amperstand,
+    Symbol.pipe,
+    Symbol.lt,
+    Symbol.gt,
+    Symbol.eq,
+    Symbol.tilda
+]
