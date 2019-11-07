@@ -20,24 +20,20 @@ export class Main {
         for (let file of files) {
             const outputFile = this.file.getOutFilePath(file, "T");
             const writeStream = await this.file.init(outputFile);
-            await this.file.appendLine(`<tokens>`, writeStream);
-            await this.processFile(file, writeStream);
-            await this.file.appendLine(`</tokens>${os.EOL}`, writeStream);
+            await this.processFile(file);
+            await this.outputTokensXml(writeStream);
             await this.file.closeStream(writeStream);
             console.log(`Outputted to ${outputFile}${os.EOL}`);
         }
     }
 
-    private async processFile(inputFile: string, writeStream: fs.WriteStream): Promise<void> {
+    private async processFile(inputFile: string): Promise<void> {
         return new Promise (resolve => {
+            this.tokenizer.clearTokens();
             const { readStream, readInterface } = this.file.getReadStreamAndInterface(inputFile);
-            const fileName = this.getFilename(inputFile);
 
             readInterface.on("line", async line => {
-                const processedLine = this.tokenizer.tokenizeLine(line);
-                if (processedLine) {
-                    await this.file.appendLine(`${processedLine}`, writeStream);
-                }
+                this.tokenizer.tokenizeLine(line);
             });
 
             readInterface.on("close", () => {
@@ -48,18 +44,13 @@ export class Main {
         });
     }
 
-    /**
-     * Returns the filename without path.
-     * Needed if the inputFile is specified with a path.
-     * @param fileNameWithPath
-     */
-    private getFilename(fileNameWithPath: string): string {
-        const fileNameWithoutTypeSuffix = fileNameWithPath.split(".")[0];
-        const filenamePathTokens = fileNameWithoutTypeSuffix.split("/");
-        const length = filenamePathTokens.length;
-        if (length < 2) {
-            return fileNameWithPath;
-        }
-        return filenamePathTokens[length - 1];
+    private async outputTokensXml(writeStream: fs.WriteStream): Promise<void> {
+        await this.file.appendLine(`<tokens>`, writeStream);
+        const tokens = this.tokenizer.tokens;
+        tokens.forEach(async token => {
+            const output = token.composeTag();
+            await this.file.appendLine(output, writeStream);
+        });
+        await this.file.appendLine(`</tokens>${os.EOL}`, writeStream);
     }
 }
