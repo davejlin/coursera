@@ -4,7 +4,7 @@ export const spaceSymbol = " ";
 export const emptySymbol = "";
 export const quoteSymbol = "\"";
 
-export enum FileSuffix {
+export enum FileType {
     jack = "jack",
     xml = "xml"
 }

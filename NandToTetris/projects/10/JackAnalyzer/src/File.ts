@@ -1,7 +1,7 @@
 import fs = require("fs");
 import os = require("os");
 import readline = require("readline");
-import { FileSuffix } from "./Constants";
+import { FileType } from "./Constants";
 
 type Stream = fs.ReadStream | fs.WriteStream;
 
@@ -112,21 +112,21 @@ export class File {
             return false;
         }
 
-        if (suffix[length-1] === FileSuffix.jack) {
+        if (suffix[length-1] === FileType.jack) {
             return true;
         }
 
         return false;
     }
 
-    public getOutFilePath(path: string): string {
+    public getOutFilePath(path: string, nameSuffix: string = ""): string {
         const fullFilePathWithoutTypeSuffix = path.split(".")[0];
 
         if (this.isDirectory(path)) {
             const tokens = path.split("/");
-            return `${fullFilePathWithoutTypeSuffix}/${tokens[tokens.length-1]}.${FileSuffix.xml}`
+            return `${fullFilePathWithoutTypeSuffix}/${tokens[tokens.length-1]}${nameSuffix}.${FileType.xml}`
         }
 
-        return `${fullFilePathWithoutTypeSuffix}.${FileSuffix.xml}`;
+        return `${fullFilePathWithoutTypeSuffix}${nameSuffix}.${FileType.xml}`;
     }
 }

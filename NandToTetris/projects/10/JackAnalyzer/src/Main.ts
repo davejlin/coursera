@@ -1,5 +1,6 @@
 import { File } from "./File";
 import { JackTokenizer } from "./JackTokenizer";
+import { FileType } from "./Constants";
 import os = require("os");
 import fs = require("fs");
 
@@ -12,9 +13,12 @@ export class Main {
     public async run(input: string): Promise<void> {
         console.log(`Processing ${input}`);
         const files = this.file.getFiles(input);
+        await this.runTokenizer(files);
+    }
 
+    private async runTokenizer(files): Promise<void> {
         for (let file of files) {
-            const outputFile = this.file.getOutFilePath(file);
+            const outputFile = this.file.getOutFilePath(file, "T");
             const writeStream = await this.file.init(outputFile);
             await this.file.appendLine(`<tokens>`, writeStream);
             await this.processFile(file, writeStream);
