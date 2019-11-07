@@ -1,28 +1,18 @@
-import { commentSymbolType1, commentSymbolType2, spaceSymbol, emptySymbol } from "./Constants";
+import { Token } from "./Token";
+import { File } from "./File";
+import { WriteStream } from "fs";
 
 export class Parser {
     /**
-     * Cleans the command line:
-     * Removes trailing and leading white spaces,
-     * Removes comments
-     * @param {string} line command line
-     * @returns {string} command line without whitespaces or comments
+     * Generates output of compiled Jack code in xml format
      */
-    public clean(line: string): string {
-        let cleanedLine = line.trim();
-        cleanedLine = cleanedLine.replace(/\/\/.*$/g, ''); // to end of line comments
-        cleanedLine = cleanedLine.replace(/\/\*[\s\S]*?\*\//g, ''); // inline /* */ comments
-        cleanedLine = cleanedLine.replace(/^[\/\*].*$/g, ''); // API comments
-        return cleanedLine.trim();
+    public async compile(file: File, writeStream: WriteStream): Promise<void> {
+        await this.compileClass(file, writeStream);
     }
 
-    /**
-     * Returns tokens
-     * @param {string} line command line
-     * @returns {string[]} array of tokens
-     */
-    public getTokens(line: string): string[] {
-        let cleanedLine = this.clean(line);
-        return cleanedLine.match(/\w+|".*"|\S/g);
+    private async compileClass(file: File, writeStream: WriteStream): Promise<void> {
+        await file.appendLine(`<class>`, writeStream);
+
+        await file.appendLine(`</class>`, writeStream);
     }
 }

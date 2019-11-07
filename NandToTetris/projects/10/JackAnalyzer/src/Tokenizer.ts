@@ -1,26 +1,21 @@
-import os = require("os");
-import { Parser } from "./Parser";
 import { Keywords, Symbols, TokenType, quoteSymbol } from "./Constants";
 import { Token } from "./Token";
 
-export class JackTokenizer {
-    public tokens: Token[] = [];
-    constructor(private parser: Parser) {}
+export class Tokenizer {
+    constructor() {}
 
-    public clearTokens() {
-        this.tokens = [];
-    }
-
-    public tokenizeLine(line: string) {
-        const lineTokens = this.parser.getTokens(line);
+    public tokenizeLine(line: string): Token[] {
+        const tokens: Token[] = [];
+        const lineTokens = this.getTokens(line);
         if (lineTokens) {
             lineTokens.forEach(token => {
                 if (token) {
                     const type = this.getType(token);
-                    this.tokens.push(new Token(type, token));
+                    tokens.push(new Token(type, token));
                 }
             })
         }
+        return tokens;
     }
 
     private getType(token: string): TokenType {
@@ -65,5 +60,30 @@ export class JackTokenizer {
 
     private isIdentifier(token: string): boolean {
         return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token);
+    }
+
+    /**
+     * Cleans the command line:
+     * Removes trailing and leading white spaces,
+     * Removes comments
+     * @param {string} line command line
+     * @returns {string} command line without whitespaces or comments
+     */
+    private clean(line: string): string {
+        let cleanedLine = line.trim();
+        cleanedLine = cleanedLine.replace(/\/\/.*$/g, ''); // to end of line comments
+        cleanedLine = cleanedLine.replace(/\/\*[\s\S]*?\*\//g, ''); // inline /* */ comments
+        cleanedLine = cleanedLine.replace(/^[\/\*].*$/g, ''); // API comments
+        return cleanedLine.trim();
+    }
+
+    /**
+     * Returns tokens
+     * @param {string} line command line
+     * @returns {string[]} array of tokens
+     */
+    private getTokens(line: string): string[] {
+        let cleanedLine = this.clean(line);
+        return cleanedLine.match(/\w+|".*"|\S/g);
     }
 }
