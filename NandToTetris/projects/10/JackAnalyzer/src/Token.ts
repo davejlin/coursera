@@ -1,4 +1,5 @@
 import { TokenType } from "./Constants";
+import os = require("os");
 
 export class Token {
     constructor(public type: TokenType, public token: string) {}
@@ -21,7 +22,7 @@ export class Token {
     }
 
     private createTag(tagname: string, token: string): string {
-        return `<${tagname}> ${token} </${tagname}>`;
+        return `<${tagname}> ${token} </${tagname}>` + os.EOL;
     }
 
     private substituteSymbol(token: string): string {

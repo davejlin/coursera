@@ -6,11 +6,8 @@ import { FileType } from "./Constants";
 type Stream = fs.ReadStream | fs.WriteStream;
 
 export class File {
-    private firstLine = true;
-
     public async init(outFile: string): Promise<fs.WriteStream> {
         return new Promise(resovle => {
-            this.firstLine = true;
             this.deleteFile(outFile);
 
             const outStream = fs.createWriteStream(outFile, {
@@ -55,24 +52,13 @@ export class File {
 
     public async appendLine(line: string, writeStream: fs.WriteStream): Promise<void> {
         return new Promise(resolve => {
-            if (this.firstLine) {
-                writeStream.write(line, error => {
-                    if (error) {
-                        console.log(`File: appendLine error: ${error}`);
-                    } else {
-                        this.firstLine = false;
-                    }
-                    resolve();
-                });
-            } else {
-                writeStream.write(os.EOL + line, error => {
-                    if (error) {
-                        console.log(`File: appendLine error: ${error}`);
-                    }
-                    resolve();
-                });
-            }
-        })
+            writeStream.write(line, error => {
+                if (error) {
+                    console.log(`File: appendLine error: ${error}`);
+                }
+                resolve();
+            });
+        });
     }
 
     public async closeStream<T extends Stream>(stream: T): Promise<void> {

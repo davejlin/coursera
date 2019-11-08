@@ -1,17 +1,13 @@
 import { File } from "./File";
 import { Tokenizer } from "./Tokenizer";
-import os = require("os");
-import { Parser } from "./Parser";
 import { Token } from "./Token";
-import { ReadStream } from "fs";
+import { ReadStream, WriteStream } from "fs";
 import { Interface } from "readline";
+import { Parser } from "./Parser";
+import os = require("os");
 
 export class Main {
-    constructor(
-        private file: File,
-        private tokenizer: Tokenizer,
-        private parser: Parser
-    ) {}
+    constructor(private file: File, private tokenizer: Tokenizer, private parser: Parser) {}
 
     public async run(input: string): Promise<void> {
         console.log(`Processing ${input}`);
@@ -22,75 +18,69 @@ export class Main {
 
     private async process(files): Promise<void> {
         for (let file of files) {
-            const outputTokenFile = this.file.getOutFilePath(file, "T");
-            await this.tokenize(file, outputTokenFile);
-            console.log(`Outputted to ${outputTokenFile}`);
-
-            const outputCompiledFile = this.file.getOutFilePath(file);
-            await this.compile(outputTokenFile, outputCompiledFile)
-            console.log(`Outputted to ${outputCompiledFile}${os.EOL}`);
+            await this.tokenize(file);
         }
     }
 
-    private async tokenize(inputFile: string, outputFile: string): Promise<void> {
-        const writeStream = await this.file.init(outputFile);
-        const writeLine = async (output: string) => {
-            await this.file.appendLine(output, writeStream);
+    private async tokenize(inputFile: string): Promise<void> {
+        const tokenOutputFile = this.file.getOutFilePath(inputFile, "T");
+        const tokensWriteStream = await this.file.init(tokenOutputFile);
+
+        const parserOutputFile = this.file.getOutFilePath(inputFile);
+        const parserWriteStream = await this.file.init(parserOutputFile);
+
+        const parserWriteLine = async (output: string) => {
+            await this.file.appendLine(output, parserWriteStream);
         }
+        
+        await this.parser.init(parserWriteLine);
+
         const { readStream, readInterface } = this.file.getReadStreamAndInterface(inputFile);
+        
+        await this.tokenizeFile(readStream, readInterface, tokensWriteStream);
+        await this.parser.deinit();
 
-        await this.tokenizeFile(readStream, readInterface, writeLine);
         readStream.destroy();
-        await this.file.closeStream(writeStream);
+        await this.file.closeStream(tokensWriteStream);
+        await this.file.closeStream(parserWriteStream);
+
+        console.log(`Outputted to ${tokenOutputFile}`);
+        console.log(`Outputted to ${parserOutputFile}${os.EOL}`);
     }
 
 
-    public async tokenizeFile(readStream: ReadStream, readInterface: Interface, writeLine: (output: string) => Promise<void>) {
-        await writeLine(`<tokens>`);
+    public async tokenizeFile(readStream: ReadStream, readInterface: Interface, tokensWriteStream: WriteStream) {
+        const tokenWriteLine = async (output: string) => {
+            await this.file.appendLine(output, tokensWriteStream);
+        }
+    
+        await tokenWriteLine(`<tokens>` + os.EOL);
         return new Promise (resolve => {
 
             readInterface.on("line", async line => {
-                await this.tokenizeLine(line, writeLine);
+                await this.tokenizeLine(line, tokenWriteLine);
             });
 
             readInterface.on("close", () => {
                 readStream.on("close", async () => {
-                    await writeLine(`</tokens>${os.EOL}`);
+                    await tokenWriteLine(`</tokens>` + os.EOL);
                     resolve();
                 })
             });
         });
     }
 
-    public async tokenizeLine(line: string, writeLine: (string) => Promise<void>): Promise<void> {
+    public async tokenizeLine(line: string, writeLine: (string: string) => Promise<void>): Promise<void> {
         const lineTokens = this.tokenizer.getTokens(line);
         if (lineTokens) {
-            lineTokens.forEach(async lineToken => {
-                if (lineToken) {
-                    const type = this.tokenizer.getType(lineToken);
-                    const token = new Token(type, lineToken)  // the next token
+            lineTokens.forEach(async aToken => {
+                if (aToken) {
+                    const type = this.tokenizer.getType(aToken);
+                    const token = new Token(type, aToken)  // the next token
                     await writeLine(token.composeTag());
+                    this.parser.nextToken(token);
                 }
             })
         }
-    }
-
-    private async compile(inputFile: string, outputFile: string): Promise<void> {
-        const writeStream = await this.file.init(outputFile);
-
-        return new Promise (resolve => {
-            const { readStream, readInterface } = this.file.getReadStreamAndInterface(inputFile);
-
-            readInterface.on("line", async line => {
-                await this.file.appendLine(line, writeStream);
-            });
-
-            readInterface.on("close", () => {
-                readStream.on("close", async () => {
-                    await this.file.closeStream(writeStream);
-                    resolve();
-                })
-            });
-        });
     }
 }
