@@ -1,7 +1,22 @@
 import { Keywords, Symbols, TokenType, quoteSymbol } from "./Constants";
+import os = require("os");
 
 export class Tokenizer {
+    private writeLine: (string: string) => Promise<void>;
     constructor() {}
+
+    public async init(writeLine: (string: string) => Promise<void>): Promise<void> {
+        this.writeLine = writeLine;
+        await this.writeLine(`<tokens>` + os.EOL);
+    }
+
+    public async deinit(): Promise<void> {
+        await this.writeLine(`</tokens>` + os.EOL);
+    }
+
+    public async write(token: string): Promise<void> {
+        await this.writeLine(token);
+    }
 
     /**
      * Returns tokens
