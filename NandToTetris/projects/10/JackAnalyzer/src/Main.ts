@@ -78,7 +78,7 @@ export class Main {
                     const type = this.tokenizer.getType(aToken);
                     const token = new Token(type, aToken)  // the next token
                     await writeLine(token.composeTag());
-                    this.parser.nextToken(token);
+                    await this.parser.nextToken(token);
                 }
             })
         }
