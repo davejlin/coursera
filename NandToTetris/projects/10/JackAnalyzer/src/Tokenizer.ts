@@ -1,24 +1,19 @@
 import { Keywords, Symbols, TokenType, quoteSymbol } from "./Constants";
-import { Token } from "./Token";
 
 export class Tokenizer {
     constructor() {}
 
-    public tokenizeLine(line: string): Token[] {
-        const tokens: Token[] = [];
-        const lineTokens = this.getTokens(line);
-        if (lineTokens) {
-            lineTokens.forEach(token => {
-                if (token) {
-                    const type = this.getType(token);
-                    tokens.push(new Token(type, token));
-                }
-            })
-        }
-        return tokens;
+    /**
+     * Returns tokens
+     * @param {string} line command line
+     * @returns {string[]} array of tokens
+     */
+    public getTokens(line: string): string[] {
+        let cleanedLine = this.clean(line);
+        return cleanedLine.match(/\w+|".*"|\S/g);
     }
 
-    private getType(token: string): TokenType {
+    public getType(token: string): TokenType {
         if (this.isKeyword(token)) {
             return TokenType.keyword;
         }
@@ -75,15 +70,5 @@ export class Tokenizer {
         cleanedLine = cleanedLine.replace(/\/\*[\s\S]*?\*\//g, ''); // inline /* */ comments
         cleanedLine = cleanedLine.replace(/^[\/\*].*$/g, ''); // API comments
         return cleanedLine.trim();
-    }
-
-    /**
-     * Returns tokens
-     * @param {string} line command line
-     * @returns {string[]} array of tokens
-     */
-    private getTokens(line: string): string[] {
-        let cleanedLine = this.clean(line);
-        return cleanedLine.match(/\w+|".*"|\S/g);
     }
 }
