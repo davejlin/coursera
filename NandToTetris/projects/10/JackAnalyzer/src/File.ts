@@ -1,6 +1,4 @@
 import fs = require("fs");
-import os = require("os");
-import readline = require("readline");
 import { FileType } from "./Constants";
 
 type Stream = fs.ReadStream | fs.WriteStream;
@@ -42,12 +40,10 @@ export class File {
         return files;
     }
 
-    public getReadStreamAndInterface(inFile: string): { readStream: fs.ReadStream, readInterface: readline.Interface } {
-        const readStream = fs.createReadStream(inFile);
-        const readInterface = readline.createInterface({
-            input: readStream
+    public getReadStreamAndInterface(inFile: string): fs.ReadStream {
+        return fs.createReadStream(inFile, {
+            encoding: "utf8"
         });
-        return { readStream, readInterface };
     }
 
     public async appendLine(line: string, writeStream: fs.WriteStream): Promise<void> {
