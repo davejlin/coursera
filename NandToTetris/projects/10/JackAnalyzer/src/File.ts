@@ -4,7 +4,7 @@ import { FileType } from "./Constants";
 type Stream = fs.ReadStream | fs.WriteStream;
 
 export class File {
-    public async init(outFile: string): Promise<fs.WriteStream> {
+    public static async init(outFile: string): Promise<fs.WriteStream> {
         return new Promise(resovle => {
             this.deleteFile(outFile);
 
@@ -24,7 +24,7 @@ export class File {
      * If input is a directory, returns all .jack files in that directory.
      * @param input 
      */
-    public getFiles(input: string): string[] {
+    public static getFiles(input: string): string[] {
         const files: string[] = [];
         if (this.isJackFile(input)) {
             files.push(input);
@@ -40,13 +40,13 @@ export class File {
         return files;
     }
 
-    public getReadStreamAndInterface(inFile: string): fs.ReadStream {
+    public static getReadStreamAndInterface(inFile: string): fs.ReadStream {
         return fs.createReadStream(inFile, {
             encoding: "utf8"
         });
     }
 
-    public async appendLine(line: string, writeStream: fs.WriteStream): Promise<void> {
+    public static async appendLine(line: string, writeStream: fs.WriteStream): Promise<void> {
         return new Promise(resolve => {
             writeStream.write(line, error => {
                 if (error) {
@@ -57,7 +57,7 @@ export class File {
         });
     }
 
-    public async closeStream<T extends Stream>(stream: T): Promise<void> {
+    public static async closeStream<T extends Stream>(stream: T): Promise<void> {
         return new Promise(resolve => {
             stream.close();
             stream.on("close", () => {
@@ -66,7 +66,7 @@ export class File {
         });
     }
 
-    private deleteFile(file: string) {
+    private static deleteFile(file: string) {
         if (fs.existsSync(file)) {
             fs.unlinkSync(file);
             console.log(`File: Deleted ${file}`);
@@ -75,15 +75,15 @@ export class File {
         }
     }
 
-    private isDirectory(path: string): boolean {
+    private static isDirectory(path: string): boolean {
         return fs.statSync(path).isDirectory();
     }
 
-    private isFile(path: string): boolean {
+    private static isFile(path: string): boolean {
         return fs.statSync(path).isFile();
     }
 
-    private isJackFile(path: string): boolean {
+    private static isJackFile(path: string): boolean {
         if (!this.isFile(path)) {
             return false;
         }
@@ -101,7 +101,7 @@ export class File {
         return false;
     }
 
-    public getOutFilePath(path: string, nameSuffix: string = ""): string {
+    public static getOutFilePath(path: string, nameSuffix: string = ""): string {
         const fullFilePathWithoutTypeSuffix = path.split(".")[0];
 
         if (this.isDirectory(path)) {

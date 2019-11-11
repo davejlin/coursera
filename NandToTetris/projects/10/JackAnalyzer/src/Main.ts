@@ -1,65 +1,54 @@
 import { File } from "./File";
 import { Parser } from "./Parser";
-import os = require("os");
 import { TokenStream } from "./TokenStream";
+import { TokenWriter } from "./TokenWriter";
+import { Processor } from "./Processor";
+import { WriteStream } from "fs";
 
 export class Main {
-    constructor(private file: File, private tokenStream: TokenStream, private parser: Parser) {}
+    constructor() {}
 
     public async run(input: string): Promise<void> {
         console.log(`Processing ${input}`);
-        const files = this.file.getFiles(input);
-        await this.process(files);
+        const files = File.getFiles(input);
+        for (let file of files) {
+            await this.tokenize(file);
+            await this.compile(file);
+        }
         console.log(`Processed ${input}`);
     }
 
-    private async process(files): Promise<void> {
-        for (let file of files) {
-            await this.tokenize(file);
-        }
+    private async tokenize(file: string): Promise<void> {
+        const outputFile = File.getOutFilePath(file, "T");
+        const { tokenStream, writeStream, writeLine } = await this.getStreams(file, outputFile);
+        const tokenWriter = new TokenWriter(tokenStream, writeLine);
+        await this.process(tokenWriter);
+        await File.closeStream(writeStream);
+        console.log(`Tokens outputted to ${outputFile}`);
     }
 
-    private async tokenize(inputFile: string): Promise<void> {
-        const tokenOutputFile = this.file.getOutFilePath(inputFile, "T");
-        const tokensWriteStream = await this.file.init(tokenOutputFile);
-        const tokenWriteLine = async (output: string) => {
-            await this.file.appendLine(output, tokensWriteStream);
-        }
-
-        const parserOutputFile = this.file.getOutFilePath(inputFile);
-        const parserWriteStream = await this.file.init(parserOutputFile);
-        const parserWriteLine = async (output: string) => {
-            await this.file.appendLine(output, parserWriteStream);
-        }        
-        await this.parser.init(parserWriteLine);
-
-        const readStream = this.file.getReadStreamAndInterface(inputFile);
-
-        await tokenWriteLine(`<tokens>` + os.EOL);
-        await this.tokenStream.init(readStream);
-        await this.tokenizeFile(this.tokenStream, tokenWriteLine);
-        this.tokenStream.deinit();
-        await tokenWriteLine(`</tokens>` + os.EOL);
-
-        await this.parser.deinit();
-        await Promise.all([
-            this.file.closeStream(tokensWriteStream), 
-            this.file.closeStream(parserWriteStream)
-        ]);
-
-        console.log(`Outputted to ${tokenOutputFile}`);
-        console.log(`Outputted to ${parserOutputFile}${os.EOL}`);
+    private async compile(file: string): Promise<void>  {
+        const outputFile = File.getOutFilePath(file);
+        const { tokenStream, writeStream, writeLine } = await this.getStreams(file, outputFile);
+        const parser = new Parser(tokenStream, writeLine);
+        await this.process(parser);
+        await File.closeStream(writeStream);
+        console.log(`Compile outputted to ${outputFile}`);
     }
 
+    private async getStreams(inputFile: string, outputFile: string): Promise<{tokenStream: TokenStream, writeStream: WriteStream, writeLine: (output: string) => Promise<void>}> {
+        const writeStream = await File.init(outputFile);
+        const writeLine = async (output: string) => {
+            await File.appendLine(output, writeStream);
+        }
+        const readStream = File.getReadStreamAndInterface(inputFile);
+        const tokenStream = new TokenStream(readStream);
+        return { tokenStream, writeStream, writeLine };
+    }
 
-    public async tokenizeFile(tokenStream: TokenStream, writeLine: (line:string) => Promise<void>) {
-        return new Promise (async resolve => {
-            while (tokenStream.hasNextToken()) {
-                const token = tokenStream.nextToken();
-                await writeLine(token.composeTag());
-                await this.parser.nextToken(token);
-            }
-            resolve();
-        });
+    private async process(processor: Processor) {
+        await processor.init();
+        await processor.process();
+        processor.deinit();
     }
 }

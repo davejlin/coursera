@@ -1,6 +1,7 @@
 import { ReadStream } from "fs";
 import { Token } from "./Token";
 import { Tokenizer } from "./Tokenizer";
+import os = require("os");
 
 /**
  * TokenStream provides a stream of tokens one at a time.
@@ -8,27 +9,25 @@ import { Tokenizer } from "./Tokenizer";
  * Processing is paused until the current line's tokens have been completely consumed.
  */
 export class TokenStream {
-    private readStream: ReadStream;
     private readStreamOpen = true;
     private tokens: Token[] = [];
     private hasNext = () => this.tokens.length > 0
 
-    constructor() {}
+    constructor(private readStream: ReadStream) {}
 
-    public async init(readStream: ReadStream): Promise<void> {
-        this.readStream = readStream;
+    public async init(): Promise<void> {
         return new Promise(resolve => {
-            readStream.on('readable', async () => {
+            this.readStream.on('readable', async () => {
                 resolve();
             });
     
-            readStream.on('end', () => {
+            this.readStream.on('end', () => {
                 this.readStreamOpen = false;
-                console.log(`TokenStream: ${readStream.path} end`);
+                console.log(`TokenStream: ${this.readStream.path} end`);
             });
     
-            readStream.on('error', error => {
-                console.log(`TokenStream: ${readStream.path} error: ${error}`);
+            this.readStream.on('error', error => {
+                console.log(`TokenStream: ${this.readStream.path} error: ${error}`);
             });
         });
     }
@@ -86,7 +85,7 @@ export class TokenStream {
             if (newChar === null) { // end of file
                 break;
             }
-            if (newChar === "\n") { // end of line
+            if (newChar === os.EOL ) { // end of line
                 if (this.process(line)) {
                     break;  // new tokens were created in the processed line, so stop processing more for now
                 }
