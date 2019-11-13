@@ -13,7 +13,7 @@ export class Main {
         const files = File.getFiles(input);
         for (let file of files) {
             await this.tokenize(file);
-            await this.compile(file);
+            await this.parse(file);
         }
         console.log(`Processed ${input}`);
     }
@@ -27,13 +27,13 @@ export class Main {
         console.log(`Tokens outputted to ${outputFile}`);
     }
 
-    private async compile(file: string): Promise<void>  {
+    private async parse(file: string): Promise<void>  {
         const outputFile = File.getOutFilePath(file);
         const { tokenStream, writeStream, writeLine } = await this.getStreams(file, outputFile);
         const parser = new Parser(tokenStream, writeLine);
         await this.process(parser);
         await File.closeStream(writeStream);
-        console.log(`Compile outputted to ${outputFile}`);
+        console.log(`Parser outputted to ${outputFile}`);
     }
 
     private async getStreams(inputFile: string, outputFile: string): Promise<{tokenStream: TokenStream, writeStream: WriteStream, writeLine: (output: string) => Promise<void>}> {

@@ -43,10 +43,24 @@ export class TokenStream {
         return this.hasNext();
     }
 
-    public nextToken(): Token | undefined {
-        if (this.hasNext()) {
+    /**
+     * Returns the next token and removes it from the tokens collection.
+     * FIFO
+     */
+    public getNext(): Token | undefined {
+        if (this.hasNextToken()) {
             const nextToken = this.tokens.splice(0, 1)[0];
             return nextToken; 
+        }
+        return undefined;
+    }
+
+    /**
+     * Returns the next token and keeps it in the tokens collection
+     */
+    public peekNext(): Token | undefined {
+        if (this.hasNextToken()) {
+            return this.tokens[0];
         }
         return undefined;
     }
