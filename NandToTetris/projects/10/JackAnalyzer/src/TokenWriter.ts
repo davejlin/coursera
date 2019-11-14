@@ -1,4 +1,3 @@
-import { TokenStream } from "./TokenStream";
 import { Processor } from "./Processor";
 import os = require("os");
 

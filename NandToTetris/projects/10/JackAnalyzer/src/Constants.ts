@@ -3,6 +3,7 @@ export const commentSymbolType2 = "/*";
 export const spaceSymbol = " ";
 export const emptySymbol = "";
 export const quoteSymbol = "\"";
+export const spacer = "  ";
 
 export enum FileType {
     jack = "jack",
