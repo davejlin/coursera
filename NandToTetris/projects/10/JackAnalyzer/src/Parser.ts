@@ -22,6 +22,7 @@ export class Parser extends Processor {
             const peekNextToken = this.tokenStream.peekNext().token;
             switch (peekNextToken) {
                 case Keyword.field:
+                case Keyword.static:
                     await this.compileClassVarDec();
                     break;
                 case Keyword.function:
@@ -120,6 +121,13 @@ export class Parser extends Processor {
             switch (this.tokenStream.peekNext().token) {
                 case Keyword.var:
                     await this.compileVarDec();
+                    break;
+                case Keyword.let:
+                case Keyword.if:
+                case Keyword.while:
+                case Keyword.do:
+                case Keyword.return:
+                    await this.compileStatements();
                 default:
                     break;
             }
@@ -158,14 +166,58 @@ export class Parser extends Processor {
      * Compiles a sequence of statements, not including the enclosing “{}”
      */
     private async compileStatements(): Promise<void> {
-        
+        await this.output([`<statements>` + os.EOL]);
+        this.incrementSpacer();
+
+        let cycle = true;
+
+        while (cycle) {
+            switch (this.tokenStream.peekNext().token) {
+                case Keyword.let:
+                    await this.compileLet();
+                    break;
+                case Keyword.if:
+                    await this.compileIf();
+                    break;
+                case Keyword.while:
+                    await this.compileWhile();
+                    break;
+                case Keyword.do:
+                    await this.compileDo();
+                    break;
+                case Keyword.return:
+                    await this.compileReturn();
+                    break;
+                default:
+                    cycle = false;
+                    break;
+            }
+        }
+
+        this.decrementSpacer();
+        await this.output([`</statements>` + os.EOL])
     }
 
     /**
      * Compiles a let statement
      */
     private async compileLet(): Promise<void> {
+        await this.output([`<letStatement>` + os.EOL]);
         
+        const letKeyword = this.tokenStream.getNext().composeTag();
+        const name = this.tokenStream.getNext().composeTag();
+        const symbol = this.tokenStream.getNext().composeTag();
+
+        this.incrementSpacer();
+        await this.output([letKeyword, name, symbol]);
+
+        await this.compileExpression();
+
+        const symbolSemicolon = this.tokenStream.getNext().composeTag();
+        await this.output([symbolSemicolon]);
+
+        this.decrementSpacer();
+        await this.output([`</letStatement>` + os.EOL]);
     }
 
     /**
@@ -200,7 +252,19 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
-        
+        await this.output([`<expression>` + os.EOL]);
+        this.incrementSpacer();
+        await this.output([`<term>` + os.EOL]);
+
+        const identifier = this.tokenStream.getNext().composeTag();
+        this.incrementSpacer();
+
+        await this.output([identifier]);
+
+        this.decrementSpacer();
+        await this.output([`</term>` + os.EOL]);
+        this.decrementSpacer();
+        await this.output([`</expression>` + os.EOL]);
     }
 
     /**
