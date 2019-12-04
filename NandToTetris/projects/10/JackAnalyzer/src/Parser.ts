@@ -27,7 +27,9 @@ export class Parser extends Processor {
                 case Keyword.static:
                     await this.compileClassVarDec();
                     break;
+                case Keyword.constructor:
                 case Keyword.function:
+                case Keyword.method:
                     await this.compileSubroutineDec();
                     if (this.tokenStream.peekNext().token === Symbol.closeBrace) {
                         cycle = false;
@@ -52,14 +54,7 @@ export class Parser extends Processor {
      */
     private async compileClassVarDec(): Promise<void> {
         await this.output([`<classVarDec>` + os.EOL]);
-        const keyword = this.tokenStream.getNext().composeTag();
-        const type = this.tokenStream.getNext().composeTag();
-        const name = this.tokenStream.getNext().composeTag();
-        const semiColon = this.tokenStream.getNext().composeTag();
-        this.incrementSpacer();
-        await this.output([keyword, type, name, semiColon]);
-
-        this.decrementSpacer();
+        await this.compileVars();
         await this.output([`</classVarDec>` + os.EOL]);
     }
 
@@ -71,10 +66,18 @@ export class Parser extends Processor {
 
         const functionKeyword = this.tokenStream.getNext().composeTag();
         const accessor = this.tokenStream.getNext().composeTag();
-        const name = this.tokenStream.getNext().composeTag();
+        const output = [functionKeyword, accessor];
+
+        while (this.tokenStream.peekNext().type == TokenType.identifier) {
+            const identifier = this.tokenStream.getNext().composeTag();
+            output.push(identifier);
+        }
+
         const openParenths = this.tokenStream.getNext().composeTag();
+        output.push(openParenths);
+
         this.incrementSpacer();
-        await this.output([functionKeyword, accessor, name, openParenths]);
+        await this.output(output);
 
         await this.compileParameterList();
 
@@ -149,7 +152,11 @@ export class Parser extends Processor {
      */
     private async compileVarDec(): Promise<void> {
         await this.output([`<varDec>` + os.EOL]);
+        await this.compileVars();
+        await this.output([`</varDec>` + os.EOL]);
+    }
 
+    private async compileVars(): Promise<void> {
         const varKeyword = this.tokenStream.getNext().composeTag();
         const type = this.tokenStream.getNext().composeTag();
         const name = this.tokenStream.getNext().composeTag();
@@ -166,9 +173,7 @@ export class Parser extends Processor {
         output.push(semicolon);
         this.incrementSpacer();
         await this.output(output);
-
         this.decrementSpacer();
-        await this.output([`</varDec>` + os.EOL]);
     }
 
     /**
@@ -277,12 +282,20 @@ export class Parser extends Processor {
         
         const doKeyword = this.tokenStream.getNext().composeTag();
         const identifier1 = this.tokenStream.getNext().composeTag();
-        const symbol = this.tokenStream.getNext().composeTag();
-        const identifier2 = this.tokenStream.getNext().composeTag();
+        const output = [doKeyword, identifier1];
+
+        if (this.tokenStream.peekNext().token === Symbol.period) {
+            const symbol = this.tokenStream.getNext().composeTag();
+            const identifier2 = this.tokenStream.getNext().composeTag();
+            output.push(symbol);
+            output.push(identifier2);
+        }
+
         const openParenths = this.tokenStream.getNext().composeTag();
+        output.push(openParenths);
 
         this.incrementSpacer();
-        await this.output([doKeyword, identifier1, symbol, identifier2, openParenths]);
+        await this.output(output);
 
         await this.compileExpressionList();
 
@@ -301,10 +314,16 @@ export class Parser extends Processor {
         await this.output([`<returnStatement>` + os.EOL]);
         
         const returnKeyword = this.tokenStream.getNext().composeTag();
-        const symbol = this.tokenStream.getNext().composeTag();
 
         this.incrementSpacer();
-        await this.output([returnKeyword, symbol]);
+        await this.output([returnKeyword]);
+
+        if (this.tokenStream.peekNext().token !== Symbol.semicolon) {
+            await this.compileExpression();
+        }
+
+        const symbol = this.tokenStream.getNext().composeTag();
+        await this.output([symbol]);
 
         this.decrementSpacer();
         await this.output([`</returnStatement>` + os.EOL]);
