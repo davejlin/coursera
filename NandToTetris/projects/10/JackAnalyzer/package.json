@@ -9,7 +9,7 @@
     "cleanxml": "rm -rf files/ArrayTest/*.xml && rm -rf files/ExpressionLessSquare/*.xml && rm -rf files/Square/*.xml",
     "start": "tsc && node dist/JackAnalyzer.js",
     "runall": "npm run start files/ArrayTest && npm run start files/ExpressionLessSquare && npm run start files/Square",
-    "runone": "npm run start files/ExpressionLessSquare/Main.jack"
+    "runone": "npm run start files/ExpressionLessSquare"
   },
   "keywords": [
     "Jack",
