@@ -40,7 +40,6 @@ export class Parser extends Processor {
             }
         }
 
-
         const closeSymbolToken = this.tokenStream.getNext().composeTag();
         this.decrementSpacer();
         await this.output([closeSymbolToken]);
@@ -68,7 +67,7 @@ export class Parser extends Processor {
         const accessor = this.tokenStream.getNext().composeTag();
         const output = [functionKeyword, accessor];
 
-        while (this.tokenStream.peekNext().type == TokenType.identifier) {
+        while (this.tokenStream.peekNext().type === TokenType.identifier) {
             const identifier = this.tokenStream.getNext().composeTag();
             output.push(identifier);
         }
@@ -223,7 +222,7 @@ export class Parser extends Processor {
         const name = this.tokenStream.getNext().composeTag();
         await this.output([letKeyword, name]);
 
-        if (this.tokenStream.peekNext().token == Symbol.openBracket) {
+        if (this.tokenStream.peekNext().token === Symbol.openBracket) {
             const openBracket = this.tokenStream.getNext().composeTag();
             await this.output([openBracket]);
             await this.compileExpression();
@@ -262,7 +261,7 @@ export class Parser extends Processor {
 
         await this.compileStatements();
 
-        if (this.tokenStream.peekNext().token == Keyword.else) {
+        if (this.tokenStream.peekNext().token === Keyword.else) {
             const elseKeyword = this.tokenStream.getNext().composeTag();
             const openBrace = this.tokenStream.getNext().composeTag();
             await this.output([elseKeyword, openBrace]);
@@ -361,9 +360,15 @@ export class Parser extends Processor {
                 case TokenType.keyword:
                 case TokenType.stringConstant:
                     await this.output([`<expression>` + os.EOL]);
-                    this.incrementSpacer();
                     await this.compileTerm();
-                    this.decrementSpacer();
+                    const nextToken = this.tokenStream.peekNext().token;
+                    if (nextToken === Symbol.pipe || nextToken == Symbol.amperstand) {
+                        const symbol = this.tokenStream.getNext().composeTag();
+                        this.incrementSpacer();
+                        await this.output([symbol]);
+                        this.decrementSpacer();
+                        await this.compileTerm();
+                    }
                     await this.output([`</expression>` + os.EOL]);
                     break;
                 default:
@@ -383,6 +388,7 @@ export class Parser extends Processor {
      * should not be advanced over 
      */
     private async compileTerm(): Promise<void> {
+        this.incrementSpacer();
         await this.output([`<term>` + os.EOL]);
 
         const name = this.tokenStream.getNext().composeTag();
@@ -414,6 +420,7 @@ export class Parser extends Processor {
 
         this.decrementSpacer();
         await this.output([`</term>` + os.EOL]);
+        this.decrementSpacer();
     }
 
     /**
