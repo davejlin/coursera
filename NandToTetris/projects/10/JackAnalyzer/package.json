@@ -8,9 +8,8 @@
     "cleanall": "npm run clean && npm run cleanxml && rm -rf node_modules && rm -rf package-lock.json",
     "cleanxml": "rm -rf files/ArrayTest/*.xml && rm -rf files/ExpressionLessSquare/*.xml && rm -rf files/Square/*.xml",
     "start": "tsc && node dist/JackAnalyzer.js",
-    "runall": "npm run start files/ArrayTest && npm run start files/ExpressionLessSquare && npm run start files/Square",
-    "runsome": "npm run start files/ExpressionLessSquare && npm run start files/ArrayTest"
-  },
+    "runall": "npm run start files/ArrayTest && npm run start files/ExpressionLessSquare && npm run start files/Square"
+},
   "keywords": [
     "Jack",
     "compiler",

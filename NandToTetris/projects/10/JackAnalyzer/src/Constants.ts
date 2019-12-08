@@ -110,3 +110,14 @@ export const Symbols: string[] = [
     Symbol.eq,
     Symbol.tilda
 ]
+
+export const Operators: string[] = [
+    Symbol.plus,
+    Symbol.minus,
+    Symbol.asterick,
+    Symbol.slash,
+    Symbol.amperstand,
+    Symbol.pipe,
+    Symbol.lt,
+    Symbol.gt,
+]

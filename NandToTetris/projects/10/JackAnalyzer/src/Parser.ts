@@ -1,7 +1,6 @@
 import { Processor } from "./Processor";
 import os = require("os");
-import { Keyword, Symbol, spacer, TokenType } from "./Constants";
-import { Token } from "./Token";
+import { Keyword, Symbol, spacer, TokenType, Operators } from "./Constants";
 
 export class Parser extends Processor {
     private spacer = "";
@@ -342,9 +341,10 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
-        while (this.tokenStream.peekNext().token !== Symbol.semicolon
-        && this.tokenStream.peekNext().token !== Symbol.closeParenths
-        && this.tokenStream.peekNext().token !== Symbol.closeBracket) {
+        let nextToken = this.tokenStream.peekNext().token;
+        while (nextToken !== Symbol.semicolon
+        && nextToken !== Symbol.closeParenths
+        && nextToken !== Symbol.closeBracket) {
             switch (this.tokenStream.peekNext().type) {
                 case TokenType.identifier:
                 case TokenType.keyword:
@@ -352,8 +352,7 @@ export class Parser extends Processor {
                 case TokenType.integerConstant:
                     await this.output([`<expression>` + os.EOL]);
                     await this.compileTerm();
-                    const nextToken = this.tokenStream.peekNext().token;
-                    if (nextToken === Symbol.pipe || nextToken == Symbol.amperstand) {
+                    if (Operators.includes(this.tokenStream.peekNext().token)) {
                         const symbol = this.tokenStream.getNext().composeTag();
                         this.incrementSpacer();
                         await this.output([symbol]);
@@ -366,6 +365,7 @@ export class Parser extends Processor {
                     await this.output([this.tokenStream.getNext().composeTag()]);
                     break;
             }
+            nextToken = this.tokenStream.peekNext().token;
         }
     }
 
