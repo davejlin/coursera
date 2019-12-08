@@ -41,7 +41,6 @@ export class Parser extends Processor {
         }
 
         const closeSymbolToken = this.tokenStream.getNext().composeTag();
-        this.decrementSpacer();
         await this.output([closeSymbolToken]);
 
         this.decrementSpacer();
@@ -351,7 +350,6 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
-        this.incrementSpacer();
         while (this.tokenStream.peekNext().token !== Symbol.semicolon
         && this.tokenStream.peekNext().token !== Symbol.closeParenths
         && this.tokenStream.peekNext().token !== Symbol.closeBracket) {
@@ -376,7 +374,6 @@ export class Parser extends Processor {
                     break;
             }
         }
-        this.decrementSpacer();
     }
 
     /**
@@ -430,7 +427,9 @@ export class Parser extends Processor {
         await this.output([`<expressionList>` + os.EOL]);
 
         if (this.tokenStream.peekNext().token != Symbol.closeParenths) {
+            this.incrementSpacer();
             await this.compileExpression();
+            this.decrementSpacer();
         }
 
         const closeParenth = this.tokenStream.getNext().composeTag();
