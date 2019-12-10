@@ -341,18 +341,36 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
-        let nextToken = this.tokenStream.peekNext();
-        while (nextToken.token !== Symbol.semicolon
-        && nextToken.token !== Symbol.closeParenths
-        && nextToken.token !== Symbol.closeBracket) {
-            switch (nextToken.type) {
-                case TokenType.identifier:
-                case TokenType.keyword:
-                case TokenType.stringConstant:
-                case TokenType.integerConstant:
+        let peekNextToken = this.tokenStream.peekNext();
+        while (peekNextToken.token !== Symbol.semicolon
+        && peekNextToken.token !== Symbol.closeParenths
+        && peekNextToken.token !== Symbol.closeBracket) {
+            switch (peekNextToken.type) {
+                case TokenType.symbol:
+                    if (peekNextToken.token === Symbol.minus) {
+                        await this.output([`<expression>` + os.EOL]);
+                        this.incrementSpacer();
+                        await this.output([`<term>` + os.EOL])
+                        const minus = this.tokenStream.getNext().composeTag();
+                        this.incrementSpacer();
+                        await this.output([minus]);
+                        this.decrementSpacer();
+                        await this.compileTerm();
+                        this.incrementSpacer();
+                        this.decrementSpacer();
+                        await this.output([`</term>` + os.EOL])
+                        this.decrementSpacer();
+                        await this.output([`</expression>` + os.EOL]);
+                        this.incrementSpacer();
+                    } else {
+                        await this.output([this.tokenStream.getNext().composeTag()]);
+                    }
+                    break;
+                default:
                     await this.output([`<expression>` + os.EOL]);
                     await this.compileTerm();
-                    if (Operators.includes(this.tokenStream.peekNext().token)) {
+                    peekNextToken = this.tokenStream.peekNext();
+                    if (Operators.includes(peekNextToken.token)) {
                         const symbol = this.tokenStream.getNext().composeTag();
                         this.incrementSpacer();
                         await this.output([symbol]);
@@ -361,11 +379,8 @@ export class Parser extends Processor {
                     }
                     await this.output([`</expression>` + os.EOL]);
                     break;
-                default:
-                    await this.output([this.tokenStream.getNext().composeTag()]);
-                    break;
             }
-            nextToken = this.tokenStream.peekNext();
+            peekNextToken = this.tokenStream.peekNext();
         }
     }
 
@@ -381,22 +396,32 @@ export class Parser extends Processor {
         this.incrementSpacer();
         await this.output([`<term>` + os.EOL]);
 
-        const name = this.tokenStream.getNext().composeTag();
-        this.incrementSpacer();
-        await this.output([name]);
-        
-        switch (this.tokenStream.peekNext().token) {
-            case Symbol.openBracket:
-                await this.compileBracket();
-                break;
-            case Symbol.openParenths:
-                break;
-            case Symbol.period:
-                await this.compileMethodCall();
-                await this.compileExpressionList();
-                break;
-            default:
-                break;
+        if (this.tokenStream.peekNext().token === Symbol.openParenths) {
+            const openPareths = this.tokenStream.getNext().composeTag();
+            this.incrementSpacer();
+            await this.output([openPareths]);
+
+            await this.compileExpression();
+            
+            const closeParenths = this.tokenStream.getNext().composeTag();
+            this.decrementSpacer();
+            await this.output([closeParenths]);
+        } else {
+            const name = this.tokenStream.getNext().composeTag();
+            this.incrementSpacer();
+            await this.output([name]);
+            
+            switch (this.tokenStream.peekNext().token) {
+                case Symbol.openBracket:
+                    await this.compileBracket();
+                    break;
+                case Symbol.period:
+                    await this.compileMethodCall();
+                    await this.compileExpressionList();
+                    break;
+                default:
+                    break;
+            }
         }
 
         this.decrementSpacer();
