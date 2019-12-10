@@ -341,11 +341,11 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
-        let nextToken = this.tokenStream.peekNext().token;
-        while (nextToken !== Symbol.semicolon
-        && nextToken !== Symbol.closeParenths
-        && nextToken !== Symbol.closeBracket) {
-            switch (this.tokenStream.peekNext().type) {
+        let nextToken = this.tokenStream.peekNext();
+        while (nextToken.token !== Symbol.semicolon
+        && nextToken.token !== Symbol.closeParenths
+        && nextToken.token !== Symbol.closeBracket) {
+            switch (nextToken.type) {
                 case TokenType.identifier:
                 case TokenType.keyword:
                 case TokenType.stringConstant:
@@ -365,7 +365,7 @@ export class Parser extends Processor {
                     await this.output([this.tokenStream.getNext().composeTag()]);
                     break;
             }
-            nextToken = this.tokenStream.peekNext().token;
+            nextToken = this.tokenStream.peekNext();
         }
     }
 
