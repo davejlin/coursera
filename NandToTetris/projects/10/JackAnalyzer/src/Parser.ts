@@ -341,13 +341,14 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
+        let firstPass = true;
         let peekNextToken = this.tokenStream.peekNext();
         while (peekNextToken.token !== Symbol.semicolon
         && peekNextToken.token !== Symbol.closeParenths
         && peekNextToken.token !== Symbol.closeBracket) {
             switch (peekNextToken.type) {
                 case TokenType.symbol:
-                    if (peekNextToken.token === Symbol.minus) {
+                    if (peekNextToken.token === Symbol.minus && firstPass) {
                         await this.output([`<expression>` + os.EOL]);
                         this.incrementSpacer();
                         await this.output([`<term>` + os.EOL])
@@ -355,13 +356,29 @@ export class Parser extends Processor {
                         this.incrementSpacer();
                         await this.output([minus]);
                         this.decrementSpacer();
+
                         await this.compileTerm();
-                        this.incrementSpacer();
-                        this.decrementSpacer();
+                        
                         await this.output([`</term>` + os.EOL])
                         this.decrementSpacer();
                         await this.output([`</expression>` + os.EOL]);
                         this.incrementSpacer();
+                    } else if (peekNextToken.token === Symbol.openParenths) {
+                        await this.output([`<expression>` + os.EOL]);
+                        this.incrementSpacer();
+                        await this.output([`<term>` + os.EOL])
+                        const openParenths = this.tokenStream.getNext().composeTag();
+                        this.incrementSpacer();
+                        await this.output([openParenths]);
+
+                        await this.compileExpression();
+                        
+                        const closeParenths = this.tokenStream.getNext().composeTag();
+                        await this.output([closeParenths]);
+                        this.decrementSpacer();
+                        await this.output([`</term>` + os.EOL])
+                        this.decrementSpacer();
+                        await this.output([`</expression>` + os.EOL]);
                     } else {
                         await this.output([this.tokenStream.getNext().composeTag()]);
                     }
@@ -381,6 +398,7 @@ export class Parser extends Processor {
                     break;
             }
             peekNextToken = this.tokenStream.peekNext();
+            firstPass = false;
         }
     }
 
