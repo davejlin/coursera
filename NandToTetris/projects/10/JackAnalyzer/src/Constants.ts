@@ -121,3 +121,9 @@ export const Operators: string[] = [
     Symbol.lt,
     Symbol.gt,
 ]
+
+export const ExpressionTerminators: string[] = [
+    Symbol.semicolon,
+    Symbol.closeParenths,
+    Symbol.closeBracket
+]

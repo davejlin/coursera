@@ -1,6 +1,6 @@
 import { Processor } from "./Processor";
 import os = require("os");
-import { Keyword, Symbol, spacer, TokenType, Operators } from "./Constants";
+import { Keyword, Symbol, spacer, TokenType, Operators, ExpressionTerminators } from "./Constants";
 
 export class Parser extends Processor {
     private spacer = "";
@@ -345,23 +345,11 @@ export class Parser extends Processor {
 
         let firstPass = true;
         let peekNextToken = this.tokenStream.peekNext();
-        while (peekNextToken.token !== Symbol.semicolon
-        && peekNextToken.token !== Symbol.closeParenths
-        && peekNextToken.token !== Symbol.closeBracket) {
+        while (!ExpressionTerminators.includes(peekNextToken.token)) {
             switch (peekNextToken.type) {
                 case TokenType.symbol:
                     if (firstPass && (peekNextToken.token === Symbol.minus || peekNextToken.token === Symbol.tilda)) {
-                        this.incrementSpacer();
-                        await this.output([`<term>` + os.EOL])
-                        const minus = this.tokenStream.getNext().composeTag();
-                        this.incrementSpacer();
-                        await this.output([minus]);
-                        this.decrementSpacer();
-
                         await this.compileTerm();
-                        
-                        await this.output([`</term>` + os.EOL])
-                        this.decrementSpacer();
                     } else if (peekNextToken.token === Symbol.openParenths) {
                         await this.compileTerm();
                     } else if (peekNextToken.token === Symbol.comma) {
@@ -405,31 +393,47 @@ export class Parser extends Processor {
         this.incrementSpacer();
         await this.output([`<term>` + os.EOL]);
 
-        if (this.tokenStream.peekNext().token === Symbol.openParenths) {
-            const openPareths = this.tokenStream.getNext().composeTag();
-            this.incrementSpacer();
-            await this.output([openPareths]);
+        const peekNextToken = this.tokenStream.peekNext().token;
 
-            await this.compileExpression();
-            
-            const closeParenths = this.tokenStream.getNext().composeTag();
-            await this.output([closeParenths]);
-        } else {
-            const name = this.tokenStream.getNext().composeTag();
-            this.incrementSpacer();
-            await this.output([name]);
-            
-            switch (this.tokenStream.peekNext().token) {
-                case Symbol.openBracket:
-                    await this.compileBracket();
-                    break;
-                case Symbol.period:
-                    await this.compileMethodCall();
-                    await this.compileExpressionList();
-                    break;
-                default:
-                    break;
-            }
+        switch (peekNextToken) {
+            case Symbol.minus:
+            case Symbol.tilda:
+                const symbol = this.tokenStream.getNext().composeTag();
+                this.incrementSpacer();
+                await this.output([symbol]);
+                this.decrementSpacer();
+
+                await this.compileTerm();
+
+                this.incrementSpacer();
+                break;
+            case Symbol.openParenths:
+                const openPareths = this.tokenStream.getNext().composeTag();
+                this.incrementSpacer();
+                await this.output([openPareths]);
+    
+                await this.compileExpression();
+                
+                const closeParenths = this.tokenStream.getNext().composeTag();
+                await this.output([closeParenths]);
+                break;
+            default:
+                const name = this.tokenStream.getNext().composeTag();
+                this.incrementSpacer();
+                await this.output([name]);
+                
+                switch (this.tokenStream.peekNext().token) {
+                    case Symbol.openBracket:
+                        await this.compileBracket();
+                        break;
+                    case Symbol.period:
+                        await this.compileMethodCall();
+                        await this.compileExpressionList();
+                        break;
+                    default:
+                        break;
+                }
+                break;
         }
 
         this.decrementSpacer();
