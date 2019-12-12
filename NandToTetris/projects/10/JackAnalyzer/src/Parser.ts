@@ -350,7 +350,7 @@ export class Parser extends Processor {
         && peekNextToken.token !== Symbol.closeBracket) {
             switch (peekNextToken.type) {
                 case TokenType.symbol:
-                    if (peekNextToken.token === Symbol.minus && firstPass) {
+                    if (firstPass && (peekNextToken.token === Symbol.minus || peekNextToken.token === Symbol.tilda)) {
                         this.incrementSpacer();
                         await this.output([`<term>` + os.EOL])
                         const minus = this.tokenStream.getNext().composeTag();
