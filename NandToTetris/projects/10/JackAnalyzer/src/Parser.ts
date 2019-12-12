@@ -361,22 +361,17 @@ export class Parser extends Processor {
                         await this.compileTerm();
                         
                         await this.output([`</term>` + os.EOL])
+                        this.decrementSpacer();
                     } else if (peekNextToken.token === Symbol.openParenths) {
-                        this.incrementSpacer();
-                        await this.output([`<term>` + os.EOL])
-                        const openParenths = this.tokenStream.getNext().composeTag();
-                        this.incrementSpacer();
-                        await this.output([openParenths]);
-
-                        await this.compileExpression();
-
-                        const closeParenths = this.tokenStream.getNext().composeTag();
-                        await this.output([closeParenths]);
-                        this.decrementSpacer();
-                        await this.output([`</term>` + os.EOL])
-                        this.decrementSpacer();
-                    } else {
+                        await this.compileTerm();
+                    } else if (peekNextToken.token === Symbol.comma) {
+                        await this.output([`</expression>` + os.EOL]);
                         await this.output([this.tokenStream.getNext().composeTag()]);
+                        await this.output([`<expression>` + os.EOL]);
+                    } else {
+                        this.incrementSpacer();
+                        await this.output([this.tokenStream.getNext().composeTag()]);
+                        this.decrementSpacer();
                     }
                     break;
                 default:
@@ -418,7 +413,6 @@ export class Parser extends Processor {
             await this.compileExpression();
             
             const closeParenths = this.tokenStream.getNext().composeTag();
-            this.decrementSpacer();
             await this.output([closeParenths]);
         } else {
             const name = this.tokenStream.getNext().composeTag();
