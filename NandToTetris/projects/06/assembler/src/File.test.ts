@@ -7,10 +7,23 @@ import { File } from "./File";
 jest.mock("fs");
 jest.mock("readline");
 
+const MockOutStream = jest.fn(() => ({
+    close: jest.fn(),
+    on: jest.fn().mockImplementation((_, cb) => {
+        cb();
+    }),
+    write: jest.fn().mockImplementation((_, cb) => {
+        cb();
+    })
+}));
+
 describe("File", () => {
+    let mockOutStream;
     let file: File;
 
     beforeEach(() => {
+        mockOutStream = new MockOutStream();
+        fs.createWriteStream = jest.fn().mockReturnValue(mockOutStream);
         file = new File();
     });
 
@@ -35,18 +48,18 @@ describe("File", () => {
     test("appendLine writes to outstream", async () => {
         const line = "line";
         await file.init("outFile");
-        file.appendLine(line);
+        await file.appendLine(line);
         expect.assertions(1);
-        expect(file.getWriteStream().write).toBeCalledWith(line);
+        expect(file.getWriteStream().write).toBeCalledWith(line, expect.any(Function));
     });
 
     test("appendLine adds linebreak to lines after the first append", async () => {
         const line = "line";
         await file.init("outFile");
-        file.appendLine(line);
-        file.appendLine(line);
+        await file.appendLine(line);
+        await file.appendLine(line);
         expect.assertions(1);
-        expect(file.getWriteStream().write).toBeCalledWith(`${os.EOL}${line}`);
+        expect(file.getWriteStream().write).toBeCalledWith(`${os.EOL}${line}`, expect.any(Function));
     });
 
     test("closeFiles closes files", async () => {
@@ -97,5 +110,40 @@ describe("File", () => {
         expect.assertions(2);
         expect(file.getReadStream().close).toBeCalledWith();
         expect(file.getWriteStream().close).toBeCalledWith();
+    });
+
+    test("appendLine logs on error - first line", async () => {
+        let mockLogArgument = "";
+        const mockConsoleLog = log => mockLogArgument = log;
+        console.log = mockConsoleLog;
+        mockOutStream.write = jest.fn().mockImplementation((_, cb) => {
+            cb("some error 1");
+        });
+
+        const line = "line";
+        await file.init("outFile");
+        await file.appendLine(line);
+        expect.assertions(1);
+        expect(mockLogArgument).toEqual(`File: appendLine error: some error 1`);
+    });
+
+    test("appendLine logs on error - after first line", async () => {
+        let mockLogArgument = "";
+        const mockConsoleLog = log => mockLogArgument = log;
+        console.log = mockConsoleLog;
+        mockOutStream.write = jest.fn()
+        .mockImplementationOnce((_, cb) => {
+            cb();
+        })
+        .mockImplementationOnce((_, cb) => {
+            cb("some error 2");
+        });
+
+        const line = "line";
+        await file.init("outFile");
+        await file.appendLine(line);
+        await file.appendLine(line);
+        expect.assertions(1);
+        expect(mockLogArgument).toEqual(`File: appendLine error: some error 2`);
     });
 });
