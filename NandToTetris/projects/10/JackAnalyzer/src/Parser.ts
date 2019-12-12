@@ -341,6 +341,8 @@ export class Parser extends Processor {
      * Compiles an expression
      */
     private async compileExpression(): Promise<void> {
+        await this.output([`<expression>` + os.EOL]);
+
         let firstPass = true;
         let peekNextToken = this.tokenStream.peekNext();
         while (peekNextToken.token !== Symbol.semicolon
@@ -349,7 +351,6 @@ export class Parser extends Processor {
             switch (peekNextToken.type) {
                 case TokenType.symbol:
                     if (peekNextToken.token === Symbol.minus && firstPass) {
-                        await this.output([`<expression>` + os.EOL]);
                         this.incrementSpacer();
                         await this.output([`<term>` + os.EOL])
                         const minus = this.tokenStream.getNext().composeTag();
@@ -360,11 +361,7 @@ export class Parser extends Processor {
                         await this.compileTerm();
                         
                         await this.output([`</term>` + os.EOL])
-                        this.decrementSpacer();
-                        await this.output([`</expression>` + os.EOL]);
-                        this.incrementSpacer();
                     } else if (peekNextToken.token === Symbol.openParenths) {
-                        await this.output([`<expression>` + os.EOL]);
                         this.incrementSpacer();
                         await this.output([`<term>` + os.EOL])
                         const openParenths = this.tokenStream.getNext().composeTag();
@@ -372,19 +369,17 @@ export class Parser extends Processor {
                         await this.output([openParenths]);
 
                         await this.compileExpression();
-                        
+
                         const closeParenths = this.tokenStream.getNext().composeTag();
                         await this.output([closeParenths]);
                         this.decrementSpacer();
                         await this.output([`</term>` + os.EOL])
                         this.decrementSpacer();
-                        await this.output([`</expression>` + os.EOL]);
                     } else {
                         await this.output([this.tokenStream.getNext().composeTag()]);
                     }
                     break;
                 default:
-                    await this.output([`<expression>` + os.EOL]);
                     await this.compileTerm();
                     peekNextToken = this.tokenStream.peekNext();
                     if (Operators.includes(peekNextToken.token)) {
@@ -394,12 +389,13 @@ export class Parser extends Processor {
                         this.decrementSpacer();
                         await this.compileTerm();
                     }
-                    await this.output([`</expression>` + os.EOL]);
+
                     break;
             }
             peekNextToken = this.tokenStream.peekNext();
             firstPass = false;
         }
+        await this.output([`</expression>` + os.EOL]);
     }
 
     /**
