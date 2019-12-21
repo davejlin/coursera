@@ -1,0 +1,27 @@
+{
+  "name": "jackcompiler",
+  "version": "1.0.0",
+  "description": "Jack Language Compiler II: Code Generator",
+  "main": "dist/JackCompiler.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "cleanall": "npm run clean && npm run cleanxml && rm -rf node_modules && rm -rf package-lock.json",
+    "cleanxml": "rm -rf files/Average/*.xml && rm -rf files/ComplexArrays/*.xml && rm -rf files/ConvertToBin/*.xml && rm -rf files/Pong/*.xml && rm -rf files/Seven/*.xml && rm -rf files/Square/*.xml",
+    "start": "tsc && node dist/JackCompiler.js",
+    "runall": "npm run start files/Average"
+  },
+  "keywords": [
+    "Jack",
+    "compiler",
+    "syntax",
+    "analyzer",
+    "JackAnalyzer"
+  ],
+  "author": "David Lin",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "typescript": "^3.5.2"
+  },
+  "dependencies": {}
+}
