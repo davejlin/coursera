@@ -127,3 +127,10 @@ export const ExpressionTerminators: string[] = [
     Symbol.closeParenths,
     Symbol.closeBracket
 ]
+
+export enum SymbolKind {
+    static = "STATIC",
+    field = "FIELD",
+    arg = "ARG",
+    var = "VAR"
+}
