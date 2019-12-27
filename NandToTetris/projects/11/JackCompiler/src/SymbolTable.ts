@@ -1,5 +1,6 @@
 import { SymbolKind } from "./Constants";
 import { Symbol } from "./Symbol";
+import os = require("os");
 
 export class SymbolTable {
     private classTable = new Map<string, Symbol>();
@@ -120,11 +121,28 @@ export class SymbolTable {
      * The subroutine's scope is checked first, and if not found, the class' scope is checked next.
      * @param name 
      */
-    public getSymbol(name: string): Symbol {
+    private getSymbol(name: string): Symbol {
         let symbol = this.subroutineTable.get(name);
         if (symbol == null) {
             symbol = this.classTable.get(name);
         }
         return symbol;
+    }
+
+    /**
+     * outputs the composed tag of an entry in the symbol table
+     */
+    public async composeTag(name: string, output: (output: string[]) => Promise<void>, incrementSpacer: () => void, decrementSpacer: () => void) {
+        const symbol = this.getSymbol(name);
+        if (symbol == undefined) {
+            await output([`<symbolTableEntry> undefined </symbolTableEntry>` + os.EOL]);
+            return
+        }
+
+        await output([`<symbolTableEntry>` + os.EOL]);
+        incrementSpacer();
+        await output([`<kind> ${symbol.kind} </kind>` + os.EOL, `<type> ${symbol.type} </type>` + os.EOL, `<name> ${symbol.name} </name>` + os.EOL,`<index> ${symbol.index} </index>` + os.EOL]);
+        decrementSpacer();
+        await output([`</symbolTableEntry>` + os.EOL]);
     }
 }

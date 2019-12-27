@@ -63,6 +63,8 @@ export class Parser extends Processor {
      * Compiles a declaration for a method, function, or constructor
      */
     private async compileSubroutineDec(): Promise<void> {
+        this.symbolTable.startSubroutine();
+
         await this.output([`<subroutineDec>` + os.EOL]);
 
         const functionKeyword = this.tokenStream.getNext().composeTag();
@@ -96,21 +98,20 @@ export class Parser extends Processor {
      */
     private async compileParameterList(): Promise<void> {
         await this.output([`<parameterList>` + os.EOL]);
+        this.incrementSpacer();
 
-        const output: string[] = [];
         while (this.tokenStream.peekNext().token !== Symbol.closeParenths) {
-            const type = this.tokenStream.getNext().composeTag();
-            const name = this.tokenStream.getNext().composeTag();
-            output.push(type);
-            output.push(name);
+            const type = this.tokenStream.getNext();
+            const name = this.tokenStream.getNext();
+            await this.output([type.composeTag(), name.composeTag()]);
+
+            await this.defineSymbolTableEntry(name.token, type.token, SymbolKind.arg);
+
             const peekCommaSeparator = this.tokenStream.peekNext().token;
             if (peekCommaSeparator === Symbol.comma) {
-                output.push(this.tokenStream.getNext().composeTag());
+                await this.output([this.tokenStream.getNext().composeTag()]);
             }
         }
-
-        this.incrementSpacer();
-        await this.output(output);
 
         this.decrementSpacer();
         await this.output([`</parameterList>` + os.EOL]);
@@ -165,8 +166,7 @@ export class Parser extends Processor {
         this.incrementSpacer();
         await this.output([varKeyword.composeTag(), type.composeTag(), name.composeTag()]);
 
-        this.symbolTable.define(name.token, type.token, SymbolKind[varKeyword.token]);
-        await this.composeSymbolTableEntry(name.token);
+        await this.defineSymbolTableEntry(name.token, type.token, SymbolKind[varKeyword.token]);
 
         while (this.tokenStream.peekNext().token === Symbol.comma) {
             const comma = this.tokenStream.getNext();
@@ -174,8 +174,7 @@ export class Parser extends Processor {
             
             await this.output([comma.composeTag(), name.composeTag()]);
 
-            this.symbolTable.define(name.token, type.token, SymbolKind[varKeyword.token])
-            await this.composeSymbolTableEntry(name.token);
+            await this.defineSymbolTableEntry(name.token, type.token, SymbolKind[varKeyword.token])
         }
 
         const semicolon = this.tokenStream.getNext().composeTag();
@@ -507,23 +506,13 @@ export class Parser extends Processor {
     }
 
     /**
-     * outputs the composed tag of symbol
+     * Defines and outputs symbol table entry
+     * @param name 
+     * @param type 
+     * @param kind 
      */
-    private async composeSymbolTableEntry(name: string) {
-        const symbol = this.symbolTable.getSymbol(name);
-        if (symbol == undefined) {
-            await this.output([`<symbolTableEntry> undefined </symbolTableEntry>` + os.EOL]);
-            return
-        }
-
-        await this.output([`<symbolTableEntry>` + os.EOL]);
-        this.incrementSpacer();
-        await this.output([
-            `<kind> ${symbol.kind} </kind>` + os.EOL,
-            `<type> ${symbol.type} </type>` + os.EOL,
-            `<name> ${symbol.name} </name>` + os.EOL,
-            `<index> ${symbol.index} </index>` + os.EOL]);
-        this.decrementSpacer();
-        await this.output([`</symbolTableEntry>` + os.EOL]);
+    private async defineSymbolTableEntry(name: string, type: string, kind: SymbolKind) {
+        this.symbolTable.define(name, type, kind);
+        await this.symbolTable.composeTag(name, this.output.bind(this), this.incrementSpacer.bind(this), this.decrementSpacer.bind(this));
     }
 }
