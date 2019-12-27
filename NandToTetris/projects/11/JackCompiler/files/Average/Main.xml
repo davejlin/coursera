@@ -16,20 +16,44 @@
         <keyword> var </keyword>
         <identifier> Array </identifier>
         <identifier> a </identifier>
+        <symbolTableEntry>
+          <kind> VAR </kind>
+          <type> Array </type>
+          <name> a </name>
+          <index> 0 </index>
+        </symbolTableEntry>
         <symbol> ; </symbol>
       </varDec>
       <varDec>
         <keyword> var </keyword>
         <keyword> int </keyword>
         <identifier> length </identifier>
+        <symbolTableEntry>
+          <kind> VAR </kind>
+          <type> int </type>
+          <name> length </name>
+          <index> 1 </index>
+        </symbolTableEntry>
         <symbol> ; </symbol>
       </varDec>
       <varDec>
         <keyword> var </keyword>
         <keyword> int </keyword>
         <identifier> i </identifier>
+        <symbolTableEntry>
+          <kind> VAR </kind>
+          <type> int </type>
+          <name> i </name>
+          <index> 2 </index>
+        </symbolTableEntry>
         <symbol> , </symbol>
         <identifier> sum </identifier>
+        <symbolTableEntry>
+          <kind> VAR </kind>
+          <type> int </type>
+          <name> sum </name>
+          <index> 3 </index>
+        </symbolTableEntry>
         <symbol> ; </symbol>
       </varDec>
       <statements>
