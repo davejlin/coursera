@@ -60,6 +60,12 @@
         <letStatement>
           <keyword> let </keyword>
           <identifier> length </identifier>
+          <symbolTableEntry>
+            <kind> VAR </kind>
+            <type> int </type>
+            <name> length </name>
+            <index> 1 </index>
+          </symbolTableEntry>
           <symbol> = </symbol>
           <expression>
             <term>
@@ -82,6 +88,12 @@
         <letStatement>
           <keyword> let </keyword>
           <identifier> a </identifier>
+          <symbolTableEntry>
+            <kind> VAR </kind>
+            <type> Array </type>
+            <name> a </name>
+            <index> 0 </index>
+          </symbolTableEntry>
           <symbol> = </symbol>
           <expression>
             <term>
@@ -93,6 +105,12 @@
                 <expression>
                   <term>
                     <identifier> length </identifier>
+                    <symbolTableEntry>
+                      <kind> VAR </kind>
+                      <type> int </type>
+                      <name> length </name>
+                      <index> 1 </index>
+                    </symbolTableEntry>
                   </term>
                 </expression>
               </expressionList>
@@ -104,6 +122,12 @@
         <letStatement>
           <keyword> let </keyword>
           <identifier> i </identifier>
+          <symbolTableEntry>
+            <kind> VAR </kind>
+            <type> int </type>
+            <name> i </name>
+            <index> 2 </index>
+          </symbolTableEntry>
           <symbol> = </symbol>
           <expression>
             <term>
@@ -118,10 +142,22 @@
           <expression>
             <term>
               <identifier> i </identifier>
+              <symbolTableEntry>
+                <kind> VAR </kind>
+                <type> int </type>
+                <name> i </name>
+                <index> 2 </index>
+              </symbolTableEntry>
             </term>
             <symbol> &lt; </symbol>
             <term>
               <identifier> length </identifier>
+              <symbolTableEntry>
+                <kind> VAR </kind>
+                <type> int </type>
+                <name> length </name>
+                <index> 1 </index>
+              </symbolTableEntry>
             </term>
           </expression>
           <symbol> ) </symbol>
@@ -130,10 +166,22 @@
             <letStatement>
               <keyword> let </keyword>
               <identifier> a </identifier>
+              <symbolTableEntry>
+                <kind> VAR </kind>
+                <type> Array </type>
+                <name> a </name>
+                <index> 0 </index>
+              </symbolTableEntry>
               <symbol> [ </symbol>
               <expression>
                 <term>
                   <identifier> i </identifier>
+                  <symbolTableEntry>
+                    <kind> VAR </kind>
+                    <type> int </type>
+                    <name> i </name>
+                    <index> 2 </index>
+                  </symbolTableEntry>
                 </term>
               </expression>
               <symbol> ] </symbol>
@@ -159,10 +207,22 @@
             <letStatement>
               <keyword> let </keyword>
               <identifier> sum </identifier>
+              <symbolTableEntry>
+                <kind> VAR </kind>
+                <type> int </type>
+                <name> sum </name>
+                <index> 3 </index>
+              </symbolTableEntry>
               <symbol> = </symbol>
               <expression>
                 <term>
                   <identifier> sum </identifier>
+                  <symbolTableEntry>
+                    <kind> VAR </kind>
+                    <type> int </type>
+                    <name> sum </name>
+                    <index> 3 </index>
+                  </symbolTableEntry>
                 </term>
                 <symbol> + </symbol>
                 <term>
@@ -171,9 +231,21 @@
                   <expression>
                     <term>
                       <identifier> i </identifier>
+                      <symbolTableEntry>
+                        <kind> VAR </kind>
+                        <type> int </type>
+                        <name> i </name>
+                        <index> 2 </index>
+                      </symbolTableEntry>
                     </term>
                   </expression>
                   <symbol> ] </symbol>
+                  <symbolTableEntry>
+                    <kind> VAR </kind>
+                    <type> Array </type>
+                    <name> a </name>
+                    <index> 0 </index>
+                  </symbolTableEntry>
                 </term>
               </expression>
               <symbol> ; </symbol>
@@ -181,10 +253,22 @@
             <letStatement>
               <keyword> let </keyword>
               <identifier> i </identifier>
+              <symbolTableEntry>
+                <kind> VAR </kind>
+                <type> int </type>
+                <name> i </name>
+                <index> 2 </index>
+              </symbolTableEntry>
               <symbol> = </symbol>
               <expression>
                 <term>
                   <identifier> i </identifier>
+                  <symbolTableEntry>
+                    <kind> VAR </kind>
+                    <type> int </type>
+                    <name> i </name>
+                    <index> 2 </index>
+                  </symbolTableEntry>
                 </term>
                 <symbol> + </symbol>
                 <term>
@@ -222,10 +306,22 @@
             <expression>
               <term>
                 <identifier> sum </identifier>
+                <symbolTableEntry>
+                  <kind> VAR </kind>
+                  <type> int </type>
+                  <name> sum </name>
+                  <index> 3 </index>
+                </symbolTableEntry>
               </term>
               <symbol> / </symbol>
               <term>
                 <identifier> length </identifier>
+                <symbolTableEntry>
+                  <kind> VAR </kind>
+                  <type> int </type>
+                  <name> length </name>
+                  <index> 1 </index>
+                </symbolTableEntry>
               </term>
             </expression>
           </expressionList>

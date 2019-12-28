@@ -2,6 +2,8 @@ import { Processor } from "./Processor";
 import os = require("os");
 import { Keyword, Symbol, SymbolKind, spacer, TokenType, Operators, ExpressionTerminators } from "./Constants";
 import { SymbolTable } from "./SymbolTable";
+import { Symbol as SymbolClass } from "./Symbol";
+import { Token } from "./Token";
 
 export class Parser extends Processor {
     private spacer = "";
@@ -15,10 +17,10 @@ export class Parser extends Processor {
         this.resetSpacer();
         await this.output([`<class>` + os.EOL]);
 
-        const classKeyword = this.tokenStream.getNext().composeTag();
-        const name = this.tokenStream.getNext().composeTag();
-        const openSymbol = this.tokenStream.getNext().composeTag();
-        const output = [classKeyword, name, openSymbol];
+        const classKeyword = this.tokenStream.getNext();
+        const name = this.tokenStream.getNext();
+        const openSymbol = this.tokenStream.getNext();
+        const output = [classKeyword.composeTag(), name.composeTag(), openSymbol.composeTag()];
         this.incrementSpacer();
         await this.output(output);
 
@@ -33,7 +35,7 @@ export class Parser extends Processor {
                 case Keyword.constructor:
                 case Keyword.function:
                 case Keyword.method:
-                    await this.compileSubroutineDec();
+                    await this.compileSubroutineDec(name.token);
                     if (this.tokenStream.peekNext().token === Symbol.closeBrace) {
                         cycle = false;
                     }
@@ -62,8 +64,8 @@ export class Parser extends Processor {
     /**
      * Compiles a declaration for a method, function, or constructor
      */
-    private async compileSubroutineDec(): Promise<void> {
-        this.symbolTable.startSubroutine();
+    private async compileSubroutineDec(className: string): Promise<void> {
+        this.startSymbolTableForSubroutine(className);
 
         await this.output([`<subroutineDec>` + os.EOL]);
 
@@ -226,8 +228,10 @@ export class Parser extends Processor {
         this.incrementSpacer();
 
         const letKeyword = this.tokenStream.getNext().composeTag();
-        const name = this.tokenStream.getNext().composeTag();
-        await this.output([letKeyword, name]);
+        const name = this.tokenStream.getNext();
+        await this.output([letKeyword, name.composeTag()]);
+
+        const symbolTableEntry = await this.getSymbolTableEntry(name);
 
         if (this.tokenStream.peekNext().token === Symbol.openBracket) {
             await this.compileBracket();
@@ -427,19 +431,20 @@ export class Parser extends Processor {
                 await this.output([closeParenths]);
                 break;
             default:
-                const name = this.tokenStream.getNext().composeTag();
+                const name = this.tokenStream.getNext();
                 this.incrementSpacer();
-                await this.output([name]);
+                await this.output([name.composeTag()]);
                 
                 switch (this.tokenStream.peekNext().token) {
-                    case Symbol.openBracket:
-                        await this.compileBracket();
-                        break;
                     case Symbol.period:
                         await this.compileMethodCall();
                         await this.compileExpressionList();
                         break;
+                    case Symbol.openBracket:
+                        await this.compileBracket();
+                        // fall-through
                     default:
+                        const symbolTableEntry = await this.getSymbolTableEntry(name);
                         break;
                 }
                 break;
@@ -506,13 +511,38 @@ export class Parser extends Processor {
     }
 
     /**
+     * Starts subroutine in symbol table and defines the first argument "this"
+     * @param className 
+     */
+    private async startSymbolTableForSubroutine(className: string) {
+        this.symbolTable.startSubroutine();
+        this.symbolTable.define("this", className, SymbolKind.arg);
+    }
+
+    /**
      * Defines and outputs symbol table entry
      * @param name 
      * @param type 
      * @param kind 
      */
-    private async defineSymbolTableEntry(name: string, type: string, kind: SymbolKind) {
+    private async defineSymbolTableEntry(name: string, type: string, kind: SymbolKind): Promise<void> {
         this.symbolTable.define(name, type, kind);
         await this.symbolTable.composeTag(name, this.output.bind(this), this.incrementSpacer.bind(this), this.decrementSpacer.bind(this));
+    }
+
+    /**
+     * Gets and outputs symbol table entry
+     * @param name 
+     * @param type 
+     * @param kind 
+     */
+    private async getSymbolTableEntry(name: Token): Promise<SymbolClass> {
+        if (name.type !== TokenType.identifier) {
+            return;
+        }
+
+        const symbol = this.symbolTable.getSymbol(name.token);
+        await this.symbolTable.composeTag(name.token, this.output.bind(this), this.incrementSpacer.bind(this), this.decrementSpacer.bind(this));
+        return symbol;
     }
 }

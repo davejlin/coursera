@@ -6,9 +6,10 @@
   "scripts": {
     "clean": "rm -rf dist",
     "cleanall": "npm run clean && npm run cleanxml && rm -rf node_modules && rm -rf package-lock.json",
-    "cleanxml": "rm -rf files/Average/*.xml && rm -rf files/ComplexArrays/*.xml && rm -rf files/ConvertToBin/*.xml && rm -rf files/Pong/*.xml && rm -rf files/Seven/*.xml && rm -rf files/Square/*.xml",
+    "cleanxml": "rm -rf files/Seven/*.xml && rm -rf files/ConvertToBin/*.xml && rm -rf files/Square/*.xml && rm -rf files/Average/*.xml && rm -rf files/Pong/*.xml && rm -rf files/ComplexArrays/*.xml",
     "start": "tsc && node dist/JackCompiler.js",
-    "runall": "npm run start files/Average"
+    "runall": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Square && npm run start files/Average && npm run start files/Pong && npm run start files/ComplexArrays",
+    "runsome": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Average"
   },
   "keywords": [
     "Jack",

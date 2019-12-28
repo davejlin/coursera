@@ -121,7 +121,7 @@ export class SymbolTable {
      * The subroutine's scope is checked first, and if not found, the class' scope is checked next.
      * @param name 
      */
-    private getSymbol(name: string): Symbol {
+    public getSymbol(name: string): Symbol {
         let symbol = this.subroutineTable.get(name);
         if (symbol == null) {
             symbol = this.classTable.get(name);
