@@ -101,14 +101,14 @@ export class File {
         return false;
     }
 
-    public static getOutFilePath(path: string, nameSuffix: string = ""): string {
+    public static getOutFilePath(path: string, type: string, nameSuffix: string = ""): string {
         const fullFilePathWithoutTypeSuffix = path.split(".")[0];
 
         if (this.isDirectory(path)) {
             const tokens = path.split("/");
-            return `${fullFilePathWithoutTypeSuffix}/${tokens[tokens.length-1]}${nameSuffix}.${FileType.xml}`
+            return `${fullFilePathWithoutTypeSuffix}/${tokens[tokens.length-1]}${nameSuffix}.${type}`
         }
 
-        return `${fullFilePathWithoutTypeSuffix}${nameSuffix}.${FileType.xml}`;
+        return `${fullFilePathWithoutTypeSuffix}${nameSuffix}.${type}`;
     }
 }

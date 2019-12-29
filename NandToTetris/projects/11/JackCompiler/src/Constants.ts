@@ -7,6 +7,7 @@ export const spacer = "  ";
 
 export enum FileType {
     jack = "jack",
+    vm = "vm",
     xml = "xml"
 }
 
@@ -133,4 +134,27 @@ export enum SymbolKind {
     field = "FIELD",
     arg = "ARG",
     var = "VAR"
+}
+
+export enum Segment {
+    const = "CONST",
+    arg = "ARG",
+    local = "LOCAL",
+    static = "STATIC",
+    this = "THIS",
+    that = "THAT",
+    pointer = "POINTER",
+    temp = "TEMP"
+}
+
+export enum Command {
+    add = "ADD",
+    sub = "SUB",
+    neg = "NEG",
+    eq = "EQ",
+    gt = "GT",
+    lt = "LT",
+    and = "AND",
+    or = "OR",
+    not = "NOT"
 }
