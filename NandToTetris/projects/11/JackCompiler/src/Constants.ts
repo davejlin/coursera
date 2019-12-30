@@ -137,14 +137,14 @@ export enum SymbolKind {
 }
 
 export enum Segment {
-    const = "CONST",
+    const = "constant",
     arg = "ARG",
     local = "LOCAL",
     static = "STATIC",
     this = "THIS",
     that = "THAT",
     pointer = "POINTER",
-    temp = "TEMP"
+    temp = "temp"
 }
 
 export enum Command {

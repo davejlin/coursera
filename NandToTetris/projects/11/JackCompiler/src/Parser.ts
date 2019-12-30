@@ -72,11 +72,11 @@ export class Parser extends Processor {
         await this.output([`<subroutineDec>` + os.EOL]);
 
         const functionKeyword = this.tokenStream.getNext().composeTag();
-        const accessor = this.tokenStream.getNext().composeTag();
+        const returnType = this.tokenStream.getNext().composeTag();
 
-        const output = [functionKeyword, accessor];
+        const output = [functionKeyword, returnType];
 
-        while (this.tokenStream.peekNext().type === TokenType.identifier) {
+        if (this.tokenStream.peekNext().type === TokenType.identifier) {
             const identifier = this.tokenStream.getNext().composeTag();
             output.push(identifier);
         }
@@ -87,7 +87,7 @@ export class Parser extends Processor {
         this.incrementSpacer();
         await this.output(output);
 
-        await this.compileParameterList();
+        const nParameters = await this.compileParameterList();
 
         const closeParenths = this.tokenStream.getNext().composeTag();
         await this.output([closeParenths]);
@@ -101,11 +101,13 @@ export class Parser extends Processor {
     /**
      * Compiles a (possibly empty) parameter list, not including the enclosing “()”
      */
-    private async compileParameterList(): Promise<void> {
+    private async compileParameterList(): Promise<number> {
+        let nParameters = 0;
         await this.output([`<parameterList>` + os.EOL]);
         this.incrementSpacer();
 
         while (this.tokenStream.peekNext().token !== Symbol.closeParenths) {
+            nParameters += 1;
             const type = this.tokenStream.getNext();
             const name = this.tokenStream.getNext();
 
@@ -122,6 +124,7 @@ export class Parser extends Processor {
 
         this.decrementSpacer();
         await this.output([`</parameterList>` + os.EOL]);
+        return nParameters;
     }
 
     /**
@@ -324,15 +327,16 @@ export class Parser extends Processor {
         
         const doKeyword = this.tokenStream.getNext().composeTag();
         const identifier1 = this.tokenStream.getNext().composeTag();
+        let methodName = "";
 
         this.incrementSpacer();
         await this.output([doKeyword, identifier1]);
 
         if (this.tokenStream.peekNext().token === Symbol.period) {
-            await this.compileMethodCall();
+            methodName = await this.compileMethodCall();
         }
 
-        await this.compileExpressionList();
+        const nElements = await this.compileExpressionList();
 
         const semicolon = this.tokenStream.getNext().composeTag();
 
@@ -356,9 +360,9 @@ export class Parser extends Processor {
             await this.compileExpression();
         }
 
-        const symbol = this.tokenStream.getNext().composeTag();
+        const semiColon = this.tokenStream.getNext().composeTag();
 
-        await this.output([symbol]);
+        await this.output([semiColon]);
         this.decrementSpacer();
         await this.output([`</returnStatement>` + os.EOL]);
     }
@@ -366,9 +370,10 @@ export class Parser extends Processor {
     /**
      * Compiles an expression
      */
-    private async compileExpression(): Promise<void> {
+    private async compileExpression(): Promise<number> {
         await this.output([`<expression>` + os.EOL]);
 
+        let nElements = 1;
         let firstPass = true;
         let peekNextToken = this.tokenStream.peekNext();
         while (!ExpressionTerminators.includes(peekNextToken.token)) {
@@ -379,6 +384,7 @@ export class Parser extends Processor {
                     } else if (peekNextToken.token === Symbol.openParenths) {
                         await this.compileTerm();
                     } else if (peekNextToken.token === Symbol.comma) {
+                        nElements += 1;
                         const comma = this.tokenStream.getNext().composeTag();
 
                         await this.output([`</expression>` + os.EOL]);
@@ -409,6 +415,7 @@ export class Parser extends Processor {
             firstPass = false;
         }
         await this.output([`</expression>` + os.EOL]);
+        return nElements;
     }
 
     /**
@@ -479,20 +486,22 @@ export class Parser extends Processor {
     /**
      * Compiles a possibly empty comma-separated list of expressions
      */
-    private async compileExpressionList(): Promise<void> {
+    private async compileExpressionList(): Promise<number> {
+        let nElements = 0;
         const openParenths = this.tokenStream.getNext().composeTag();
 
         await this.output([openParenths, `<expressionList>` + os.EOL]);
 
         if (this.tokenStream.peekNext().token != Symbol.closeParenths) {
             this.incrementSpacer();
-            await this.compileExpression();
+            nElements = await this.compileExpression();
             this.decrementSpacer();
         }
 
         const closeParenth = this.tokenStream.getNext().composeTag();
 
         await this.output([`</expressionList>` + os.EOL, closeParenth]);
+        return nElements;
     }
 
     private async compileBracket() {
@@ -506,11 +515,12 @@ export class Parser extends Processor {
         await this.output([closedBracket]);
     }
 
-    private async compileMethodCall() {
+    private async compileMethodCall(): Promise<string> {
         const period = this.tokenStream.getNext().composeTag();
         const methodName = this.tokenStream.getNext().composeTag();
 
         await this.output([period, methodName]);
+        return methodName;
     }
 
     private async output(output: string[]): Promise<void> {
