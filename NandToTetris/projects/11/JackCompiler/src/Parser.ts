@@ -77,8 +77,8 @@ export class Parser extends Processor {
         const output = [functionKeyword, returnType];
 
         if (this.tokenStream.peekNext().type === TokenType.identifier) {
-            const identifier = this.tokenStream.getNext().composeTag();
-            output.push(identifier);
+            const methodName = this.tokenStream.getNext().composeTag();
+            output.push(methodName);
         }
 
         const openParenths = this.tokenStream.getNext().composeTag();
@@ -87,7 +87,7 @@ export class Parser extends Processor {
         this.incrementSpacer();
         await this.output(output);
 
-        const nParameters = await this.compileParameterList();
+        await this.compileParameterList();
 
         const closeParenths = this.tokenStream.getNext().composeTag();
         await this.output([closeParenths]);
@@ -101,13 +101,11 @@ export class Parser extends Processor {
     /**
      * Compiles a (possibly empty) parameter list, not including the enclosing “()”
      */
-    private async compileParameterList(): Promise<number> {
-        let nParameters = 0;
+    private async compileParameterList(): Promise<void> {
         await this.output([`<parameterList>` + os.EOL]);
         this.incrementSpacer();
 
         while (this.tokenStream.peekNext().token !== Symbol.closeParenths) {
-            nParameters += 1;
             const type = this.tokenStream.getNext();
             const name = this.tokenStream.getNext();
 
@@ -124,7 +122,6 @@ export class Parser extends Processor {
 
         this.decrementSpacer();
         await this.output([`</parameterList>` + os.EOL]);
-        return nParameters;
     }
 
     /**
@@ -390,6 +387,7 @@ export class Parser extends Processor {
                         await this.output([`</expression>` + os.EOL]);
                         await this.output([comma]);
                         await this.output([`<expression>` + os.EOL]);
+                        firstPass = true;
                     } else {
                         const symbol = this.tokenStream.getNext().composeTag();
                         

@@ -1,5 +1,5 @@
 import { Processor } from "./Processor";
-import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment } from "./Constants";
+import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command } from "./Constants";
 import { SymbolTable } from "./SymbolTable";
 import { Symbol as SymbolClass } from "./Symbol";
 import { Token } from "./Token";
@@ -61,28 +61,24 @@ export class CompilationEngine extends Processor {
 
         const functionKeyword = this.tokenStream.getNext().composeTag();
         const returnType = this.tokenStream.getNext().composeTag();
-        let identifier = "";
+        let methodName = "";
 
         if (this.tokenStream.peekNext().type === TokenType.identifier) {
-            identifier = this.tokenStream.getNext().token;
+            methodName = this.tokenStream.getNext().token;
         }
 
         const openParenths = this.tokenStream.getNext().composeTag();
-        const nParameters = await this.compileParameterList();
+        await this.compileParameterList();
         const closeParenths = this.tokenStream.getNext().composeTag();
 
-        await this.vmWriter.writeFunction(`${className}.${identifier}`, nParameters);
-
-        await this.compileSubroutineBody();
+        await this.compileSubroutineBody(className, methodName);
     }
 
     /**
      * Compiles a (possibly empty) parameter list, not including the enclosing “()”
      */
-    private async compileParameterList(): Promise<number> {
-        let nParameters = 0;
+    private async compileParameterList(): Promise<void> {
         while (this.tokenStream.peekNext().token !== Symbol.closeParenths) {
-            nParameters += 1;
             const type = this.tokenStream.getNext();
             const name = this.tokenStream.getNext();
 
@@ -93,13 +89,12 @@ export class CompilationEngine extends Processor {
                 const comma = this.tokenStream.getNext().composeTag();
             }
         }
-        return nParameters;
     }
 
     /**
      * Compiles the body of a method, function, or constructor
      */
-    private async compileSubroutineBody(): Promise<void> {
+    private async compileSubroutineBody(className: string, methodName: string): Promise<void> {
         let cycle = true;
 
         const openBrace = this.tokenStream.getNext().composeTag();
@@ -109,6 +104,18 @@ export class CompilationEngine extends Processor {
                 case Keyword.var:
                     await this.compileVarDec();
                     break;
+                default:
+                    cycle = false;
+                    break;
+            }
+        }
+
+        const nVars = this.symbolTable.varCount(SymbolKind.var);
+        await this.vmWriter.writeFunction(`${className}.${methodName}`, nVars);
+
+        cycle = true;
+        while (cycle) {
+            switch (this.tokenStream.peekNext().token) {
                 case Keyword.let:
                 case Keyword.if:
                 case Keyword.while:
@@ -273,17 +280,29 @@ export class CompilationEngine extends Processor {
     private async compileExpression(): Promise<number> {
         let nElements = 1;
         let firstPass = true;
+        let resetFirstPass = false;
+        let negate = false;
         let peekNextToken = this.tokenStream.peekNext();
+
         while (!ExpressionTerminators.includes(peekNextToken.token)) {
             switch (peekNextToken.type) {
                 case TokenType.symbol:
                     if (firstPass && (peekNextToken.token === Symbol.minus || peekNextToken.token === Symbol.tilda)) {
+                        if (peekNextToken.token === Symbol.minus) {
+                            negate = true;
+                            console.info(`* ${negate}`);
+                        }
                         await this.compileTerm();
                     } else if (peekNextToken.token === Symbol.openParenths) {
                         await this.compileTerm();
                     } else if (peekNextToken.token === Symbol.comma) {
                         nElements += 1;
                         const comma = this.tokenStream.getNext().composeTag();
+                        if (negate) {
+                            await this.vmWriter.writeArithmetic(Command.neg);
+                            negate = false;
+                        }
+                        resetFirstPass = true;
                     } else {
                         const symbol = this.tokenStream.getNext();
                         await this.vmWriter.writeArithmetic(symbol.token);
@@ -301,7 +320,19 @@ export class CompilationEngine extends Processor {
                     break;
             }
             peekNextToken = this.tokenStream.peekNext();
-            firstPass = false;
+
+            if (resetFirstPass) {
+                firstPass = true;
+                resetFirstPass = false;
+            } else {
+                firstPass = false;
+            }
+
+        }
+
+        if (negate) {
+            await this.vmWriter.writeArithmetic(Command.neg);
+            negate = false;
         }
         return nElements;
     }

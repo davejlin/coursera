@@ -1,5 +1,5 @@
 import os = require("os");
-import { Symbol, Segment } from "./Constants";
+import { Symbol, Segment, Command } from "./Constants";
 
 export class VMWriter {
     constructor (private writeLine: (line: string) => Promise<void>) {}
@@ -45,6 +45,9 @@ export class VMWriter {
             case Symbol.lt:
                 break;
             case Symbol.gt:
+                break;
+            case Command.neg:
+                await this.writeLine(`neg` + os.EOL);
                 break;
             default:
                 await this.writeLine(`ERROR: UNKNOWN OPERATOR` + os.EOL);
