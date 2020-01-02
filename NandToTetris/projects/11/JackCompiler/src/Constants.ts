@@ -138,12 +138,12 @@ export enum SymbolKind {
 
 export enum Segment {
     const = "constant",
-    arg = "ARG",
-    local = "LOCAL",
-    static = "STATIC",
-    this = "THIS",
-    that = "THAT",
-    pointer = "POINTER",
+    arg = "argument",
+    local = "local",
+    static = "static",
+    this = "this",
+    that = "that",
+    pointer = "pointer",
     temp = "temp"
 }
 
@@ -158,3 +158,10 @@ export enum Command {
     or = "OR",
     not = "NOT"
 }
+
+export const SymbolKindSegmentMap: Map<SymbolKind, Segment> = new Map ([
+    [SymbolKind.static, Segment.static],
+    [SymbolKind.field, Segment.this],
+    [SymbolKind.arg, Segment.this],
+    [SymbolKind.var, Segment.local],
+]);
