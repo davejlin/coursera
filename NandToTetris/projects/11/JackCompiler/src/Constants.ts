@@ -162,6 +162,14 @@ export enum Command {
 export const SymbolKindSegmentMap: Map<SymbolKind, Segment> = new Map ([
     [SymbolKind.static, Segment.static],
     [SymbolKind.field, Segment.this],
-    [SymbolKind.arg, Segment.this],
+    [SymbolKind.arg, Segment.arg],
     [SymbolKind.var, Segment.local],
 ]);
+
+export const Labels = {
+    ifTrue: "IF_TRUE",
+    ifFalse: "IF_FALSE",
+    ifEnd: "IF_END",
+    whileStart: "WHILE_BLOCK",
+    whileEnd: "WHILE_END",
+}

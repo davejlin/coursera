@@ -32,25 +32,37 @@ export class VMWriter {
                 await this.writeLine(`add` + os.EOL);
                 break;
             case Symbol.minus:
+                await this.writeLine(`sub` + os.EOL);
                 break;
             case Symbol.asterick:
                 await this.writeLine(`call Math.multiply 2` + os.EOL);
                 break;
             case Symbol.slash:
+                await this.writeLine(`call Math.divide 2` + os.EOL);
                 break;
             case Symbol.amperstand:
+                await this.writeLine(`and` + os.EOL);
                 break;
             case Symbol.pipe:
+                await this.writeLine(`or` + os.EOL);
                 break;
             case Symbol.lt:
+                await this.writeLine(`lt` + os.EOL);
                 break;
             case Symbol.gt:
+                await this.writeLine(`gt` + os.EOL);
+                break;
+            case Symbol.eq:
+                await this.writeLine(`eq` + os.EOL);
                 break;
             case Command.neg:
                 await this.writeLine(`neg` + os.EOL);
                 break;
+            case Command.not:
+                await this.writeLine(`not` + os.EOL);
+                break;
             default:
-                await this.writeLine(`ERROR: UNKNOWN OPERATOR` + os.EOL);
+                await this.writeLine(`ERROR: UNKNOWN OPERATOR ${operator}` + os.EOL);
         }
     }
 
@@ -59,7 +71,7 @@ export class VMWriter {
      * @param label 
      */
     public async writeLabel(label: string): Promise<void> {
-
+        await this.writeLine(`label ${label}` + os.EOL);
     }
 
     /**
@@ -67,7 +79,7 @@ export class VMWriter {
      * @param label 
      */
     public async writeGoto(label: string): Promise<void> {
-
+        await this.writeLine(`goto ${label}` + os.EOL);
     }
 
     /**
@@ -75,7 +87,7 @@ export class VMWriter {
      * @param label 
      */
     public async writeIf(label: string): Promise<void> {
-
+        await this.writeLine(`if-goto ${label}` + os.EOL);
     }
 
     /**

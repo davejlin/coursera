@@ -1,5 +1,5 @@
 import { Processor } from "./Processor";
-import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command, SymbolKindSegmentMap } from "./Constants";
+import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command, SymbolKindSegmentMap, Labels } from "./Constants";
 import { SymbolTable } from "./SymbolTable";
 import { Symbol as SymbolClass } from "./Symbol";
 import { Token } from "./Token";
@@ -8,6 +8,13 @@ import { VMWriter } from "./VMWriter";
 
 export class CompilationEngine extends Processor {
     private symbolTable: SymbolTable;
+    private whileLabelNumber = -1;
+    private whileLabelStart;
+    private whileLabelEnd;
+    private ifLabelNumber = -1;
+    private ifLabelTrue;
+    private ifLabelFalse;
+    private ifLabelEnd;
 
     constructor (protected tokenStream: TokenStream, private vmWriter: VMWriter) {
         super(tokenStream, null);
@@ -57,11 +64,12 @@ export class CompilationEngine extends Processor {
      * Compiles a declaration for a method, function, or constructor
      */
     private async compileSubroutineDec(className: string): Promise<void> {
-        this.startSymbolTableForSubroutine(className);
 
         const functionKeyword = this.tokenStream.getNext().composeTag();
         const returnType = this.tokenStream.getNext().composeTag();
         let methodName = "";
+
+        this.startSymbolTableForSubroutine(className, functionKeyword);
 
         if (this.tokenStream.peekNext().type === TokenType.identifier) {
             methodName = this.tokenStream.getNext().token;
@@ -199,7 +207,9 @@ export class CompilationEngine extends Processor {
 
         await this.compileExpression();
 
-        await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+        if (symbolTableEntry != null) {
+            await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+        }
 
         const symbolSemicolon = this.tokenStream.getNext().composeTag();
     }
@@ -208,15 +218,24 @@ export class CompilationEngine extends Processor {
      * Compiles an if statement, possibly with a trailing else clause
      */
     private async compileIf(): Promise<void> {
+        this.incrementIfLabels();
+
         const ifKeyword = this.tokenStream.getNext().composeTag();
         const openPareths = this.tokenStream.getNext().composeTag();
 
         await this.compileExpression();
 
+        await this.vmWriter.writeIf(this.ifLabelTrue);
+        await this.vmWriter.writeGoto(this.ifLabelFalse);
+        await this.vmWriter.writeLabel(this.ifLabelTrue);
+
         const closeParenth = this.tokenStream.getNext().composeTag();
         const openBrace = this.tokenStream.getNext().composeTag();
 
         await this.compileStatements();
+
+        await this.vmWriter.writeGoto(this.ifLabelEnd);
+        await this.vmWriter.writeLabel(this.ifLabelFalse);
 
         if (this.tokenStream.peekNext().token === Keyword.else) {
             const elseKeyword = this.tokenStream.getNext().composeTag();
@@ -224,21 +243,35 @@ export class CompilationEngine extends Processor {
             
             await this.compileStatements();
         }
+
+        await this.vmWriter.writeLabel(this.ifLabelEnd);
+        this.decrementIfLabels();
     }
 
     /**
      * Compiles a while statement
      */
-    private async compileWhile(): Promise<void> {        
+    private async compileWhile(): Promise<void> {
+        this.incrementWhileLabels();
+        await this.vmWriter.writeLabel(this.whileLabelStart);
+
         const whileKeyword = this.tokenStream.getNext().composeTag();
         const openPareths = this.tokenStream.getNext().composeTag();
 
         await this.compileExpression();
 
+        await this.vmWriter.writeArithmetic(Command.not);
+        await this.vmWriter.writeIf(this.whileLabelEnd);
+
         const closeParenth = this.tokenStream.getNext().composeTag();
         const openBrace = this.tokenStream.getNext().composeTag();
 
         await this.compileStatements();
+
+        await this.vmWriter.writeGoto(this.whileLabelStart);
+        await this.vmWriter.writeLabel(this.whileLabelEnd);
+
+        this.decrementWhileLabels();
     }
 
     /**
@@ -286,14 +319,23 @@ export class CompilationEngine extends Processor {
         let firstPass = true;
         let resetFirstPass = false;
         let negate = false;
+        let not = false;
         let peekNextToken = this.tokenStream.peekNext();
+        let symbolToken: Token;
 
         while (!ExpressionTerminators.includes(peekNextToken.token)) {
             switch (peekNextToken.type) {
                 case TokenType.symbol:
                     if (firstPass && (peekNextToken.token === Symbol.minus || peekNextToken.token === Symbol.tilda)) {
-                        if (peekNextToken.token === Symbol.minus) {
-                            negate = true;
+                        switch (peekNextToken.token) {
+                            case Symbol.minus:
+                                negate = true;
+                                break;
+                            case Symbol.tilda:
+                                not = true;
+                                break;
+                            default:
+                                break;
                         }
                         await this.compileTerm();
                     } else if (peekNextToken.token === Symbol.openParenths) {
@@ -301,14 +343,10 @@ export class CompilationEngine extends Processor {
                     } else if (peekNextToken.token === Symbol.comma) {
                         nElements += 1;
                         const comma = this.tokenStream.getNext().composeTag();
-                        if (negate) {
-                            await this.vmWriter.writeArithmetic(Command.neg);
-                            negate = false;
-                        }
+                        ({ negate, not } = await this.writeNegateOrNot(negate, not));
                         resetFirstPass = true;
                     } else {
-                        const symbol = this.tokenStream.getNext();
-                        await this.vmWriter.writeArithmetic(symbol.token);
+                        symbolToken = this.tokenStream.getNext();
                     }
                     break;
                 default:
@@ -333,11 +371,24 @@ export class CompilationEngine extends Processor {
 
         }
 
+        ({ negate, not } = await this.writeNegateOrNot(negate, not));
+        if (symbolToken) {
+            await this.vmWriter.writeArithmetic(symbolToken.token);
+        }
+
+        return nElements;
+    }
+
+    private async writeNegateOrNot(negate: boolean, not: boolean) {
         if (negate) {
             await this.vmWriter.writeArithmetic(Command.neg);
             negate = false;
         }
-        return nElements;
+        if (not) {
+            await this.vmWriter.writeArithmetic(Command.not);
+            not = false;
+        }
+        return { negate, not };
     }
 
     /**
@@ -379,13 +430,46 @@ export class CompilationEngine extends Processor {
                         await this.compileBracket();
                         // fall-through
                     default:
+                        let segment: Segment;
+                        let index: number;
                         const numberConstant = Number(name.token);
+
                         if (isNaN(numberConstant))  {
-                            const symbolTableEntry = await this.getSymbolTableEntry(name);
-                            await this.vmWriter.writePush(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+                            const type = name.type;
+                            switch (type) {
+                                case TokenType.identifier:
+                                    const symbolTableEntry = await this.getSymbolTableEntry(name);
+                                    if (symbolTableEntry != null ) {
+                                        segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
+                                        index = symbolTableEntry.index;
+                                    }
+                                    break;
+                                case TokenType.keyword:
+                                    switch (name.token) {
+                                        case Keyword.true:
+                                            await this.vmWriter.writePush(Segment.const, 0);
+                                            await this.vmWriter.writeArithmetic(Command.not);
+                                            break;
+                                        case Keyword.false:
+                                        case Keyword.null:
+                                            await this.vmWriter.writePush(Segment.const, 0);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
                         } else {
-                            await this.vmWriter.writePush(Segment.const, numberConstant);
+                            segment = Segment.const;
+                            index = numberConstant;
                         }
+
+                        if (segment != null && index != null) {
+                            await this.vmWriter.writePush(segment, index);
+                        }
+
                         break;
                 }
                 break;
@@ -424,9 +508,12 @@ export class CompilationEngine extends Processor {
      * Starts subroutine in symbol table and defines the first argument "this"
      * @param className 
      */
-    private async startSymbolTableForSubroutine(className: string) {
+    private async startSymbolTableForSubroutine(className: string, functionKeyword: string) {
         this.symbolTable.startSubroutine();
-        this.symbolTable.define("this", className, SymbolKind.arg);
+
+        if (functionKeyword === Keyword.method) {
+            this.symbolTable.define("this", className, SymbolKind.arg);
+        }
     }
 
     /**
@@ -450,5 +537,36 @@ export class CompilationEngine extends Processor {
 
         const symbol = this.symbolTable.getSymbol(name.token);
         return symbol;
+    }
+
+    private incrementWhileLabels(): void {
+        this.whileLabelNumber += 1;
+        this.updateWhileLabel();
+    }
+
+    private decrementWhileLabels(): void {
+        this.whileLabelNumber -= 1;
+        this.updateWhileLabel();
+    }
+
+    private updateWhileLabel() {
+        this.whileLabelStart = `${Labels.whileStart}${this.whileLabelNumber}`;
+        this.whileLabelEnd =  `${Labels.whileEnd}${this.whileLabelNumber}`;
+    }
+
+    private incrementIfLabels(): void {
+        this.ifLabelNumber += 1;
+        this.updateIfLabel();
+    }
+
+    private decrementIfLabels(): void {
+        this.ifLabelNumber -= 1;
+        this.updateIfLabel();
+    }
+
+    private updateIfLabel() {
+        this.ifLabelTrue = `${Labels.ifTrue}${this.ifLabelNumber}`;
+        this.ifLabelFalse = `${Labels.ifFalse}${this.ifLabelNumber}`;
+        this.ifLabelEnd = `${Labels.ifEnd}${this.ifLabelNumber}`;
     }
 }
