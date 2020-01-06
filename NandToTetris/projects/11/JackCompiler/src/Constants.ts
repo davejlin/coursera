@@ -173,3 +173,7 @@ export const Labels = {
     whileStart: "WHILE_BLOCK",
     whileEnd: "WHILE_END",
 }
+
+export enum Methods {
+    new = "new"
+}

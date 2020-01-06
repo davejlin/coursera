@@ -10,7 +10,7 @@
     "cleanvm": "rm -rf files/Seven/*.vm && rm -rf files/ConvertToBin/*.vm && rm -rf files/Square/*.vm && rm -rf files/Average/*.vm && rm -rf files/Pong/*.vm && rm -rf files/ComplexArrays/*.vm",
     "start": "tsc && node dist/JackCompiler.js",
     "runall": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Square && npm run start files/Average && npm run start files/Pong && npm run start files/ComplexArrays",
-    "runsome": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Average"
+    "runsome": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Square && npm run start files/Average"
   },
   "keywords": [
     "Jack",
