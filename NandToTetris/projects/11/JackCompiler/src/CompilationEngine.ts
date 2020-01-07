@@ -9,13 +9,8 @@ import { VMWriter } from "./VMWriter";
 export class CompilationEngine extends Processor {
     private symbolTable: SymbolTable;
     private classMap: Map<string, string>;
-    private whileLabelNumber = -1;
-    private whileLabelStart;
-    private whileLabelEnd;
-    private ifLabelNumber = -1;
-    private ifLabelTrue;
-    private ifLabelFalse;
-    private ifLabelEnd;
+    private whileLabelNumber = 0;
+    private ifLabelNumber = 0;
 
     constructor (protected tokenStream: TokenStream, private vmWriter: VMWriter) {
         super(tokenStream, null);
@@ -72,6 +67,8 @@ export class CompilationEngine extends Processor {
         let methodName = "";
 
         this.startSymbolTableForSubroutine(className, functionKeyword.token);
+        this.resetWhileLabels();
+        this.resetIfLabels();
 
         if (this.tokenStream.peekNext().type === TokenType.identifier) {
             methodName = this.tokenStream.getNext().token;
@@ -230,24 +227,24 @@ export class CompilationEngine extends Processor {
      * Compiles an if statement, possibly with a trailing else clause
      */
     private async compileIf(): Promise<void> {
-        this.incrementIfLabels();
+        const ifIndex = this.getAndIncrementIfIndex();
 
         const ifKeyword = this.tokenStream.getNext().composeTag();
         const openPareths = this.tokenStream.getNext().composeTag();
 
         await this.compileExpression();
 
-        await this.vmWriter.writeIf(this.ifLabelTrue);
-        await this.vmWriter.writeGoto(this.ifLabelFalse);
-        await this.vmWriter.writeLabel(this.ifLabelTrue);
+        await this.vmWriter.writeIf(`${Labels.ifTrue}${ifIndex}`);
+        await this.vmWriter.writeGoto(`${Labels.ifFalse}${ifIndex}`);
+        await this.vmWriter.writeLabel(`${Labels.ifTrue}${ifIndex}`);
 
         const closeParenth = this.tokenStream.getNext().composeTag();
         const openBrace = this.tokenStream.getNext().composeTag();
 
         await this.compileStatements();
 
-        await this.vmWriter.writeGoto(this.ifLabelEnd);
-        await this.vmWriter.writeLabel(this.ifLabelFalse);
+        await this.vmWriter.writeGoto(`${Labels.ifEnd}${ifIndex}`);
+        await this.vmWriter.writeLabel(`${Labels.ifFalse}${ifIndex}`);
 
         if (this.tokenStream.peekNext().token === Keyword.else) {
             const elseKeyword = this.tokenStream.getNext().composeTag();
@@ -256,16 +253,15 @@ export class CompilationEngine extends Processor {
             await this.compileStatements();
         }
 
-        await this.vmWriter.writeLabel(this.ifLabelEnd);
-        this.decrementIfLabels();
+        await this.vmWriter.writeLabel(`${Labels.ifEnd}${ifIndex}`);
     }
 
     /**
      * Compiles a while statement
      */
     private async compileWhile(): Promise<void> {
-        this.incrementWhileLabels();
-        await this.vmWriter.writeLabel(this.whileLabelStart);
+        const whileIndex = this.getAndIncrementWhileIndex();
+        await this.vmWriter.writeLabel(`${Labels.whileStart}${whileIndex}`);
 
         const whileKeyword = this.tokenStream.getNext().composeTag();
         const openPareths = this.tokenStream.getNext().composeTag();
@@ -273,17 +269,15 @@ export class CompilationEngine extends Processor {
         await this.compileExpression();
 
         await this.vmWriter.writeArithmetic(Command.not);
-        await this.vmWriter.writeIf(this.whileLabelEnd);
+        await this.vmWriter.writeIf(`${Labels.whileEnd}${whileIndex}`);
 
         const closeParenth = this.tokenStream.getNext().composeTag();
         const openBrace = this.tokenStream.getNext().composeTag();
 
         await this.compileStatements();
 
-        await this.vmWriter.writeGoto(this.whileLabelStart);
-        await this.vmWriter.writeLabel(this.whileLabelEnd);
-
-        this.decrementWhileLabels();
+        await this.vmWriter.writeGoto(`${Labels.whileStart}${whileIndex}`);
+        await this.vmWriter.writeLabel(`${Labels.whileEnd}${whileIndex}`);
     }
 
     /**
@@ -583,34 +577,19 @@ export class CompilationEngine extends Processor {
         return symbol;
     }
 
-    private incrementWhileLabels(): void {
-        this.whileLabelNumber += 1;
-        this.updateWhileLabel();
+    private getAndIncrementWhileIndex(): number {
+        return this.whileLabelNumber++;
+    }
+    
+    private resetWhileLabels(): void {
+        this.whileLabelNumber = 0;
     }
 
-    private decrementWhileLabels(): void {
-        this.whileLabelNumber -= 1;
-        this.updateWhileLabel();
+    private getAndIncrementIfIndex(): number {
+        return this.ifLabelNumber++;
     }
 
-    private updateWhileLabel() {
-        this.whileLabelStart = `${Labels.whileStart}${this.whileLabelNumber}`;
-        this.whileLabelEnd =  `${Labels.whileEnd}${this.whileLabelNumber}`;
-    }
-
-    private incrementIfLabels(): void {
-        this.ifLabelNumber += 1;
-        this.updateIfLabel();
-    }
-
-    private decrementIfLabels(): void {
-        this.ifLabelNumber -= 1;
-        this.updateIfLabel();
-    }
-
-    private updateIfLabel() {
-        this.ifLabelTrue = `${Labels.ifTrue}${this.ifLabelNumber}`;
-        this.ifLabelFalse = `${Labels.ifFalse}${this.ifLabelNumber}`;
-        this.ifLabelEnd = `${Labels.ifEnd}${this.ifLabelNumber}`;
+    private resetIfLabels(): void {
+        this.ifLabelNumber = 0;
     }
 }
