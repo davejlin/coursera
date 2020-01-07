@@ -282,18 +282,19 @@ export class CompilationEngine extends Processor {
     private async compileDo(): Promise<void> {        
         const doKeyword = this.tokenStream.getNext().composeTag();
         const identifier1 = this.tokenStream.getNext();
-        const mappedName = this.classMap.get(identifier1.token) ?? identifier1.token;
         let methodName = "";
 
         if (this.tokenStream.peekNext().token === Symbol.period) {
             methodName = await this.compileMethodCall();
         }
 
-        const nElements = await this.compileExpressionList();
+        let nArgs = await this.compileExpressionList();
 
         const semicolon = this.tokenStream.getNext().composeTag();
 
-        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, nElements);
+        const { mappedName, adjustedNArgs } = this.getNameAndAdjustedNArgs(identifier1.token, identifier1.token, nArgs);
+
+        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
         await this.vmWriter.writePop(Segment.temp, 0);
     }
 
@@ -426,9 +427,10 @@ export class CompilationEngine extends Processor {
                 switch (this.tokenStream.peekNext().token) {
                     case Symbol.period:
                         const methodName = await this.compileMethodCall(varName, name.token);
-                        const nElements = await this.compileExpressionList();
-                        const mappedName = this.classMap.get(varName) ?? name.token;
-                        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, nElements);
+                        const nArgs = await this.compileExpressionList();
+                        let { mappedName, adjustedNArgs } = this.getNameAndAdjustedNArgs(varName, name.token, nArgs);
+                        adjustedNArgs = methodName === Methods.new ? adjustedNArgs - 1 : adjustedNArgs;
+                        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
                         break;
                     case Symbol.openBracket:
                         await this.compileBracket();
@@ -577,5 +579,22 @@ export class CompilationEngine extends Processor {
         this.ifLabelTrue = `${Labels.ifTrue}${this.ifLabelNumber}`;
         this.ifLabelFalse = `${Labels.ifFalse}${this.ifLabelNumber}`;
         this.ifLabelEnd = `${Labels.ifEnd}${this.ifLabelNumber}`;
+    }
+
+    /**
+     * Get mapped name and adjust number of arguments for methods
+     * @param varName 
+     * @param tokenName 
+     * @param nArgs 
+     */
+    private getNameAndAdjustedNArgs(varName: string, tokenName: string, nArgs: number): { mappedName: string, adjustedNArgs: number } {
+        let adjustedNElements = nArgs;
+        let mappedName = this.classMap.get(varName);
+        if (mappedName) {
+            adjustedNElements += 1; // add one argument (this) for methods
+        } else {
+            mappedName = tokenName;
+        }
+        return { mappedName, adjustedNArgs: adjustedNElements };
     }
 }
