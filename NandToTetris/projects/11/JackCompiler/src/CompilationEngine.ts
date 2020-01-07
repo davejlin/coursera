@@ -53,7 +53,7 @@ export class CompilationEngine extends Processor {
         }
 
         const closeSymbolToken = this.tokenStream.getNext().composeTag();
-    }s
+    }
 
     /**
      * Compiles a static declaration or a field declaration
@@ -67,11 +67,11 @@ export class CompilationEngine extends Processor {
      */
     private async compileSubroutineDec(className: string): Promise<void> {
 
-        const functionKeyword = this.tokenStream.getNext().composeTag();
+        const functionKeyword = this.tokenStream.getNext();
         const returnType = this.tokenStream.getNext().composeTag();
         let methodName = "";
 
-        this.startSymbolTableForSubroutine(className, functionKeyword);
+        this.startSymbolTableForSubroutine(className, functionKeyword.token);
 
         if (this.tokenStream.peekNext().type === TokenType.identifier) {
             methodName = this.tokenStream.getNext().token;
@@ -81,7 +81,7 @@ export class CompilationEngine extends Processor {
         await this.compileParameterList();
         const closeParenths = this.tokenStream.getNext().composeTag();
 
-        await this.compileSubroutineBody(className, methodName);
+        await this.compileSubroutineBody(className, methodName, functionKeyword.token);
     }
 
     /**
@@ -104,7 +104,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles the body of a method, function, or constructor
      */
-    private async compileSubroutineBody(className: string, methodName: string): Promise<void> {
+    private async compileSubroutineBody(className: string, methodName: string, functionKeyword: string): Promise<void> {
         let cycle = true;
 
         const openBrace = this.tokenStream.getNext().composeTag();
@@ -123,6 +123,16 @@ export class CompilationEngine extends Processor {
         const nVars = this.symbolTable.varCount(SymbolKind.var);
         await this.vmWriter.writeFunction(`${className}.${methodName}`, nVars);
 
+        if (methodName === Methods.new) {
+            const nFields = this.symbolTable.varCount(SymbolKind.field);
+            await this.vmWriter.writePush(Segment.const, nFields);
+            await this.vmWriter.writeCall(`Memory.alloc`, 1);
+            await this.vmWriter.writePop(Segment.pointer, 0);
+        } else if (functionKeyword === Keyword.method) {
+            await this.vmWriter.writePush(Segment.arg, 0);
+            await this.vmWriter.writePop(Segment.pointer, 0);
+        }                
+
         cycle = true;
         while (cycle) {
             switch (this.tokenStream.peekNext().token) {
@@ -131,7 +141,7 @@ export class CompilationEngine extends Processor {
                 case Keyword.while:
                 case Keyword.do:
                 case Keyword.return:
-                    await this.compileStatements();
+                    await this.compileStatements(methodName);
                     cycle = false;
                 default:
                     break;
@@ -166,7 +176,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles a sequence of statements, not including the enclosing “{}”
      */
-    private async compileStatements(): Promise<void> {
+    private async compileStatements(methodName: string = null): Promise<void> {
 
         while (this.tokenStream.peekNext().token != Symbol.closeBrace) {
             switch (this.tokenStream.peekNext().token) {
@@ -183,7 +193,7 @@ export class CompilationEngine extends Processor {
                     await this.compileDo();
                     break;
                 case Keyword.return:
-                    await this.compileReturn();
+                    await this.compileReturn(methodName);
                     break;
                 default:
                     break;
@@ -299,7 +309,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles a return statement
      */
-    private async compileReturn(): Promise<void> {        
+    private async compileReturn(methodName: string): Promise<void> {        
         const returnKeyword = this.tokenStream.getNext().composeTag();
 
         if (this.tokenStream.peekNext().token !== Symbol.semicolon) {
@@ -310,6 +320,9 @@ export class CompilationEngine extends Processor {
 
         const semicolon = this.tokenStream.getNext().composeTag();
 
+        if (methodName == Methods.new) {
+            await this.vmWriter.writePush(Segment.pointer, 0);
+        }
         await this.vmWriter.writeReturn();
     }
 
