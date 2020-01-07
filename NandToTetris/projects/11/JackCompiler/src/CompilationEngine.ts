@@ -207,7 +207,7 @@ export class CompilationEngine extends Processor {
         }     
         const equals = this.tokenStream.getNext().composeTag();
 
-        await this.compileExpression(name.token);
+        await this.compileExpression(name);
 
         if (symbolTableEntry != null) {
             await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
@@ -285,16 +285,14 @@ export class CompilationEngine extends Processor {
         let methodName = "";
 
         if (this.tokenStream.peekNext().token === Symbol.period) {
-            methodName = await this.compileMethodCall();
+            methodName = await this.getMethodName();
         }
 
         let nArgs = await this.compileExpressionList();
 
         const semicolon = this.tokenStream.getNext().composeTag();
 
-        const { mappedName, adjustedNArgs } = this.getNameAndAdjustedNArgs(identifier1.token, identifier1.token, nArgs);
-
-        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
+        await this.compileMethodCall(identifier1, identifier1.token, methodName, nArgs);
         await this.vmWriter.writePop(Segment.temp, 0);
     }
 
@@ -318,7 +316,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles an expression
      */
-    private async compileExpression(varName: string = null): Promise<number> {
+    private async compileExpression(varToken: Token = null): Promise<number> {
         let nElements = 1;
         let firstPass = true;
         let resetFirstPass = false;
@@ -354,7 +352,7 @@ export class CompilationEngine extends Processor {
                     }
                     break;
                 default:
-                    await this.compileTerm(varName);
+                    await this.compileTerm(varToken);
                     peekNextToken = this.tokenStream.peekNext();
                     if (Operators.includes(peekNextToken.token)) {
                         const symbol = this.tokenStream.getNext();
@@ -403,7 +401,7 @@ export class CompilationEngine extends Processor {
      * possibilities.  Any other token is not part of this term and
      * should not be advanced over 
      */
-    private async compileTerm(varName: string = null): Promise<void> {
+    private async compileTerm(varToken: Token = null): Promise<void> {
         const peekNextToken = this.tokenStream.peekNext().token;
 
         switch (peekNextToken) {
@@ -426,11 +424,9 @@ export class CompilationEngine extends Processor {
                 
                 switch (this.tokenStream.peekNext().token) {
                     case Symbol.period:
-                        const methodName = await this.compileMethodCall(varName, name.token);
+                        const methodName = await this.getMethodName(varToken.token, name.token);
                         const nArgs = await this.compileExpressionList();
-                        let { mappedName, adjustedNArgs } = this.getNameAndAdjustedNArgs(varName, name.token, nArgs);
-                        adjustedNArgs = methodName === Methods.new ? adjustedNArgs - 1 : adjustedNArgs;
-                        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
+                        await this.compileMethodCall(varToken, name.token, methodName, nArgs);
                         break;
                     case Symbol.openBracket:
                         await this.compileBracket();
@@ -504,7 +500,31 @@ export class CompilationEngine extends Processor {
         const closedBracket = this.tokenStream.getNext().composeTag();
     }
 
-    private async compileMethodCall(varName: string = null, className: string = null): Promise<string> {
+    /**
+     * for methods, get mapped name of class, adjust number of arguments of method, push class' memory segment to stack
+     * @param varToken 
+     * @param tokenName 
+     * @param nArgs 
+     */
+    private async compileMethodCall(varToken: Token, tokenName: string, methodName: string, nArgs: number): Promise<void> {
+        let adjustedNArgs = nArgs;
+        let mappedName = this.classMap.get(varToken.token);
+        if (mappedName) {
+            const symbolTableEntry = await this.getSymbolTableEntry(varToken);
+            const segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
+
+            if (methodName !== Methods.new) {
+                adjustedNArgs += 1; // add one argument (this) for methods
+                await this.vmWriter.writePush(segment, symbolTableEntry.index);
+            }
+        } else {
+            mappedName = tokenName;
+        }
+
+        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
+    }
+
+    private async getMethodName(varName: string = null, className: string = null): Promise<string> {
         const period = this.tokenStream.getNext().composeTag();
         const methodName = this.tokenStream.getNext();
 
@@ -579,22 +599,5 @@ export class CompilationEngine extends Processor {
         this.ifLabelTrue = `${Labels.ifTrue}${this.ifLabelNumber}`;
         this.ifLabelFalse = `${Labels.ifFalse}${this.ifLabelNumber}`;
         this.ifLabelEnd = `${Labels.ifEnd}${this.ifLabelNumber}`;
-    }
-
-    /**
-     * Get mapped name and adjust number of arguments for methods
-     * @param varName 
-     * @param tokenName 
-     * @param nArgs 
-     */
-    private getNameAndAdjustedNArgs(varName: string, tokenName: string, nArgs: number): { mappedName: string, adjustedNArgs: number } {
-        let adjustedNElements = nArgs;
-        let mappedName = this.classMap.get(varName);
-        if (mappedName) {
-            adjustedNElements += 1; // add one argument (this) for methods
-        } else {
-            mappedName = tokenName;
-        }
-        return { mappedName, adjustedNArgs: adjustedNElements };
     }
 }
