@@ -354,6 +354,7 @@ export class CompilationEngine extends Processor {
                     } else if (peekNextToken.token === Symbol.comma) {
                         nElements += 1;
                         const comma = this.tokenStream.getNext().composeTag();
+                        symbolToken = await this.compileSymbol(symbolToken);
                         ({ negate, not } = await this.writeNegateOrNot(negate, not));
                         resetFirstPass = true;
                     } else {
@@ -383,9 +384,7 @@ export class CompilationEngine extends Processor {
         }
 
         ({ negate, not } = await this.writeNegateOrNot(negate, not));
-        if (symbolToken) {
-            await this.vmWriter.writeArithmetic(symbolToken.token);
-        }
+        symbolToken = await this.compileSymbol(symbolToken);
 
         return nElements;
     }
@@ -506,13 +505,6 @@ export class CompilationEngine extends Processor {
         return nElements;
     }
 
-    private async compileBracket() {
-        const openBracket = this.tokenStream.getNext().composeTag();
-        
-        await this.compileExpression();
-        const closedBracket = this.tokenStream.getNext().composeTag();
-    }
-
     /**
      * for methods, get mapped name of class, adjust number of arguments of method, push class' memory segment to stack
      * @param varToken 
@@ -542,6 +534,20 @@ export class CompilationEngine extends Processor {
             await this.vmWriter.writePush(Segment.pointer, 0);
             await this.vmWriter.writeCall(`${className}.${varToken.token}`, adjustedNArgs);
         }
+    }
+
+    private async compileBracket() {
+        const openBracket = this.tokenStream.getNext().composeTag();
+        
+        await this.compileExpression();
+        const closedBracket = this.tokenStream.getNext().composeTag();
+    }
+
+    private async compileSymbol(symbolToken: Token): Promise<null> {
+        if (symbolToken) {
+            await this.vmWriter.writeArithmetic(symbolToken.token);
+        }
+        return null;
     }
 
     private async getMethodName(varName: string = null, className: string = null): Promise<string> {
