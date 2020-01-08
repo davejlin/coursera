@@ -138,7 +138,7 @@ export class CompilationEngine extends Processor {
                 case Keyword.while:
                 case Keyword.do:
                 case Keyword.return:
-                    await this.compileStatements(methodName);
+                    await this.compileStatements(className);
                     cycle = false;
                 default:
                     break;
@@ -173,24 +173,24 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles a sequence of statements, not including the enclosing “{}”
      */
-    private async compileStatements(methodName: string = null): Promise<void> {
+    private async compileStatements(className: string): Promise<void> {
 
         while (this.tokenStream.peekNext().token != Symbol.closeBrace) {
             switch (this.tokenStream.peekNext().token) {
                 case Keyword.let:
-                    await this.compileLet();
+                    await this.compileLet(className);
                     break;
                 case Keyword.if:
-                    await this.compileIf();
+                    await this.compileIf(className);
                     break;
                 case Keyword.while:
-                    await this.compileWhile();
+                    await this.compileWhile(className);
                     break;
                 case Keyword.do:
-                    await this.compileDo();
+                    await this.compileDo(className);
                     break;
                 case Keyword.return:
-                    await this.compileReturn(methodName);
+                    await this.compileReturn();
                     break;
                 default:
                     break;
@@ -203,7 +203,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles a let statement
      */
-    private async compileLet(): Promise<void> {
+    private async compileLet(className: string): Promise<void> {
         const letKeyword = this.tokenStream.getNext().composeTag();
         const name = this.tokenStream.getNext();
         
@@ -214,7 +214,7 @@ export class CompilationEngine extends Processor {
         }     
         const equals = this.tokenStream.getNext().composeTag();
 
-        await this.compileExpression(name);
+        await this.compileExpression(name, className);
 
         if (symbolTableEntry != null) {
             await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
@@ -226,13 +226,13 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles an if statement, possibly with a trailing else clause
      */
-    private async compileIf(): Promise<void> {
+    private async compileIf(className: string): Promise<void> {
         const ifIndex = this.getAndIncrementIfIndex();
 
         const ifKeyword = this.tokenStream.getNext().composeTag();
         const openPareths = this.tokenStream.getNext().composeTag();
 
-        await this.compileExpression();
+        await this.compileExpression(null, className);
 
         await this.vmWriter.writeIf(`${Labels.ifTrue}${ifIndex}`);
         await this.vmWriter.writeGoto(`${Labels.ifFalse}${ifIndex}`);
@@ -241,32 +241,38 @@ export class CompilationEngine extends Processor {
         const closeParenth = this.tokenStream.getNext().composeTag();
         const openBrace = this.tokenStream.getNext().composeTag();
 
-        await this.compileStatements();
+        await this.compileStatements(className);
 
-        await this.vmWriter.writeGoto(`${Labels.ifEnd}${ifIndex}`);
-        await this.vmWriter.writeLabel(`${Labels.ifFalse}${ifIndex}`);
+
 
         if (this.tokenStream.peekNext().token === Keyword.else) {
             const elseKeyword = this.tokenStream.getNext().composeTag();
             const openBrace = this.tokenStream.getNext().composeTag();
             
-            await this.compileStatements();
+            await this.vmWriter.writeGoto(`${Labels.ifEnd}${ifIndex}`);
+            await this.vmWriter.writeLabel(`${Labels.ifFalse}${ifIndex}`);
+
+            await this.compileStatements(className);
+
+            await this.vmWriter.writeLabel(`${Labels.ifEnd}${ifIndex}`);
+        } else {
+            await this.vmWriter.writeLabel(`${Labels.ifFalse}${ifIndex}`);
         }
 
-        await this.vmWriter.writeLabel(`${Labels.ifEnd}${ifIndex}`);
+
     }
 
     /**
      * Compiles a while statement
      */
-    private async compileWhile(): Promise<void> {
+    private async compileWhile(className: string): Promise<void> {
         const whileIndex = this.getAndIncrementWhileIndex();
         await this.vmWriter.writeLabel(`${Labels.whileStart}${whileIndex}`);
 
         const whileKeyword = this.tokenStream.getNext().composeTag();
         const openPareths = this.tokenStream.getNext().composeTag();
 
-        await this.compileExpression();
+        await this.compileExpression(null, className);
 
         await this.vmWriter.writeArithmetic(Command.not);
         await this.vmWriter.writeIf(`${Labels.whileEnd}${whileIndex}`);
@@ -274,7 +280,7 @@ export class CompilationEngine extends Processor {
         const closeParenth = this.tokenStream.getNext().composeTag();
         const openBrace = this.tokenStream.getNext().composeTag();
 
-        await this.compileStatements();
+        await this.compileStatements(className);
 
         await this.vmWriter.writeGoto(`${Labels.whileStart}${whileIndex}`);
         await this.vmWriter.writeLabel(`${Labels.whileEnd}${whileIndex}`);
@@ -283,7 +289,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles a do statement
      */
-    private async compileDo(): Promise<void> {        
+    private async compileDo(className: string): Promise<void> {        
         const doKeyword = this.tokenStream.getNext().composeTag();
         const identifier1 = this.tokenStream.getNext();
         let methodName = "";
@@ -296,14 +302,14 @@ export class CompilationEngine extends Processor {
 
         const semicolon = this.tokenStream.getNext().composeTag();
 
-        await this.compileMethodCall(identifier1, identifier1.token, methodName, nArgs);
+        await this.compileMethodCall(identifier1, identifier1.token, methodName, className, nArgs);
         await this.vmWriter.writePop(Segment.temp, 0);
     }
 
     /**
      * Compiles a return statement
      */
-    private async compileReturn(methodName: string): Promise<void> {        
+    private async compileReturn(): Promise<void> {        
         const returnKeyword = this.tokenStream.getNext().composeTag();
 
         if (this.tokenStream.peekNext().token !== Symbol.semicolon) {
@@ -313,17 +319,13 @@ export class CompilationEngine extends Processor {
         }
 
         const semicolon = this.tokenStream.getNext().composeTag();
-
-        if (methodName == Methods.new) {
-            await this.vmWriter.writePush(Segment.pointer, 0);
-        }
         await this.vmWriter.writeReturn();
     }
 
     /**
      * Compiles an expression
      */
-    private async compileExpression(varToken: Token = null): Promise<number> {
+    private async compileExpression(varToken: Token = null, className: string = null,): Promise<number> {
         let nElements = 1;
         let firstPass = true;
         let resetFirstPass = false;
@@ -346,9 +348,9 @@ export class CompilationEngine extends Processor {
                             default:
                                 break;
                         }
-                        await this.compileTerm();
+                        await this.compileTerm(varToken, className);
                     } else if (peekNextToken.token === Symbol.openParenths) {
-                        await this.compileTerm();
+                        await this.compileTerm(varToken, className);
                     } else if (peekNextToken.token === Symbol.comma) {
                         nElements += 1;
                         const comma = this.tokenStream.getNext().composeTag();
@@ -359,11 +361,11 @@ export class CompilationEngine extends Processor {
                     }
                     break;
                 default:
-                    await this.compileTerm(varToken);
+                    await this.compileTerm(varToken, className);
                     peekNextToken = this.tokenStream.peekNext();
                     if (Operators.includes(peekNextToken.token)) {
                         const symbol = this.tokenStream.getNext();
-                        await this.compileTerm();
+                        await this.compileTerm(varToken, className);
                         await this.vmWriter.writeArithmetic(symbol.token);
                     }
 
@@ -408,7 +410,7 @@ export class CompilationEngine extends Processor {
      * possibilities.  Any other token is not part of this term and
      * should not be advanced over 
      */
-    private async compileTerm(varToken: Token = null): Promise<void> {
+    private async compileTerm(varToken: Token = null, className: string = null): Promise<void> {
         const peekNextToken = this.tokenStream.peekNext().token;
 
         switch (peekNextToken) {
@@ -416,24 +418,24 @@ export class CompilationEngine extends Processor {
             case Symbol.tilda:
                 const symbol = this.tokenStream.getNext().composeTag();
 
-                await this.compileTerm();
+                await this.compileTerm(varToken, className);
 
                 break;
             case Symbol.openParenths:
                 const openPareths = this.tokenStream.getNext().composeTag();
     
-                await this.compileExpression();
+                await this.compileExpression(varToken, className);
                 
                 const closeParenths = this.tokenStream.getNext().composeTag();
                 break;
             default:
                 const name = this.tokenStream.getNext();
-                
+
                 switch (this.tokenStream.peekNext().token) {
                     case Symbol.period:
                         const methodName = await this.getMethodName(varToken.token, name.token);
                         const nArgs = await this.compileExpressionList();
-                        await this.compileMethodCall(varToken, name.token, methodName, nArgs);
+                        await this.compileMethodCall(varToken, name.token, methodName, className, nArgs);
                         break;
                     case Symbol.openBracket:
                         await this.compileBracket();
@@ -455,6 +457,10 @@ export class CompilationEngine extends Processor {
                                     break;
                                 case TokenType.keyword:
                                     switch (name.token) {
+                                        case Keyword.this:
+                                            segment = Segment.pointer;
+                                            index = 0;
+                                            break;
                                         case Keyword.true:
                                             await this.vmWriter.writePush(Segment.const, 0);
                                             await this.vmWriter.writeArithmetic(Command.not);
@@ -513,22 +519,29 @@ export class CompilationEngine extends Processor {
      * @param tokenName 
      * @param nArgs 
      */
-    private async compileMethodCall(varToken: Token, tokenName: string, methodName: string, nArgs: number): Promise<void> {
+    private async compileMethodCall(varToken: Token, tokenName: string, methodName: string, className: string, nArgs: number): Promise<void> {
         let adjustedNArgs = nArgs;
         let mappedName = this.classMap.get(varToken.token);
-        if (mappedName) {
-            const symbolTableEntry = await this.getSymbolTableEntry(varToken);
-            const segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
 
-            if (methodName !== Methods.new) {
-                adjustedNArgs += 1; // add one argument (this) for methods
-                await this.vmWriter.writePush(segment, symbolTableEntry.index);
+        if (methodName) {
+            if (mappedName) {
+                const symbolTableEntry = await this.getSymbolTableEntry(varToken);
+                const segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
+    
+                if (methodName !== Methods.new) {
+                    adjustedNArgs += 1; // add one argument (this) for methods
+                    await this.vmWriter.writePush(segment, symbolTableEntry.index);
+                }
+            } else {
+                mappedName = tokenName;
             }
-        } else {
-            mappedName = tokenName;
-        }
 
-        await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
+            await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
+        } else {
+            adjustedNArgs += 1; // add one argument (this) for methods
+            await this.vmWriter.writePush(Segment.pointer, 0);
+            await this.vmWriter.writeCall(`${className}.${varToken.token}`, adjustedNArgs);
+        }
     }
 
     private async getMethodName(varName: string = null, className: string = null): Promise<string> {
