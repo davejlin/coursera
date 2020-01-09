@@ -204,20 +204,26 @@ export class CompilationEngine extends Processor {
      * Compiles a let statement
      */
     private async compileLet(className: string): Promise<void> {
+        let isArray = false;
         const letKeyword = this.tokenStream.getNext().composeTag();
         const name = this.tokenStream.getNext();
         
         const symbolTableEntry = await this.getSymbolTableEntry(name);
 
         if (this.tokenStream.peekNext().token === Symbol.openBracket) {
-            await this.compileBracket();
+            isArray = true;
+            await this.compileBracket(symbolTableEntry);
         }     
         const equals = this.tokenStream.getNext().composeTag();
 
         await this.compileExpression(name, className);
 
         if (symbolTableEntry != null) {
-            await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+            if (isArray) {
+                await this.compileArrayEnd();
+            } else {
+                await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+            }
         }
 
         const symbolSemicolon = this.tokenStream.getNext().composeTag();
@@ -325,7 +331,7 @@ export class CompilationEngine extends Processor {
     /**
      * Compiles an expression
      */
-    private async compileExpression(varToken: Token = null, className: string = null,): Promise<number> {
+    private async compileExpression(varToken: Token = null, className: string = null): Promise<number> {
         let nElements = 1;
         let firstPass = true;
         let resetFirstPass = false;
@@ -437,7 +443,7 @@ export class CompilationEngine extends Processor {
                         await this.compileMethodCall(varToken, name.token, methodName, className, nArgs);
                         break;
                     case Symbol.openBracket:
-                        await this.compileBracket();
+                        await this.compileBracket(await this.getSymbolTableEntry(name));
                         // fall-through
                     default:
                         let segment: Segment;
@@ -539,11 +545,13 @@ export class CompilationEngine extends Processor {
         }
     }
 
-    private async compileBracket() {
+    private async compileBracket(symbolTableEntry: SymbolClass) {
         const openBracket = this.tokenStream.getNext().composeTag();
         
         await this.compileExpression();
         const closedBracket = this.tokenStream.getNext().composeTag();
+        await this.vmWriter.writePush(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+        await this.vmWriter.writeArithmetic(Symbol.plus);
     }
 
     private async compileSymbol(symbolToken: Token): Promise<null> {
@@ -551,6 +559,13 @@ export class CompilationEngine extends Processor {
             await this.vmWriter.writeArithmetic(symbolToken.token);
         }
         return null;
+    }
+
+    private async compileArrayEnd(): Promise<void> {
+        await this.vmWriter.writePop(Segment.temp, 0);
+        await this.vmWriter.writePop(Segment.pointer, 1);
+        await this.vmWriter.writePush(Segment.temp, 0);
+        await this.vmWriter.writePop(Segment.that, 0);
     }
 
     private ascii (a: string): number { return a.charCodeAt(0); }
