@@ -454,6 +454,9 @@ export class CompilationEngine extends Processor {
                                         index = symbolTableEntry.index;
                                     }
                                     break;
+                                case TokenType.stringConstant:
+                                    await this.compileStringConstant(name.token);
+                                    break;
                                 case TokenType.keyword:
                                     switch (name.token) {
                                         case Keyword.this:
@@ -548,6 +551,22 @@ export class CompilationEngine extends Processor {
             await this.vmWriter.writeArithmetic(symbolToken.token);
         }
         return null;
+    }
+
+    private ascii (a: string): number { return a.charCodeAt(0); }
+
+    private async compileStringConstant(stringConstant: string): Promise<void> {
+        const stringStripped = stringConstant.slice(1,-1);
+        const nChars = stringStripped.length;
+        await this.vmWriter.writePush(Segment.const, nChars);
+        await this.vmWriter.writeCall(`String.new`, 1);
+
+        const asciiValues = stringStripped.split('').map(this.ascii);
+        for (const value of asciiValues) {
+            await this.vmWriter.writePush(Segment.const, value);
+            await this.vmWriter.writeCall(`String.appendChar`, 2);
+        }
+
     }
 
     private async getMethodName(varName: string = null, className: string = null): Promise<string> {
