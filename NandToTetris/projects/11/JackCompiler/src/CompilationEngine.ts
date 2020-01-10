@@ -1,5 +1,5 @@
 import { Processor } from "./Processor";
-import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command, SymbolKindSegmentMap, Labels, Methods, SymbolType, OsClasses } from "./Constants";
+import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command, SymbolKindSegmentMap, Labels, Methods, SymbolType, OsClasses, PrimitiveTypes } from "./Constants";
 import { SymbolTable } from "./SymbolTable";
 import { Symbol as SymbolClass } from "./Symbol";
 import { Token } from "./Token";
@@ -298,18 +298,10 @@ export class CompilationEngine extends Processor {
     private async compileDo(className: string): Promise<void> {        
         const doKeyword = this.tokenStream.getNext().composeTag();
         const identifier1 = this.tokenStream.getNext();
-        let methodName = "";
 
-        if (this.tokenStream.peekNext().token === Symbol.period) {
-            methodName = await this.getMethodName();
-        }
-
-        let nArgs = await this.compileExpressionList();
-
-        const semicolon = this.tokenStream.getNext().composeTag();
-
-        await this.compileMethodCall(identifier1, identifier1.token, methodName, className, nArgs);
+        await this.compileMethodCall(identifier1, identifier1.token, className);
         await this.vmWriter.writePop(Segment.temp, 0);
+        const semicolon = this.tokenStream.getNext().composeTag();
     }
 
     /**
@@ -438,9 +430,7 @@ export class CompilationEngine extends Processor {
 
                 switch (this.tokenStream.peekNext().token) {
                     case Symbol.period:
-                        const methodName = await this.getMethodName(varToken.token, name.token);
-                        const nArgs = await this.compileExpressionList();
-                        await this.compileMethodCall(varToken, name.token, methodName, className, nArgs);
+                        await this.compileMethodCall(varToken, name.token, className);
                         break;
                     case Symbol.openBracket:
                         await this.compileBracket(this.getSymbolTableEntry(name), true);
@@ -520,28 +510,32 @@ export class CompilationEngine extends Processor {
      * @param tokenName 
      * @param nArgs 
      */
-    private async compileMethodCall(varToken: Token, tokenName: string, methodName: string, className: string, nArgs: number): Promise<void> {
-        let adjustedNArgs = nArgs;
-        let mappedName = OsClasses.includes(tokenName) ? null : this.classMap.get(varToken.token);
+    private async compileMethodCall(varToken: Token, tokenName: string, className: string): Promise<void> {
+        let methodName = "";
+        if (this.tokenStream.peekNext().token === Symbol.period) {
+            methodName = await this.getMethodName();
+        }
 
         if (methodName) {
+            let nArgsToAdd = 0
+            let mappedName = OsClasses.includes(tokenName) ? null : this.classMap.get(tokenName);
             if (mappedName) {
                 const symbolTableEntry = this.getSymbolTableEntry(varToken);
                 const segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
     
-                if (methodName !== Methods.new) {
-                    adjustedNArgs += 1; // add one argument (this) for methods
+                if (mappedName !== tokenName) { // condition for a method, since a function uses the class' name, while a method uses the variable's name
+                    nArgsToAdd = 1; // add one argument (this) for methods
                     await this.vmWriter.writePush(segment, symbolTableEntry.index);
                 }
             } else {
                 mappedName = tokenName;
             }
-
-            await this.vmWriter.writeCall(`${mappedName}.${methodName}`, adjustedNArgs);
+            const nArgs = await this.compileExpressionList() + nArgsToAdd;
+            await this.vmWriter.writeCall(`${mappedName}.${methodName}`, nArgs);
         } else {
-            adjustedNArgs += 1; // add one argument (this) for methods
             await this.vmWriter.writePush(Segment.pointer, 0);
-            await this.vmWriter.writeCall(`${className}.${varToken.token}`, adjustedNArgs);
+            const nArgs = await this.compileExpressionList() + 1; // add one argument (this) for methods
+            await this.vmWriter.writeCall(`${className}.${varToken.token}`, nArgs);
         }
     }
 
@@ -589,22 +583,17 @@ export class CompilationEngine extends Processor {
 
     }
 
-    private async getMethodName(varName: string = null, className: string = null): Promise<string> {
+    private async getMethodName(): Promise<string> {
         const period = this.tokenStream.getNext().composeTag();
         const methodName = this.tokenStream.getNext();
-
-        if (methodName.token === Methods.new && varName != null) {
-            this.classMap.set(varName, className)
-        }
-
         return methodName.token;
     }
 
     /**
-     * Starts subroutine in symbol table and defines the first argument "this"
+     * Starts subroutine in symbol table
      * @param className 
      */
-    private async startSymbolTableForSubroutine(className: string, functionKeyword: string) {
+    private startSymbolTableForSubroutine(className: string, functionKeyword: string): void {
         this.symbolTable.startSubroutine();
 
         if (functionKeyword === Keyword.method) {
@@ -620,6 +609,10 @@ export class CompilationEngine extends Processor {
      */
     private async defineSymbolTableEntry(name: string, type: string, kind: SymbolKind): Promise<void> {
         this.symbolTable.define(name, type, kind);
+
+        if (!PrimitiveTypes.includes(type)) {
+            this.classMap.set(name, type);
+        }
     }
 
     /**

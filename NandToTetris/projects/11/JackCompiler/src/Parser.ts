@@ -549,7 +549,7 @@ export class Parser extends Processor {
      * Starts subroutine in symbol table and defines the first argument "this"
      * @param className 
      */
-    private async startSymbolTableForSubroutine(className: string) {
+    private startSymbolTableForSubroutine(className: string): void {
         this.symbolTable.startSubroutine();
         this.symbolTable.define("this", className, SymbolKind.arg);
     }

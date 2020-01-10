@@ -187,3 +187,9 @@ export const OsClasses: string[] = [
     "Memory",
     "Screen"
 ]
+
+export const PrimitiveTypes: string[] = [
+    Keyword.boolean,
+    Keyword.int,
+    Keyword.char
+]
