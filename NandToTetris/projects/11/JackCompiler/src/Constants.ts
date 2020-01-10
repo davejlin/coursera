@@ -136,6 +136,10 @@ export enum SymbolKind {
     var = "VAR"
 }
 
+export enum SymbolType {
+    array = "Array"
+}
+
 export enum Segment {
     const = "constant",
     arg = "argument",
@@ -177,3 +181,9 @@ export const Labels = {
 export enum Methods {
     new = "new"
 }
+
+export const OsClasses: string[] = [
+    "Keyboard",
+    "Memory",
+    "Screen"
+]

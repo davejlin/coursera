@@ -1,5 +1,5 @@
 import { Processor } from "./Processor";
-import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command, SymbolKindSegmentMap, Labels, Methods } from "./Constants";
+import { Keyword, Symbol, SymbolKind, TokenType, Operators, ExpressionTerminators, Segment, Command, SymbolKindSegmentMap, Labels, Methods, SymbolType, OsClasses } from "./Constants";
 import { SymbolTable } from "./SymbolTable";
 import { Symbol as SymbolClass } from "./Symbol";
 import { Token } from "./Token";
@@ -208,7 +208,7 @@ export class CompilationEngine extends Processor {
         const letKeyword = this.tokenStream.getNext().composeTag();
         const name = this.tokenStream.getNext();
         
-        const symbolTableEntry = await this.getSymbolTableEntry(name);
+        const symbolTableEntry = this.getSymbolTableEntry(name);
 
         if (this.tokenStream.peekNext().token === Symbol.openBracket) {
             isArray = true;
@@ -443,7 +443,7 @@ export class CompilationEngine extends Processor {
                         await this.compileMethodCall(varToken, name.token, methodName, className, nArgs);
                         break;
                     case Symbol.openBracket:
-                        await this.compileBracket(await this.getSymbolTableEntry(name));
+                        await this.compileBracket(this.getSymbolTableEntry(name), true);
                         // fall-through
                     default:
                         let segment: Segment;
@@ -454,8 +454,8 @@ export class CompilationEngine extends Processor {
                             const type = name.type;
                             switch (type) {
                                 case TokenType.identifier:
-                                    const symbolTableEntry = await this.getSymbolTableEntry(name);
-                                    if (symbolTableEntry != null ) {
+                                    const symbolTableEntry = this.getSymbolTableEntry(name);
+                                    if (symbolTableEntry != null && symbolTableEntry.type !== SymbolType.array) {
                                         segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
                                         index = symbolTableEntry.index;
                                     }
@@ -522,11 +522,11 @@ export class CompilationEngine extends Processor {
      */
     private async compileMethodCall(varToken: Token, tokenName: string, methodName: string, className: string, nArgs: number): Promise<void> {
         let adjustedNArgs = nArgs;
-        let mappedName = this.classMap.get(varToken.token);
+        let mappedName = OsClasses.includes(tokenName) ? null : this.classMap.get(varToken.token);
 
         if (methodName) {
             if (mappedName) {
-                const symbolTableEntry = await this.getSymbolTableEntry(varToken);
+                const symbolTableEntry = this.getSymbolTableEntry(varToken);
                 const segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
     
                 if (methodName !== Methods.new) {
@@ -545,13 +545,18 @@ export class CompilationEngine extends Processor {
         }
     }
 
-    private async compileBracket(symbolTableEntry: SymbolClass) {
+    private async compileBracket(symbolTableEntry: SymbolClass, fromExpression: boolean = false) {
         const openBracket = this.tokenStream.getNext().composeTag();
         
         await this.compileExpression();
         const closedBracket = this.tokenStream.getNext().composeTag();
         await this.vmWriter.writePush(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
         await this.vmWriter.writeArithmetic(Symbol.plus);
+        
+        if (fromExpression) {
+            await this.vmWriter.writePop(Segment.pointer, 1);
+            await this.vmWriter.writePush(Segment.that, 0);
+        }
     }
 
     private async compileSymbol(symbolToken: Token): Promise<null> {
@@ -621,7 +626,7 @@ export class CompilationEngine extends Processor {
      * Gets and outputs symbol table entry
      * @param name 
      */
-    private async getSymbolTableEntry(name: Token): Promise<SymbolClass> {
+    private getSymbolTableEntry(name: Token): SymbolClass {
         if (name.type !== TokenType.identifier) {
             return;
         }
