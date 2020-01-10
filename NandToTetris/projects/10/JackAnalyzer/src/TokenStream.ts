@@ -97,6 +97,9 @@ export class TokenStream {
         while (true) {
             const newChar = this.readStream.read(1);
             if (newChar === null) { // end of file
+                if (line) { // if file ends on a non-empty line
+                    this.process(line);
+                }
                 break;
             }
             if (newChar === os.EOL ) { // end of line
