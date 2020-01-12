@@ -1,0 +1,30 @@
+{
+  "name": "jackcompiler",
+  "version": "1.0.0",
+  "description": "Jack Language Compiler II: Code Generator",
+  "main": "dist/JackCompiler.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "cleanall": "npm run clean && npm run cleanxml && npm run cleanvm && rm -rf node_modules && rm -rf package-lock.json",
+    "cleanxml": "rm -rf files/Seven/*.xml && rm -rf files/ConvertToBin/*.xml && rm -rf files/Square/*.xml && rm -rf files/Average/*.xml && rm -rf files/Pong/*.xml && rm -rf files/ComplexArrays/*.xml",
+    "cleanvm": "rm -rf files/Seven/*.vm && rm -rf files/ConvertToBin/*.vm && rm -rf files/Square/*.vm && rm -rf files/Average/*.vm && rm -rf files/Pong/*.vm && rm -rf files/ComplexArrays/*.vm",
+    "start": "tsc && node dist/JackCompiler.js",
+    "runall": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Square && npm run start files/Average && npm run start files/Pong && npm run start files/ComplexArrays",
+    "runsome": "npm run start files/Seven && npm run start files/ConvertToBin && npm run start files/Square && npm run start files/Average && npm run start files/Pong",
+    "runone": "npm run start files/Pong"
+  },
+  "keywords": [
+    "Jack",
+    "compiler",
+    "syntax",
+    "analyzer",
+    "JackAnalyzer"
+  ],
+  "author": "David Lin",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "typescript": "^3.5.2"
+  },
+  "dependencies": {}
+}
