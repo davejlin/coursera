@@ -130,20 +130,7 @@ export class CompilationEngine extends Processor {
             await this.vmWriter.writePop(Segment.pointer, 0);
         }                
 
-        cycle = true;
-        while (cycle) {
-            switch (this.tokenStream.peekNext().token) {
-                case Keyword.let:
-                case Keyword.if:
-                case Keyword.while:
-                case Keyword.do:
-                case Keyword.return:
-                    await this.compileStatements(className);
-                    cycle = false;
-                default:
-                    break;
-            }
-        }
+        await this.compileStatements(className);
     }
 
     /**
@@ -156,15 +143,17 @@ export class CompilationEngine extends Processor {
     private async compileVars(): Promise<void> {
         const varKeyword = this.tokenStream.getNext();
         const type = this.tokenStream.getNext();
-        const name = this.tokenStream.getNext();
 
-        await this.defineSymbolTableEntry(name.token, type.token, SymbolKind[varKeyword.token]);
-
-        while (this.tokenStream.peekNext().token === Symbol.comma) {
-            const comma = this.tokenStream.getNext();
+        while (true) {
             const name = this.tokenStream.getNext();
 
             await this.defineSymbolTableEntry(name.token, type.token, SymbolKind[varKeyword.token])
+
+            if (this.tokenStream.peekNext().token === Symbol.comma) {
+                const comma = this.tokenStream.getNext();
+            } else {
+                break;
+            }
         }
 
         const semicolon = this.tokenStream.getNext().composeTag();
@@ -423,6 +412,12 @@ export class CompilationEngine extends Processor {
                 break;
             default:
                 const name = this.tokenStream.getNext();
+                const symbolTableEntry = this.getSymbolTableEntry(name);
+
+                if (symbolTableEntry && symbolTableEntry.type === SymbolType.array) {
+                    await this.compileArray(symbolTableEntry, true);
+                    return;
+                }
 
                 switch (this.tokenStream.peekNext().token) {
                     case Symbol.period:
@@ -431,19 +426,13 @@ export class CompilationEngine extends Processor {
                     default:
                         let segment: Segment;
                         let index: number;
+
                         const numberConstant = Number(name.token);
-
-                        const symbolTableEntry = this.getSymbolTableEntry(name);
-
-                        if (symbolTableEntry && symbolTableEntry.type === SymbolType.array) {
-                            await this.compileArray(symbolTableEntry, true);
-                        }
-
                         if (isNaN(numberConstant))  {
                             const type = name.type;
                             switch (type) {
                                 case TokenType.identifier:
-                                    if (symbolTableEntry && symbolTableEntry.type !== SymbolType.array) {
+                                    if (symbolTableEntry) {
                                         segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
                                         index = symbolTableEntry.index;
                                     }
@@ -586,7 +575,6 @@ export class CompilationEngine extends Processor {
             await this.vmWriter.writePush(Segment.const, value);
             await this.vmWriter.writeCall(`String.appendChar`, 2);
         }
-
     }
 
     private async getMethodName(): Promise<string> {

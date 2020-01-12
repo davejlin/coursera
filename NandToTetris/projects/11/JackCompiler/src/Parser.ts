@@ -1,6 +1,6 @@
 import { Processor } from "./Processor";
 import os = require("os");
-import { Keyword, Symbol, SymbolKind, spacer, TokenType, Operators, ExpressionTerminators } from "./Constants";
+import { Keyword, Symbol, SymbolKind, spacer, TokenType, Operators, ExpressionTerminators, SymbolType } from "./Constants";
 import { SymbolTable } from "./SymbolTable";
 import { Symbol as SymbolClass } from "./Symbol";
 import { Token } from "./Token";
@@ -141,18 +141,13 @@ export class Parser extends Processor {
                 case Keyword.var:
                     await this.compileVarDec();
                     break;
-                case Keyword.let:
-                case Keyword.if:
-                case Keyword.while:
-                case Keyword.do:
-                case Keyword.return:
-                    await this.compileStatements();
-                    cycle = false;
                 default:
+                    cycle = false;
                     break;
             }
         }
 
+        await this.compileStatements();
         this.decrementSpacer();
         await this.output([`</subroutineBody>` + os.EOL]);
     }
@@ -169,20 +164,23 @@ export class Parser extends Processor {
     private async compileVars(): Promise<void> {
         const varKeyword = this.tokenStream.getNext();
         const type = this.tokenStream.getNext();
-        const name = this.tokenStream.getNext();
 
         this.incrementSpacer();
-        await this.output([varKeyword.composeTag(), type.composeTag(), name.composeTag()]);
+        await this.output([varKeyword.composeTag(), type.composeTag()]);
 
-        await this.defineSymbolTableEntry(name.token, type.token, SymbolKind[varKeyword.token]);
-
-        while (this.tokenStream.peekNext().token === Symbol.comma) {
-            const comma = this.tokenStream.getNext();
+        while (true) {
             const name = this.tokenStream.getNext();
             
-            await this.output([comma.composeTag(), name.composeTag()]);
+            await this.output([name.composeTag()]);
 
             await this.defineSymbolTableEntry(name.token, type.token, SymbolKind[varKeyword.token])
+
+            if (this.tokenStream.peekNext().token === Symbol.comma) {
+                const comma = this.tokenStream.getNext();
+                await this.output([comma.composeTag()]);
+            } else {
+                break;
+            }
         }
 
         const semicolon = this.tokenStream.getNext().composeTag();
@@ -241,8 +239,8 @@ export class Parser extends Processor {
 
         const symbolTableEntry = await this.getSymbolTableEntry(name);
 
-        if (this.tokenStream.peekNext().token === Symbol.openBracket) {
-            await this.compileBracket();
+        if (symbolTableEntry.type === SymbolType.array) {
+            await this.compileArray();
         }     
         const equals = this.tokenStream.getNext().composeTag();
 
@@ -467,8 +465,8 @@ export class Parser extends Processor {
                         await this.compileExpressionList();
                         break;
                     case Symbol.openBracket:
-                        await this.compileBracket();
-                        // fall-through
+                        await this.compileArray();
+                        // fall through
                     default:
                         const symbolTableEntry = await this.getSymbolTableEntry(name);
                         break;
@@ -502,15 +500,17 @@ export class Parser extends Processor {
         return nElements;
     }
 
-    private async compileBracket() {
-        const openBracket = this.tokenStream.getNext().composeTag();
+    private async compileArray() {
+        if (this.tokenStream.peekNext().token === Symbol.openBracket) {
+            const openBracket = this.tokenStream.getNext().composeTag();
 
-        await this.output([openBracket]);
-        
-        await this.compileExpression();
-        const closedBracket = this.tokenStream.getNext().composeTag();
-        
-        await this.output([closedBracket]);
+            await this.output([openBracket]);
+            
+            await this.compileExpression();
+            const closedBracket = this.tokenStream.getNext().composeTag();
+            
+            await this.output([closedBracket]);
+        }
     }
 
     private async compileMethodCall(): Promise<string> {
