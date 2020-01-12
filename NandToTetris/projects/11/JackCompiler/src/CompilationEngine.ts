@@ -204,22 +204,22 @@ export class CompilationEngine extends Processor {
      * Compiles a let statement
      */
     private async compileLet(className: string): Promise<void> {
-        let isArray = false;
+        let isBracketedArray = false;
         const letKeyword = this.tokenStream.getNext().composeTag();
         const name = this.tokenStream.getNext();
         
         const symbolTableEntry = this.getSymbolTableEntry(name);
 
-        if (this.tokenStream.peekNext().token === Symbol.openBracket) {
-            isArray = true;
-            await this.compileBracket(symbolTableEntry);
-        }     
+        if (symbolTableEntry.type === SymbolType.array) {
+            isBracketedArray = await this.compileArray(symbolTableEntry);
+        }
+        
         const equals = this.tokenStream.getNext().composeTag();
 
         await this.compileExpression(name, className);
 
-        if (symbolTableEntry != null) {
-            if (isArray) {
+        if (symbolTableEntry) {
+            if (isBracketedArray) {
                 await this.compileArrayEnd();
             } else {
                 await this.vmWriter.writePop(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
@@ -249,8 +249,6 @@ export class CompilationEngine extends Processor {
 
         await this.compileStatements(className);
 
-
-
         if (this.tokenStream.peekNext().token === Keyword.else) {
             const elseKeyword = this.tokenStream.getNext().composeTag();
             const openBrace = this.tokenStream.getNext().composeTag();
@@ -264,8 +262,6 @@ export class CompilationEngine extends Processor {
         } else {
             await this.vmWriter.writeLabel(`${Labels.ifFalse}${ifIndex}`);
         }
-
-
     }
 
     /**
@@ -432,20 +428,22 @@ export class CompilationEngine extends Processor {
                     case Symbol.period:
                         await this.compileMethodCall(name, className);
                         break;
-                    case Symbol.openBracket:
-                        await this.compileBracket(this.getSymbolTableEntry(name), true);
-                        // fall-through
                     default:
                         let segment: Segment;
                         let index: number;
                         const numberConstant = Number(name.token);
 
+                        const symbolTableEntry = this.getSymbolTableEntry(name);
+
+                        if (symbolTableEntry && symbolTableEntry.type === SymbolType.array) {
+                            await this.compileArray(symbolTableEntry, true);
+                        }
+
                         if (isNaN(numberConstant))  {
                             const type = name.type;
                             switch (type) {
                                 case TokenType.identifier:
-                                    const symbolTableEntry = this.getSymbolTableEntry(name);
-                                    if (symbolTableEntry != null && symbolTableEntry.type !== SymbolType.array) {
+                                    if (symbolTableEntry && symbolTableEntry.type !== SymbolType.array) {
                                         segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
                                         index = symbolTableEntry.index;
                                     }
@@ -479,7 +477,7 @@ export class CompilationEngine extends Processor {
                             index = numberConstant;
                         }
 
-                        if (segment != null && index != null) {
+                        if (segment) {
                             await this.vmWriter.writePush(segment, index);
                         }
 
@@ -541,17 +539,23 @@ export class CompilationEngine extends Processor {
         }
     }
 
-    private async compileBracket(symbolTableEntry: SymbolClass, fromExpression: boolean = false) {
-        const openBracket = this.tokenStream.getNext().composeTag();
+    private async compileArray(symbolTableEntry: SymbolClass, fromExpression: boolean = false): Promise<boolean> {
+        if (this.tokenStream.peekNext().token === Symbol.openBracket) {
+            const openBracket = this.tokenStream.getNext().composeTag();
         
-        await this.compileExpression();
-        const closedBracket = this.tokenStream.getNext().composeTag();
-        await this.vmWriter.writePush(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
-        await this.vmWriter.writeArithmetic(Symbol.plus);
-        
-        if (fromExpression) {
-            await this.vmWriter.writePop(Segment.pointer, 1);
-            await this.vmWriter.writePush(Segment.that, 0);
+            await this.compileExpression();
+            const closedBracket = this.tokenStream.getNext().composeTag();
+            await this.vmWriter.writePush(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+            await this.vmWriter.writeArithmetic(Symbol.plus);
+            
+            if (fromExpression) {
+                await this.vmWriter.writePop(Segment.pointer, 1);
+                await this.vmWriter.writePush(Segment.that, 0);
+            }
+            return true;
+        } else if (fromExpression) {
+            await this.vmWriter.writePush(SymbolKindSegmentMap.get(symbolTableEntry.kind), symbolTableEntry.index);
+            return false;
         }
     }
 
