@@ -323,11 +323,11 @@ export class Parser extends Processor {
         await this.output([`<doStatement>` + os.EOL]);
         
         const doKeyword = this.tokenStream.getNext().composeTag();
-        const identifier1 = this.tokenStream.getNext().composeTag();
+        const identifier = this.tokenStream.getNext().composeTag();
         let methodName = "";
 
         this.incrementSpacer();
-        await this.output([doKeyword, identifier1]);
+        await this.output([doKeyword, identifier]);
 
         if (this.tokenStream.peekNext().token === Symbol.period) {
             methodName = await this.compileMethodCall();

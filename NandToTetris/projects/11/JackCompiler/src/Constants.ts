@@ -185,7 +185,9 @@ export enum Methods {
 export const OsClasses: string[] = [
     "Keyboard",
     "Memory",
-    "Screen"
+    "Output",
+    "Screen",
+    "Sys"
 ]
 
 export const PrimitiveTypes: string[] = [

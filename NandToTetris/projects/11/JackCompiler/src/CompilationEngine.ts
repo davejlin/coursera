@@ -297,9 +297,9 @@ export class CompilationEngine extends Processor {
      */
     private async compileDo(className: string): Promise<void> {        
         const doKeyword = this.tokenStream.getNext().composeTag();
-        const identifier1 = this.tokenStream.getNext();
+        const identifier = this.tokenStream.getNext();
 
-        await this.compileMethodCall(identifier1, identifier1.token, className);
+        await this.compileMethodCall(identifier, className);
         await this.vmWriter.writePop(Segment.temp, 0);
         const semicolon = this.tokenStream.getNext().composeTag();
     }
@@ -430,7 +430,7 @@ export class CompilationEngine extends Processor {
 
                 switch (this.tokenStream.peekNext().token) {
                     case Symbol.period:
-                        await this.compileMethodCall(varToken, name.token, className);
+                        await this.compileMethodCall(name, className);
                         break;
                     case Symbol.openBracket:
                         await this.compileBracket(this.getSymbolTableEntry(name), true);
@@ -506,11 +506,12 @@ export class CompilationEngine extends Processor {
 
     /**
      * for methods, get mapped name of class, adjust number of arguments of method, push class' memory segment to stack
-     * @param varToken 
-     * @param tokenName 
-     * @param nArgs 
+     * (e.g. identififier.method)
+     * @param identifier identifier's token
+     * @param className name of the current class
+     * @param nArgs number of arguments in the method call
      */
-    private async compileMethodCall(varToken: Token, tokenName: string, className: string): Promise<void> {
+    private async compileMethodCall(identifier: Token, className: string): Promise<void> {
         let methodName = "";
         if (this.tokenStream.peekNext().token === Symbol.period) {
             methodName = await this.getMethodName();
@@ -518,24 +519,25 @@ export class CompilationEngine extends Processor {
 
         if (methodName) {
             let nArgsToAdd = 0
-            let mappedName = OsClasses.includes(tokenName) ? null : this.classMap.get(tokenName);
+            const identifierName = identifier.token;
+            let mappedName = OsClasses.includes(identifierName) ? null : this.classMap.get(identifierName);
             if (mappedName) {
-                const symbolTableEntry = this.getSymbolTableEntry(varToken);
+                const symbolTableEntry = this.getSymbolTableEntry(identifier);
                 const segment = SymbolKindSegmentMap.get(symbolTableEntry.kind);
     
-                if (mappedName !== tokenName) { // condition for a method, since a function uses the class' name, while a method uses the variable's name
+                if (mappedName !== identifierName) { // condition for a method, since a function uses the class' name, while a method uses the variable's name
                     nArgsToAdd = 1; // add one argument (this) for methods
                     await this.vmWriter.writePush(segment, symbolTableEntry.index);
                 }
             } else {
-                mappedName = tokenName;
+                mappedName = identifierName;
             }
             const nArgs = await this.compileExpressionList() + nArgsToAdd;
             await this.vmWriter.writeCall(`${mappedName}.${methodName}`, nArgs);
         } else {
             await this.vmWriter.writePush(Segment.pointer, 0);
             const nArgs = await this.compileExpressionList() + 1; // add one argument (this) for methods
-            await this.vmWriter.writeCall(`${className}.${varToken.token}`, nArgs);
+            await this.vmWriter.writeCall(`${className}.${identifier.token}`, nArgs);
         }
     }
 
