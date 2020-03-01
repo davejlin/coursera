@@ -8,13 +8,30 @@
  * Note: Jack compilers implement multiplication and division using OS method calls.
  */
 class Math {
+    static init powersOfTwo;
 
     /** Initializes the library. */
     function void init() {
+        var int i;
+
+        let powersOfTwo = Array.new(16);
+        let powersOfTwo[0] = 1;
+
+        let i = 1;
+        while(i < 16) {
+            let powersOfTwo[i] = powersOfTwo[i-1] + powersOfTwo[i-1];
+            let i = i + 1;
+        }
+
+        return;
     }
 
     /** Returns the absolute value of x. */
     function int abs(int x) {
+        if(x < 0) {
+            let x = -x;
+        }
+        return x;
     }
 
     /** Returns the product of x and y. 
@@ -23,6 +40,15 @@ class Math {
      *  the Jack expressions x*y and multiply(x,y) return the same value.
      */
     function int multiply(int x, int y) {
+        var int i, result;
+        while(i < 16) {
+            if (y & powersOfTwo[i]) {
+                let result = result + x;
+            }
+            let x = x + x;
+            let i = i + 1;
+        }
+        return result;
     }
 
     /** Returns the integer part of x/y.
@@ -31,17 +57,83 @@ class Math {
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
+        var int quotient;
+
+        if (y = 0) {
+            do Output.printString("ERROR: Divide by zero");
+            return 0;
+        }
+
+        let quotient = Math.divideRecursive(Math.abs(x), Math.abs(y));
+
+        if (~((x < 0 ) = (y < 0))) {
+            let quotient = -quotient;
+        }
+
+        return quotient;
+    }
+
+    function int divideRecursive(int x, int y) {
+        var int quotient, result, sum;
+
+        if (y > x) {
+            return 0;
+        }
+
+        if (y < 16384) {
+            let quotient = Math.divideRecursive(x, y + y);
+        }
+
+        let sum = quotient + quotient;
+
+        if ((x - (sum * y)) < y) {
+            let result = sum;
+        } else {
+            let result = sum + 1;
+        }
+
+        return result;
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
+        var int i, result, temp1, temp2;
+
+        if (x < 0) {
+            do Output.printString("ERROR: Square root of a negative number");
+            return 0;
+        }
+
+        let i = 7;
+
+        while (~(i < 0)) {
+            let temp1 = result + powersOfTwo[i];
+            let temp2 = temp1 * temp1;
+
+            if (~(temp2 > x) & (temp2 > 0)) {
+                let result = temp1;
+            }
+            let i = i - 1;
+        }
+
+        return result;
     }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
+        if (a > b) {
+            return a;
+        } else {
+            return b;
+        }
     }
 
     /** Returns the smaller number. */
     function int min(int a, int b) {
+        if (a < b) {
+            return a;
+        } else {
+            return b;
+        }
     }
 }
