@@ -60,7 +60,8 @@ class Math {
         var int quotient;
 
         if (y = 0) {
-            do Output.printString("ERROR: Divide by zero");
+            do Output.printString("ERROR: Math.divide() Divide by zero");
+            do Sys.error(0);
             return 0;
         }
 
@@ -100,7 +101,8 @@ class Math {
         var int i, result, temp1, temp2;
 
         if (x < 0) {
-            do Output.printString("ERROR: Square root of a negative number");
+            do Output.printString("ERROR: Math.sqrt() Square root of a negative number");
+            do Sys.error(0);
             return 0;
         }
 

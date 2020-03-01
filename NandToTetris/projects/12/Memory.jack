@@ -9,26 +9,115 @@
  * consists of 32,768 words, each holding a 16-bit binary number.
  */ 
 class Memory {
+    static Array memory, free;
+    static int nextIndex, lengthIndex;
 
-    /** Initializes the class. */
+    /** Initializes the class. 
+     *  heap address 2048 - 16383 */
     function void init() {
+        let nextIndex = 0;
+        let lengthIndex = 1;
+
+        let memory = 0;
+        let free = 2048;
+
+        let free[nextIndex] = null;
+        let free[lengthIndex] = 16383 - 2048 - 1;
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return memory[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let memory[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+        var int allocSize;
+        var Array block;
+
+        let allocSize = size + 2;
+
+        if (free[lengthIndex] > allocSize) {
+            let free[lengthIndex] = free[lengthIndex] - allocSize;
+            let block = Memory.prepareBlock(free, size);
+        } else {
+            let block = Memory.fit(size);
+        }
+        return block + 2;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        var Array block, previous, next, temp;
+
+        let previous = free;
+        let next = free[nextIndex];
+        let block = o - 2;
+
+        while (~(next = null) & (next < block)) {
+            let previous = next;
+            let next = next[nextIndex];
+        }
+
+        if (next = null) {
+            let block[nextIndex] = null;
+            let previous[nextIndex] = block;
+        } else {
+            let temp = previous[nextIndex];
+            let previous[nextIndex] = block;
+            let block[nextIndex] = temp;
+        }
+
+        if ((block + block[nextIndex] + 2) = next) {
+            let block[lengthIndex] = block[lengthIndex] + next[lengthIndex] + 2;
+            let block[nextIndex] = next[nextIndex];
+        }
+
+        if ((previous + previous[lengthIndex] + 2) = block) {
+            let previous[lengthIndex] = previous[lengthIndex] + block[lengthIndex] + 2;
+            let previous[nextIndex] = block[nextIndex];
+        }
+
+        return;
     }    
+
+    function Array fit(int size) {
+        var Array temp;
+        var int tempSize;
+
+        let temp = free;
+        let tempSize = size + 2;
+
+        while(temp[lengthIndex] < tempSize) {
+            if(temp[nextIndex] = null) {
+                do Output.printString("ERROR: Memory.fit() null next segment");
+                do Sys.error(0);
+                return 0;
+            } else {
+                let temp = temp[nextIndex];
+            }
+        }
+
+        let temp[lengthIndex] = temp[lengthIndex] - tempSize;
+        return Memory.prepareBlock(temp, size);
+    }
+
+    function Array prepareBlock(Array a, int size) {
+        var Array block;
+
+        let block = a + 2 + a[lengthIndex];
+        let block[nextIndex] = null;
+        let block[lengthIndex] = size;
+
+        return block;
+    }
 }
