@@ -1,0 +1,286 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 512 rows (indexed 0..511, top to bottom)
+ * of 256 pixels each (indexed 0..255, left to right). The top left pixel on 
+ * the screen is indexed (0,0).
+ */
+class Screen {
+    static Array screen, bitArray;
+    static boolean color;
+
+    /** Initializes the Screen. */
+    function void init() {
+        var int i;
+
+        let screen = 16384;
+        let color = true;
+
+        let bitArray = Array.new(17);
+        let bitArray[0] = 1;
+
+        let i = 1;
+        while(i < 16) {
+            let bitArray[i] = bitArray[i-1] + bitArray[i-1];
+            let i = i + 1;
+        }
+
+        let bitArray[16] = 0;
+        return;
+    }
+
+    /** Erases the entire screen. */
+    function void clearScreen() {
+        var int i;
+        let i = 0;
+
+        while (i < 8192) {
+            let screen[i] = false;
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** Sets the current color, to be used for all subsequent drawXXX commands.
+     *  Black is represented by true, white by false. */
+    function void setColor(boolean b) {
+        let color = b;
+        return;
+    }
+
+    /** Draws the (x,y) pixel, using the current color. */
+    function void drawPixel(int x, int y) {
+        var int address, mask;
+
+        let address = (y * 32) + (x / 16);
+        let mask = bitArray[x & 15];
+
+        do Screen.assignAddressWithMask(address, mask);
+        return;
+    }
+
+    /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+        var int a, b, dx, dy, temp, adyMinusbdx;
+
+        // swap coords
+        if (x1 > x2) {
+            let temp = x1;
+            let x1 = x2;
+            let x2 = temp;
+
+            let temp = y1;
+            let y1 = y2;
+            let y2 = temp;
+        }
+
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+
+        if (dx = 0) {
+            // vertical line
+            do Screen.drawVerticalLine(x1, y1, y2);
+            return;
+        } else {
+            if (dy = 0) {
+                // horizontal line
+                do Screen.drawHorizontalLine(x1, x2, y1);
+                return;
+            } 
+        }
+
+        let a = 0;
+        let b = 0;
+        let adyMinusbdx = 0;
+
+        if (y2 > y1) {
+            while (~(a > dx) & ~(b > dy)) {
+                do Screen.drawPixel(x1 + a, y1 + b);
+                
+                if (adyMinusbdx < 0) {
+                    let b = b + 1;
+                    let adyMinusbdx = adyMinusbdx + dx;
+                } else {
+                    let a = a + 1;
+                    let adyMinusbdx = adyMinusbdx - dy;
+                }
+            }
+        } else {
+            let dy = -dy;
+            while (~(a > dx) & ~(b > dy)) {
+                do Screen.drawPixel(x1 + a, y1 - b);
+                
+                if (adyMinusbdx < 0) {
+                    let a = a + 1;
+                    let adyMinusbdx = adyMinusbdx + dy;
+                } else {
+                    let b = b + 1;
+                    let adyMinusbdx = adyMinusbdx - dx;
+                }
+            }
+        }
+        return;
+    }
+
+    /** Draws a filled rectangle whose top left corner is (x1, y1)
+     * and bottom right corner is (x2,y2), using the current color. */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int i, address1, address2, leftMask, rightMask, mask, temp, temp1, temp2;
+        
+        // swap coords
+        if (y1 > y2) {
+            let temp = y1;
+            let y1 = y2;
+            let y2 = temp;
+        }
+
+        if (x1 > x2) {
+            let temp = x1;
+            let x1 = x2;
+            let x2 = temp;
+        }
+
+        let address1 = (y1 * 32) + (x1 / 16);
+        let address2 = (y1 * 32) + (x2 / 16);
+
+        let i = x1 & 15;
+        let leftMask = ~(bitArray[i] - 1);
+
+        let i = x2 & 15;
+        let rightMask = bitArray[i + 1] - 1;
+
+        let mask = leftMask & rightMask;
+
+        while (~(y2 < y1)) {
+            let temp1 = address1;
+            let temp2 = address2;
+
+            if (temp1 = temp2) {
+                do Screen.assignAddressWithMask(temp1, mask);
+            } else {
+                do Screen.assignAddressWithMask(temp1, leftMask);
+                do Screen.assignAddressWithMask(temp2, rightMask);
+
+                if ((temp2 - temp1) > 1) {
+                    let temp1 = temp1 + 1;
+                    while (temp2 > temp1) {
+                        let screen[temp1] = color;
+                        let temp1 = temp1 + 1;
+                    }
+                }
+            }
+            let address1 = address1 + 32;
+            let address2 = address2 + 32;
+            let y1 = y1 + 1;
+        }
+        return;
+    }
+
+    /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
+    function void drawCircle(int x, int y, int r) {
+        var int i, j, counter; 
+
+        let i = 0; 
+        let j = r; 
+        let counter = 3 - (r + r); 
+
+        do Screen.drawHorizontalLine(x - r, x + r, y); 
+
+        while (j > i) { 
+            if (counter < 0) { 
+                let counter = counter + 6 + i + i + i + i; 
+                let i = i + 1; 
+            } else { 
+                if ((counter > 0) & (j > i)) { 
+                        let j = j - 1; 
+                        let counter = (counter + 4) - (j + j + j + j); 
+                } 
+            } 
+
+            do Screen.drawHorizontalLine(x - i, x + i, y + j); 
+            do Screen.drawHorizontalLine(x - i, x + i, y - j); 
+            do Screen.drawHorizontalLine(x - j, x + j, y + i); 
+            do Screen.drawHorizontalLine(x - j, x + j, y - i); 
+        } 
+        return; 
+    }
+
+    /** Draws a horizontal line **/
+    function void drawHorizontalLine(int x1, int x2, int y) {
+        var int i, address1, address2, leftMask, rightMask, mask, temp;
+
+        // swap
+        if (x1 > x2) {
+            let temp = x1;
+            let x1 = x2;
+            let x2 = temp;
+        }
+
+        // x addresses
+        let address1 = (y * 32) + (x1 / 16);
+        let address2 = (y * 32) + (x2 / 16);
+
+        //      0      1     2     3    4     6     7
+        //  |..x1..|16bits|32bits|... |... |... |..x2..|
+
+        // index
+        let i = x1 & 15;
+        let leftMask = ~(bitArray[i] - 1);
+
+        let i = x2 & 15;
+        let rightMask = bitArray[i + 1] - 1;
+
+        if (address1 = address2) {
+            let mask = leftMask & rightMask;
+            do Screen.assignAddressWithMask(address1, mask);
+            return;
+        } else {
+            do Screen.assignAddressWithMask(address1, leftMask);
+            do Screen.assignAddressWithMask(address2, rightMask);
+        }
+
+        if ((address2 - address1) > 1) {
+            let address1 = address1 + 1;
+            while (address2 > address1) {
+                let screen[address1] = color;
+                let address1 = address1 + 1;
+            }
+        }
+        return;
+    }
+
+    /** Draws a vertical line **/
+    function void drawVerticalLine(int x, int y1, int y2) {
+        var int address, mask, temp;
+
+        if (y1 > y2) {
+            let temp = y1;
+            let y1 = y2;
+            let y2 = temp;
+        }
+
+        let address = (y1 * 32) + (x / 16);
+        let mask = bitArray[x & 15];
+
+        while (~(y1 > y2)) {
+            do Screen.assignAddressWithMask(address, mask);
+            let address = address + 32;
+            let y1 = y1 + 1;
+        }
+        return;
+    }
+
+    /** Assigns address to screen array with color consideration **/
+    function void assignAddressWithMask(int address, int mask) {
+        if (color) {
+            let screen[address] = screen[address] | mask;
+        } else {
+            let screen[address] = screen[address] & ~mask;
+        }
+        return;
+    }
+}
