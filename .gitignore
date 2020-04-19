@@ -79,3 +79,6 @@ fastlane/test_output
 **/coverage/
 **/junit.xml
 **/dist/
+
+# VisualStudio
+**/.vscode/
