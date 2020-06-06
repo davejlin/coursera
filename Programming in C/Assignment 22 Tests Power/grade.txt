@@ -1,0 +1,65 @@
+Grading at Sat Jun  6 20:54:00 UTC 2020
+**Testing broken implementation 10 **
+-------------------------------------
+
+Assert failed for 2^2 = 2, expected: 4
+
+**Testing broken implementation 11 **
+-------------------------------------
+
+Assert failed for 10^5 = 32, expected: 100000
+
+**Testing broken implementation 1 **
+-------------------------------------
+
+Assert failed for 2^1 = 1, expected: 2
+
+**Testing broken implementation 2 **
+-------------------------------------
+
+Assert failed for 1^2 = 2, expected: 1
+
+**Testing broken implementation 3 **
+-------------------------------------
+
+Assert failed for 0^0 = 0, expected: 1
+
+**Testing broken implementation 4 **
+-------------------------------------
+
+Assert failed for 10^5 = 34464, expected: 100000
+
+**Testing broken implementation 5 **
+-------------------------------------
+
+Assert failed for 1^2 = 0, expected: 1
+
+**Testing broken implementation 6 **
+-------------------------------------
+
+Assert failed for 1^1 = 2, expected: 1
+
+**Testing broken implementation 7 **
+-------------------------------------
+
+Assert failed for 1^1 = 3, expected: 1
+
+**Testing broken implementation 8 **
+-------------------------------------
+
+Assert failed for 1^2 = 2, expected: 1
+
+**Testing broken implementation 9 **
+-------------------------------------
+
+Assert failed for 1^1 = 0, expected: 1
+
+**Testing correct implementation **
+-------------------------------------
+
+All tests run and passed
+
+All tests were ok.
+
+
+Overall Grade: PASSED
