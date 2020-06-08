@@ -128,3 +128,4 @@ card_t card_from_num(unsigned c) {
   card.suit = c / 13;
   return card;
 }
+

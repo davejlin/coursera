@@ -106,7 +106,7 @@ card_t card_from_letters(char value_let, char suit_let) {
     card.suit = SPADES;
     break;
   case 'h':
-     card.suit = HEARTS;
+    card.suit = HEARTS;
     break;
   case 'd':
     card.suit = DIAMONDS;

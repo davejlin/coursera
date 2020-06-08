@@ -27,11 +27,11 @@ int deck_contains(deck_t * d, card_t c) {
 		if (card.suit == c.suit && card.value == c.value) {
 			return 1;
 		}
-	}
+	}  	
 	return 0;
 }
 
-void shuffle(deck_t * d){
+void shuffle(deck_t * d) {
 	card_t ** cards = d->cards;
 	size_t nCards = d->n_cards;
 	for (int i = 0; i < nCards; i++) {
@@ -60,3 +60,4 @@ void assert_full_deck(deck_t * d) {
 		exit(EXIT_FAILURE);
 	}
 }
+
