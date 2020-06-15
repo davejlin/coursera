@@ -30,16 +30,41 @@ suit_t flush_suit(deck_t * hand) {
 }
 
 unsigned get_largest_element(unsigned * arr, size_t n) {
-  return 0;
+  unsigned largest = *arr;
+  for (int i = 1; i < n; i++) {
+	  unsigned value = arr[i];
+	  if (value > largest) {
+		  largest = value;
+	  }
+  }
+  return largest;
 }
 
 size_t get_match_index(unsigned * match_counts, size_t n,unsigned n_of_akind){
-
+  for (int i = 0; i < n; i++) {
+	  if (match_counts[i] == n_of_akind) {
+		  return i;
+	  }
+  }
+  printf("Fatal error: no n_of_akind in match_counts\n");
+  exit(EXIT_FAILURE);
   return 0;
 }
-ssize_t  find_secondary_pair(deck_t * hand,
+
+ssize_t find_secondary_pair(deck_t * hand,
 			     unsigned * match_counts,
 			     size_t match_idx) {
+  unsigned nCards = hand->n_cards;
+  for (int i = 0; i < nCards; i++) {
+	  if (match_counts[i] == 2) {
+		  if (i == match_idx) {
+			  i += 1; // advance to the next card because it's part of the pair and shouldn't be counted
+		  } else {
+			  return i;
+		  }
+	  }
+  }
+  
   return -1;
 }
 

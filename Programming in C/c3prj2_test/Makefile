@@ -3,6 +3,7 @@ LINK_TARGET = test
 OBJS =  \
  cards.o \
  deck.o \
+ eval.o \
  test.o
 
 REBUILDABLES = $(OBJS) $(LINK_TARGET)

@@ -2,32 +2,7 @@
 #include <stdio.h>
 #include "cards.h"
 #include "deck.h"
-
-int card_ptr_comp(const void * vp1, const void * vp2) {
-  const card_t * const * cp1 = vp1;
-  const card_t * const * cp2 = vp2;
-
-  if ((*cp1)->value > (*cp2)->value) { return -1; }
-  if ((*cp1)->value < (*cp2)->value) { return 1; }
-  if ((*cp1)->suit > (*cp2)->suit) { return 1; }
-  if ((*cp1)->suit < (*cp2)->suit) { return -1; }
-  return 0;
-}
-
-suit_t flush_suit(deck_t * hand) {
-  int count[NUM_SUITS] = {0};
-  card_t * const * const cards = hand->cards;
-  size_t const nCards = hand->n_cards;
-
-  for (int i = 0; i < nCards; i++) {
-	  suit_t suit = cards[i]->suit;
-	  if (++count[suit] == 5) {
-		  return suit;
-	  }
-  }
-
-  return NUM_SUITS;
-}
+#include "eval.h"
 
 int main() {
 	int const nCards = 52;
@@ -98,5 +73,39 @@ int main() {
 		printf("\n");
 	}
 
-}
+	printf("\nTESTING get_largest_element:\n");
 
+	int const nElements = 6;
+	unsigned numbers[nElements] = {132211, 2, 300, 4, 5, 2001};
+	unsigned largest = get_largest_element(numbers, nElements);
+
+	printf("The largest element is: %d\n", largest);
+
+	printf("\nTESTING get_match_index:\n");
+
+	int const nMatchIndex = 4;
+	unsigned match_index[nMatchIndex] = {5, 4, 5, 1};
+	unsigned matchIndex = get_match_index(match_index, nMatchIndex, 5);
+
+	printf("The match index is: %d\n", matchIndex);
+
+	printf("\nTESTING find_secondary_pair:\n");
+	deck_t deck2;
+	deck2.n_cards = nElements;
+	deck_t * deck2p = &deck2;
+	unsigned secondaryPair[nElements] = {0, 2, 2, 2, 2, 3};
+	ssize_t index = find_secondary_pair(deck2p, secondaryPair, 1);
+
+	printf("The seconary pair starts at: %d\n", index);
+
+	unsigned secondaryPair2[nElements] = {0, 2, 2, 3, 3, 3};
+	ssize_t index2 = find_secondary_pair(deck2p, secondaryPair2, 3);
+
+	printf("The seconary pair starts at: %d\n", index2);
+
+	unsigned secondaryPair3[nElements] = {2, 2, 1, 1, 2, 2};
+	ssize_t index3 = find_secondary_pair(deck2p, secondaryPair3, 0);
+
+	printf("The seconary pair starts at: %d\n", index3);
+
+}
