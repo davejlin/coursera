@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include "cards.h"
 #include "deck.h"
-#include "eval.h"
+#include "../c3prj2_eval/eval.h"
 
-int main() {
+void test_card_ptr_comp() {
 	int const nCards = 52;
 
 	card_t cards[nCards];
@@ -42,7 +42,9 @@ int main() {
 	printf("Sorted deck: \n");
 	print_hand(deck_p);
 	printf("\n");
+}
 
+void test_flush_suit() {
 	printf("\nTESTING flush_suit:\n");
 
 	for (int i = 0; i < 25; i++) {
@@ -72,15 +74,19 @@ int main() {
 		printf("flush result: %d", flushResult);
 		printf("\n");
 	}
+}
 
+void test_get_largest_element() {
 	printf("\nTESTING get_largest_element:\n");
 
-	int const nElements = 6;
-	unsigned numbers[nElements] = {132211, 2, 300, 4, 5, 2001};
-	unsigned largest = get_largest_element(numbers, nElements);
+	int const nCards = 6;
+	unsigned numbers[nCards] = {132211, 2, 300, 4, 5, 2001};
+	unsigned largest = get_largest_element(numbers, nCards);
 
 	printf("The largest element is: %d\n", largest);
+}
 
+void test_get_match_index() {
 	printf("\nTESTING get_match_index:\n");
 
 	int const nMatchIndex = 4;
@@ -88,24 +94,108 @@ int main() {
 	unsigned matchIndex = get_match_index(match_index, nMatchIndex, 5);
 
 	printf("The match index is: %d\n", matchIndex);
+}
 
+void test_find_secondary_pair() {
 	printf("\nTESTING find_secondary_pair:\n");
-	deck_t deck2;
-	deck2.n_cards = nElements;
-	deck_t * deck2p = &deck2;
-	unsigned secondaryPair[nElements] = {0, 2, 2, 2, 2, 3};
-	ssize_t index = find_secondary_pair(deck2p, secondaryPair, 1);
+
+	int const nCards = 6;
+	deck_t deck;
+	deck.n_cards = nCards;
+	deck_t * deck_p = &deck;
+	unsigned secondaryPair[nCards] = {0, 2, 2, 2, 2, 3};
+	ssize_t index = find_secondary_pair(deck_p, secondaryPair, 1);
 
 	printf("The seconary pair starts at: %d\n", index);
 
-	unsigned secondaryPair2[nElements] = {0, 2, 2, 3, 3, 3};
-	ssize_t index2 = find_secondary_pair(deck2p, secondaryPair2, 3);
+	unsigned secondaryPair2[nCards] = {0, 2, 2, 3, 3, 3};
+	ssize_t index2 = find_secondary_pair(deck_p, secondaryPair2, 3);
 
 	printf("The seconary pair starts at: %d\n", index2);
 
-	unsigned secondaryPair3[nElements] = {2, 2, 1, 1, 2, 2};
-	ssize_t index3 = find_secondary_pair(deck2p, secondaryPair3, 0);
+	unsigned secondaryPair3[nCards] = {2, 2, 1, 1, 2, 2};
+	ssize_t index3 = find_secondary_pair(deck_p, secondaryPair3, 0);
 
 	printf("The seconary pair starts at: %d\n", index3);
+}
 
+void test_is_straight_at() {
+	printf("\nTESTING is_straight_at:\n");
+
+	int const nCards = 10;
+	deck_t deck;
+	deck.n_cards = nCards;
+	card_t cards[nCards] = {
+		card_from_letters('A', 'd'),
+		card_from_letters('K', 's'),
+		card_from_letters('Q', 's'),
+		card_from_letters('J', 's'),
+		card_from_letters('0', 's'),
+		card_from_letters('0', 's'),
+		card_from_letters('5', 'd'),
+		card_from_letters('4', 'd'),
+		card_from_letters('3', 'd'),
+		card_from_letters('2', 'd')
+	};
+
+	card_t * cards_p[nCards];
+
+	for (int j = 0; j < nCards; j++) {
+		cards_p[j] = &cards[j];
+	}
+
+	deck.cards = cards_p;
+	deck_t * deck_p = &deck;
+
+	int isStrait = is_straight_at(deck_p, 0, DIAMONDS);
+	printf("For the hand: ");
+	print_hand(deck_p);
+	printf(" the straight result is:  %d\n", isStrait);
+}
+
+void test_build_hand_from_match() {
+	int const nCards = 7;
+	deck_t hand;
+	hand.n_cards = nCards;
+	card_t cards[nCards] = {
+		card_from_letters('A', 's'),
+		card_from_letters('K', 'c'),
+		card_from_letters('K', 'h'),
+		card_from_letters('K', 'd'),
+		card_from_letters('Q', 'c'),
+		card_from_letters('8', 's'),
+		card_from_letters('5', 'd')
+	};
+
+	card_t * cards_p[nCards];
+
+	for (int j = 0; j < nCards; j++) {
+		cards_p[j] = &cards[j];
+	}
+
+	hand.cards = cards_p;
+	deck_t * hand_p = &hand;
+
+	hand_eval_t builtHand = build_hand_from_match(hand_p, 3, THREE_OF_A_KIND, 1);
+
+	printf("For the hand: ");
+	print_hand(hand_p);
+	printf("the built hand is: ");
+	for (int i = 0; i < 5; i++) {
+		card_t * card = builtHand.cards[i];
+		print_card(*card);
+		printf(" ");
+	}
+	printf("\n");
+}
+
+int main() {
+
+	test_card_ptr_comp();
+	test_flush_suit();
+	test_get_largest_element();
+	test_get_match_index();
+	test_find_secondary_pair();
+	test_is_straight_at();
+	test_build_hand_from_match();
 }

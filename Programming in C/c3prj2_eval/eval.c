@@ -3,6 +3,62 @@
 #include <stdlib.h>
 #include <assert.h>
 
+// helper to find straights of length n
+// if fs = NUM_SUITS, any straight, otherwise a straight flush in the specified suit
+// returns:
+//     0  if no straight was found at that index
+//     1  if any other straight was found at that index
+int is_n_length_straight_at(deck_t * hand, size_t index, suit_t fs, int n) {
+  card_t * const * const cards = hand->cards;
+  size_t const nCards = hand->n_cards;
+
+  if (nCards-index < n) { return 0; } // early escape: not enough cards left to form a straight
+
+  card_t refCard = *cards[index];
+
+  if (refCard.value - n < 1) { return 0; } // early escape: not enough cards left to form a straight
+
+  int nextRefValue = refCard.value - 1;
+  int qualifiedCount = 1;
+
+  for (int i = index+1; i < nCards; i++) {
+	  card_t card = *cards[i];
+	  if (card.value == nextRefValue) {
+		  if (fs != NUM_SUITS) {
+			  if (card.suit != fs) { return 0; } // fail based on suit
+		  }
+		  if (++qualifiedCount == n) { return 1;}
+		  nextRefValue--;
+	  }
+  }
+
+  return 0;
+}
+
+// helper to find Ace low straights
+int is_ace_low_straight_at(deck_t * hand, size_t index, suit_t fs) {
+  card_t * const * const cards = hand->cards;
+  size_t const nCards = hand->n_cards;
+
+  if (nCards-index < 5) { return 0; } // early escape: not enough cards left to form a straight
+
+  for (int i = index+1; i < nCards; i++) {
+	  card_t card = *cards[i];
+	  if (card.value == 5) {
+		  if (fs != NUM_SUITS) {
+			  if (card.suit != fs) { return 0; } // fail based on suit
+		  }
+		  return -is_n_length_straight_at(hand, i, fs, 4);
+	  }
+  }
+
+  return 0;
+}
+
+// comparator function for quick sort
+// descending order by value
+// If two cards have the same value, compare them by suit in the same order as the enum suit_t:
+// club < diamond < heart < spade
 int card_ptr_comp(const void * vp1, const void * vp2) {
   const card_t * const * cp1 = vp1;
   const card_t * const * cp2 = vp2;
@@ -14,6 +70,7 @@ int card_ptr_comp(const void * vp1, const void * vp2) {
   return 0;
 }
 
+// returns suit which has a flush, otherwise NUM_SUITS
 suit_t flush_suit(deck_t * hand) {
   int count[NUM_SUITS] = {0};
   card_t * const * const cards = hand->cards;
@@ -29,6 +86,7 @@ suit_t flush_suit(deck_t * hand) {
   return NUM_SUITS;
 }
 
+// determines largest element in arr
 unsigned get_largest_element(unsigned * arr, size_t n) {
   unsigned largest = *arr;
   for (int i = 1; i < n; i++) {
@@ -40,7 +98,9 @@ unsigned get_largest_element(unsigned * arr, size_t n) {
   return largest;
 }
 
-size_t get_match_index(unsigned * match_counts, size_t n,unsigned n_of_akind){
+// determines first element in match_counts which equals n_of_akind
+// fail if not found
+size_t get_match_index(unsigned * match_counts, size_t n,unsigned n_of_akind) {
   for (int i = 0; i < n; i++) {
 	  if (match_counts[i] == n_of_akind) {
 		  return i;
@@ -51,6 +111,7 @@ size_t get_match_index(unsigned * match_counts, size_t n,unsigned n_of_akind){
   return 0;
 }
 
+// determines index of a secondary pair if it exists, otherwise -1
 ssize_t find_secondary_pair(deck_t * hand,
 			     unsigned * match_counts,
 			     size_t match_idx) {
@@ -68,16 +129,54 @@ ssize_t find_secondary_pair(deck_t * hand,
   return -1;
 }
 
+// determines if a straight starts at index
+// if fs = NUM_SUITS, any straight, otherwise a straight flush in the specified suit
+// returns:
+//    -1 if an Ace-low straight was found at that index (and that index is the Ace)
+//     0  if no straight was found at that index
+//     1  if any other straight was found at that index
 int is_straight_at(deck_t * hand, size_t index, suit_t fs) {
-  return 0;
+  card_t * const * const cards = hand->cards;
+  size_t const nCards = hand->n_cards;
+  
+  if (nCards-index < 5) { return 0; } // early escape: not enough cards left to form a straight
+
+  if (is_n_length_straight_at(hand, index, fs, 5)) { return 1; }
+
+  card_t refCard = *cards[index];  
+  return refCard.value == VALUE_ACE ? is_ace_low_straight_at(hand, index, fs) : 0;
 }
 
+// factory for hand_eval_t
+// copies "n" cards from the hand, starting at "idx" into the first "n" elements of the hand_eval_t's "cards" array
+// then fills the remainder of the "cards" array with the highest-value cards from the hand which were not in the "n of a kind"
+// for example, given this hand:  As Kc Kh Kd Qc 8s 5d
+// The hand has 3 kings, and the As and Qc will break ties.
+// Note that here n = 3, what= THREE_OF_A_KIND, idx= 1.
+// So the cards array in the hand_eval_t should have:  Kc Kh Kd As Qc
 hand_eval_t build_hand_from_match(deck_t * hand,
 				  unsigned n,
 				  hand_ranking_t what,
 				  size_t idx) {
 
   hand_eval_t ans;
+  ans.ranking = what;
+  
+  int index = idx;
+
+  // fill in n of a kind:
+  for (int i = 0; i < n; i++) {
+	  ans.cards[i] = hand->cards[index++];
+  }
+
+  index = n;
+
+  // fill in remaining tie breakers (i.e. highest remaining cards)
+  for (int i = 0; i < 5; i++) {
+	  if (i >= idx && i < idx + n) { continue; } 
+	  ans.cards[index++] = hand->cards[i];
+  }
+
   return ans;
 }
 
@@ -162,70 +261,70 @@ int find_straight(deck_t * hand, suit_t fs, hand_eval_t * ans) {
 //This function puts all the hand evaluation logic together.
 //This function is longer than we generally like to make functions,
 //and is thus not so great for readability :(
-hand_eval_t evaluate_hand(deck_t * hand) {
-  suit_t fs = flush_suit(hand);
-  hand_eval_t ans;
-  if (fs != NUM_SUITS) {
-    if(find_straight(hand, fs, &ans)) {
-      ans.ranking = STRAIGHT_FLUSH;
-      return ans;
-    }
-  }
-  unsigned * match_counts = get_match_counts(hand);
-  unsigned n_of_a_kind = get_largest_element(match_counts, hand->n_cards);
-  assert(n_of_a_kind <= 4);
-  size_t match_idx = get_match_index(match_counts, hand->n_cards, n_of_a_kind);
-  ssize_t other_pair_idx = find_secondary_pair(hand, match_counts, match_idx);
-  free(match_counts);
-  if (n_of_a_kind == 4) { //4 of a kind
-    return build_hand_from_match(hand, 4, FOUR_OF_A_KIND, match_idx);
-  }
-  else if (n_of_a_kind == 3 && other_pair_idx >= 0) {     //full house
-    ans = build_hand_from_match(hand, 3, FULL_HOUSE, match_idx);
-    ans.cards[3] = hand->cards[other_pair_idx];
-    ans.cards[4] = hand->cards[other_pair_idx+1];
-    return ans;
-  }
-  else if(fs != NUM_SUITS) { //flush
-    ans.ranking = FLUSH;
-    size_t copy_idx = 0;
-    for(size_t i = 0; i < hand->n_cards;i++) {
-      if (hand->cards[i]->suit == fs){
-	ans.cards[copy_idx] = hand->cards[i];
-	copy_idx++;
-	if (copy_idx >=5){
-	  break;
-	}
-      }
-    }
-    return ans;
-  }
-  else if(find_straight(hand,NUM_SUITS, &ans)) {     //straight
-    ans.ranking = STRAIGHT;
-    return ans;
-  }
-  else if (n_of_a_kind == 3) { //3 of a kind
-    return build_hand_from_match(hand, 3, THREE_OF_A_KIND, match_idx);
-  }
-  else if (other_pair_idx >=0) {     //two pair
-    assert(n_of_a_kind ==2);
-    ans = build_hand_from_match(hand, 2, TWO_PAIR, match_idx);
-    ans.cards[2] = hand->cards[other_pair_idx];
-    ans.cards[3] = hand->cards[other_pair_idx + 1];
-    if (match_idx > 0) {
-      ans.cards[4] = hand->cards[0];
-    }
-    else if (other_pair_idx > 2) {  //if match_idx is 0, first pair is in 01
-      //if other_pair_idx > 2, then, e.g. A A K Q Q
-      ans.cards[4] = hand->cards[2];
-    }
-    else {       //e.g., A A K K Q
-      ans.cards[4] = hand->cards[4];
-    }
-    return ans;
-  }
-  else if (n_of_a_kind == 2) {
-    return build_hand_from_match(hand, 2, PAIR, match_idx);
-  }
-  return build_hand_from_match(hand, 0, NOTHING, 0);
-}
+// hand_eval_t evaluate_hand(deck_t * hand) {
+//   suit_t fs = flush_suit(hand);
+//   hand_eval_t ans;
+//   if (fs != NUM_SUITS) {
+//     if(find_straight(hand, fs, &ans)) {
+//       ans.ranking = STRAIGHT_FLUSH;
+//       return ans;
+//     }
+//   }
+//   unsigned * match_counts = get_match_counts(hand);
+//   unsigned n_of_a_kind = get_largest_element(match_counts, hand->n_cards);
+//   assert(n_of_a_kind <= 4);
+//   size_t match_idx = get_match_index(match_counts, hand->n_cards, n_of_a_kind);
+//   ssize_t other_pair_idx = find_secondary_pair(hand, match_counts, match_idx);
+//   free(match_counts);
+//   if (n_of_a_kind == 4) { //4 of a kind
+//     return build_hand_from_match(hand, 4, FOUR_OF_A_KIND, match_idx);
+//   }
+//   else if (n_of_a_kind == 3 && other_pair_idx >= 0) {     //full house
+//     ans = build_hand_from_match(hand, 3, FULL_HOUSE, match_idx);
+//     ans.cards[3] = hand->cards[other_pair_idx];
+//     ans.cards[4] = hand->cards[other_pair_idx+1];
+//     return ans;
+//   }
+//   else if(fs != NUM_SUITS) { //flush
+//     ans.ranking = FLUSH;
+//     size_t copy_idx = 0;
+//     for(size_t i = 0; i < hand->n_cards;i++) {
+//       if (hand->cards[i]->suit == fs){
+// 	ans.cards[copy_idx] = hand->cards[i];
+// 	copy_idx++;
+// 	if (copy_idx >=5){
+// 	  break;
+// 	}
+//       }
+//     }
+//     return ans;
+//   }
+//   else if(find_straight(hand,NUM_SUITS, &ans)) {     //straight
+//     ans.ranking = STRAIGHT;
+//     return ans;
+//   }
+//   else if (n_of_a_kind == 3) { //3 of a kind
+//     return build_hand_from_match(hand, 3, THREE_OF_A_KIND, match_idx);
+//   }
+//   else if (other_pair_idx >=0) {     //two pair
+//     assert(n_of_a_kind ==2);
+//     ans = build_hand_from_match(hand, 2, TWO_PAIR, match_idx);
+//     ans.cards[2] = hand->cards[other_pair_idx];
+//     ans.cards[3] = hand->cards[other_pair_idx + 1];
+//     if (match_idx > 0) {
+//       ans.cards[4] = hand->cards[0];
+//     }
+//     else if (other_pair_idx > 2) {  //if match_idx is 0, first pair is in 01
+//       //if other_pair_idx > 2, then, e.g. A A K Q Q
+//       ans.cards[4] = hand->cards[2];
+//     }
+//     else {       //e.g., A A K K Q
+//       ans.cards[4] = hand->cards[4];
+//     }
+//     return ans;
+//   }
+//   else if (n_of_a_kind == 2) {
+//     return build_hand_from_match(hand, 2, PAIR, match_idx);
+//   }
+//   return build_hand_from_match(hand, 0, NOTHING, 0);
+// }
