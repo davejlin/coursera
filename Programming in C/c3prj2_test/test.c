@@ -154,6 +154,8 @@ void test_is_straight_at() {
 }
 
 void test_build_hand_from_match() {
+	printf("\nTESTING test_build_hand_from_match:\n");
+
 	int const nCards = 7;
 	deck_t hand;
 	hand.n_cards = nCards;
