@@ -117,25 +117,27 @@ void test_find_secondary_pair() {
 	ssize_t index3 = find_secondary_pair(deck_p, secondaryPair3, 0);
 
 	printf("The seconary pair starts at: %d\n", index3);
+
+	unsigned secondaryPair4[nCards] = {3, 3, 3, 3, 3, 3};
+	ssize_t index4 = find_secondary_pair(deck_p, secondaryPair4, 0);
+
+	printf("The seconary pair starts at: %d\n", index4);
 }
 
 void test_is_straight_at() {
 	printf("\nTESTING is_straight_at:\n");
 
-	int const nCards = 10;
+	int const nCards = 7;
 	deck_t deck;
 	deck.n_cards = nCards;
 	card_t cards[nCards] = {
-		card_from_letters('A', 'd'),
+		card_from_letters('A', 'c'),
+		card_from_letters('A', 's'),
+		card_from_letters('K', 'c'),
 		card_from_letters('K', 's'),
 		card_from_letters('Q', 's'),
 		card_from_letters('J', 's'),
-		card_from_letters('0', 's'),
-		card_from_letters('0', 's'),
-		card_from_letters('5', 'd'),
-		card_from_letters('4', 'd'),
-		card_from_letters('3', 'd'),
-		card_from_letters('2', 'd')
+		card_from_letters('0', 's')
 	};
 
 	card_t * cards_p[nCards];
@@ -147,7 +149,7 @@ void test_is_straight_at() {
 	deck.cards = cards_p;
 	deck_t * deck_p = &deck;
 
-	int isStrait = is_straight_at(deck_p, 0, DIAMONDS);
+	int isStrait = is_straight_at(deck_p, 1, SPADES);
 	printf("For the hand: ");
 	print_hand(deck_p);
 	printf(" the straight result is:  %d\n", isStrait);
