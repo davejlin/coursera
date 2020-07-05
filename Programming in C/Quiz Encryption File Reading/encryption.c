@@ -16,9 +16,25 @@ void encrypt(FILE * f, int key) {
 	}
 }
 
-int main(int argc, char ** argv) {
-	int key = atoi(argv[1]);
-	FILE * f = fopen(argv[2], "r");
-	encrypt(f, key);
-	return EXIT_SUCCESS;
+int main(int argc, char ** argv) {  
+	if (argc != 3) {    
+    	fprintf(stderr,"Usage: encrypt key inputFileName\n");    
+    	return EXIT_FAILURE;  
+  	}  
+  	int key = atoi(argv[1]);  
+  	if (key == 0) {    
+    	fprintf(stderr,"Invalid key (%s): must be a non-zero integer\n", argv[1]);    
+    	return EXIT_FAILURE;  
+  	}  
+  	FILE * file = fopen(argv[2], "r");  
+  	if (file == NULL) {    
+    	perror("Could not open file");    
+    	return EXIT_FAILURE;  
+  	}  
+  	encrypt(file, key);  
+  	if (fclose(file) != 0) {    
+    	perror("Failed to close the input file!");    
+    	return EXIT_FAILURE;  
+  	}  
+  	return EXIT_SUCCESS;
 }
