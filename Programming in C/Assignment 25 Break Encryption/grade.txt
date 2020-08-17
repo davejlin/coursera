@@ -1,0 +1,18 @@
+Grading at Mon Aug 17 16:38:39 UTC 2020
+Attempting to compile breaker.c 
+gcc -o breaker.o -c  breaker.c
+gcc -o breaker  breaker.o
+echo All done
+All done
+testcase1 passed
+#################################################
+testcase2:
+testcase2 passed
+#################################################
+testcase3:
+testcase3 passed
+#################################################
+testcase4:
+testcase4 passed
+
+Overall Grade: A
