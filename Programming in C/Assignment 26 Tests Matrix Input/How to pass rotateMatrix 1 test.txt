@@ -1,0 +1,77 @@
+The rotateMatrix1 test tests that the variable which holds the return value for the EOF check is typed as int and not char.  If it is typed as char, then if the file contains ASCII character 255, it would be mistaken as the EOF value (-1).  To enter ASCII charcter 255, we need to toggle the text editor in Hex edit mode first.
+
+Here is the procedure in vi:
+
+1. vi ascii255.txt
+   (run vi, creating a file named "ascii255.txt")
+
+2. i 
+   (toggle insert mode, enter 10x10 of normal values, e.g. all "0"'s, etc)
+
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+
+3. esc
+   (leave insert mode)
+
+4. :set binary
+   (toggle to binary mode, otherwise, the Hex changes will be converted to Unicode upon returning to text editor mode)
+
+5. :%!xxd
+   (toggles Hex editor mode)
+
+00000000: 3030 3030 3030 3030 3030 0a30 3030 3030  0000000000.00000
+00000010: 3030 3030 300a 3030 3030 3030 3030 3030  00000.0000000000
+00000020: 0a30 3030 3030 3030 3030 300a 3030 3030  .0000000000.0000
+00000030: 3030 3030 3030 0a30 3030 3030 3030 3030  000000.000000000
+00000040: 300a 3030 3030 3030 3030 3030 0a30 3030  0.0000000000.000
+00000050: 3030 3030 3030 300a 3030 3030 3030 3030  0000000.00000000
+00000060: 3030 0a30 3030 3030 3030 3030 300a       00.0000000000.
+
+6. i
+   (toggle insert mode)
+
+7. (change any of the Hex pair of codes to "ff", which is the ASCII 255 character)
+
+00000000: ff30 3030 3030 3030 3030 0a30 3030 3030  0000000000.00000
+00000010: 3030 3030 300a 3030 3030 3030 3030 3030  00000.0000000000
+00000020: 0a30 3030 3030 3030 3030 300a 3030 3030  .0000000000.0000
+00000030: 3030 3030 3030 0a30 3030 3030 3030 3030  000000.000000000
+00000040: 300a 3030 3030 3030 3030 3030 0a30 3030  0.0000000000.000
+00000050: 3030 3030 3030 300a 3030 3030 3030 3030  0000000.00000000
+00000060: 3030 0a30 3030 3030 3030 3030 300a       00.0000000000.
+
+8. esc
+   (leave insert mode)
+
+9. :%!xxd -r
+   (returns to text editor mode, the changed character will appear as <ff> in a different color from the other text)
+
+<ff>000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+
+10. :x
+   (save changes and exit)
+
+Every step above is important.
+
+If you don't do ":set binary", the Hex changes will be coverted to Unicode upon returning to text editor mode
+
+If you don't do ":%!xxd -r" to return to text editor mode, the file will be saved as a textual representation of the Hex editor mode, not the desired 10x10 matrix of characters with one special ASCII 255 character
+
