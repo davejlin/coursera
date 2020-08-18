@@ -1,4 +1,12 @@
-The rotateMatrix1 test tests that the variable which holds the return value for the EOF check is typed as int and not char.  If it is typed as char, then if the file contains ASCII character 255, it would be mistaken as the EOF value (-1).  To enter ASCII charcter 255, we need to toggle the text editor in Hex edit mode first.
+"You may have noticed that the type of c is int, not char. If we declared c as a char, our program would have a rather subtle bug. Can you spot it? Remember that we said fgetc returns an int so that it can return any possible character value read from the file, plus some distinct value for EOF. Assigning this return value to a char then inherently discards information—we are taking N + 1 possible values and assigning them to something that can hold N different bit patterns (in the case of char, N = 256). On most systems EOF is –1, so in this particular case, we would not be able to distinguish between reading character number 255 and the end of the file—if our input had character number 255 in it, our program would prematurely exit the loop, and ignore the rest of the input! You should aim to think of these sorts of corner cases when you write test cases."
+
+From https://www.coursera.org/learn/interacting-system-managing-memory/supplement/VMN46/reading-a-file
+
+The rotateMatrix1 test tests that the variable which holds the return value for the EOF check is typed as int and not char.  If it is typed as an 8-bit char, then if the file contains ASCII character 255, it would be mistaken as the EOF value (-1), since an 8-bit representation of number 255 and -1 is the same: 11111111 (8-bit because a char only has 8 bits whereas int has 32 bits).  
+
+https://www.prepressure.com/library/technology/ascii-binary-hex
+
+To create the ASCII charcter 255 (which is a non-printable, non-breaking space) in the test file, we need to toggle the text editor in Hex edit mode first.
 
 Here is the procedure in vi:
 
