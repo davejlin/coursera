@@ -1,6 +1,5 @@
 nonexistingfile.txt
 
-space.txt
 ok ok
 ascii255.txt
 9x9.txt
