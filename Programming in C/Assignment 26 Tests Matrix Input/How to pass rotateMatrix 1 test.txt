@@ -6,7 +6,7 @@ The rotateMatrix1 test tests that the variable which holds the return value for 
 
 https://www.prepressure.com/library/technology/ascii-binary-hex
 
-To create the ASCII charcter 255 (which is a non-printable, non-breaking space) in the test file, we need to toggle the text editor in Hex edit mode first.
+To create the ASCII charcter 255 (which is a non-printable, non-breaking space) in the test file, we need to toggle the text editor to Hex edit mode first.
 
 Here is the procedure in vi:
 
