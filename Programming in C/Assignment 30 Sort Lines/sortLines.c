@@ -41,7 +41,7 @@ struct LinesData getInput(FILE * source) {
 	
 	while(getline(&line, &lineLength, source) > 0) {
 		//line[strlen(line)-1] = '\0'; // strip new line
-		lines = realloc(lines, (numberOfLines + 1) * sizeof(lines));
+		lines = realloc(lines, (numberOfLines + 1) * sizeof(*lines));
 		lines[numberOfLines++] = line;
 		line = NULL;
 	}
