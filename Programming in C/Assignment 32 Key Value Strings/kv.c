@@ -7,6 +7,8 @@
 
 kvarray_t * readKVs(const char * fname) {
   //WRITE ME
+  kvarray_t * kvarray = malloc(sizeof(*kvarray));
+  return kvarray;
 }
 
 void freeKVs(kvarray_t * pairs) {
@@ -19,4 +21,5 @@ void printKVs(kvarray_t * pairs) {
 
 char * lookupValue(kvarray_t * pairs, const char * key) {
   //WRITE ME
+  return "";
 }
