@@ -78,6 +78,7 @@ int readFromFile(char * fileName) {
 
 	if(fclose(file) != 0) {
 		fprintf(stderr, "%s could not be closed", fileName);
+		return 0;
 	}
 
 	return 1;
