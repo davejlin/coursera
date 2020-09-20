@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct linesData_t {
+	char ** lines;
+	size_t numberOfLines;
+};
+
+typedef struct linesData_t LinesData;
 
 //This function is used to figure out the ordering
 //of the strings in qsort.  You do not need
@@ -28,12 +34,13 @@ void freeData(char ** data, size_t count) {
   }
 }
 
-struct LinesData {
-	char ** lines;
-	size_t numberOfLines;
-};
+void freeAll(LinesData * linesData) {
+	freeData(linesData->lines, linesData->numberOfLines);
+	free(linesData->lines);
+	free(linesData);
+}
 
-struct LinesData getInput(FILE * source) {
+LinesData * getInput(FILE * source) {
 	size_t numberOfLines = 0;
 	size_t lineLength;
 	char * line = NULL;
@@ -48,18 +55,17 @@ struct LinesData getInput(FILE * source) {
 
 	free(line);
 
-	struct LinesData linesData;
-	linesData.lines = lines;
-	linesData.numberOfLines = numberOfLines;
+	LinesData * linesData = malloc(sizeof(*linesData));
+	linesData->lines = lines;
+	linesData->numberOfLines = numberOfLines;
 	return linesData;
 }
 
 void readFromConsole() {
-	struct LinesData linesData = getInput(stdin);
-	sortData(linesData.lines, linesData.numberOfLines);
-	display(linesData.lines, linesData.numberOfLines);
-	freeData(linesData.lines, linesData.numberOfLines);
-	free(linesData.lines);
+	LinesData * linesData = getInput(stdin);
+	sortData(linesData->lines, linesData->numberOfLines);
+	display(linesData->lines, linesData->numberOfLines);
+	freeAll(linesData);
 }
 
 int readFromFile(char * fileName) {
@@ -70,11 +76,10 @@ int readFromFile(char * fileName) {
 		return 0;
 	}
 
-	struct LinesData linesData = getInput(file);
-	sortData(linesData.lines, linesData.numberOfLines);
-	display(linesData.lines, linesData.numberOfLines);
-	freeData(linesData.lines, linesData.numberOfLines);
-	free(linesData.lines);
+	LinesData * linesData = getInput(file);
+	sortData(linesData->lines, linesData->numberOfLines);
+	display(linesData->lines, linesData->numberOfLines);
+	freeAll(linesData);
 
 	if(fclose(file) != 0) {
 		fprintf(stderr, "%s could not be closed", fileName);
