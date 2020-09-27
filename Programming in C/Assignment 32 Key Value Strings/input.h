@@ -9,6 +9,7 @@ struct data_t {
 };
 typedef struct data_t Data;
 
-Data * getData(char * fname);
+Data * getData(const char * fname);
+void freeData(Data * data);
 
 #endif

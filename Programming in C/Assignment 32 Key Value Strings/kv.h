@@ -1,18 +1,30 @@
 #ifndef __KV_H__
 #define __KV_H__
 
+// Data
+struct data_t {
+	char ** lines;
+	size_t numberOfLines;
+};
+typedef struct data_t Data;
 
-struct _kvpair_t { 
+Data * getData(const char * fname);
+void freeData(Data * data);
+//
+
+struct _kvpair_t {
   //DEFINE ME!
   char * key;
   char * value;
 };
 typedef struct _kvpair_t kvpair_t;
 
-struct _kvarray_t { 
+struct _kvarray_t {
   //DEFINE ME!
   kvpair_t ** kvpair;
+  int length;
 };
+
 typedef struct _kvarray_t kvarray_t;
 
 

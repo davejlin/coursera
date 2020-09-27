@@ -1,6 +1,6 @@
 #include "input.h"
 
-Data * getDataFromFile(FILE * file) {
+Data * get(FILE * file) {
 	size_t numberOfLines = 0;
 	size_t lineLength;
 	char * line = NULL;
@@ -17,15 +17,33 @@ Data * getDataFromFile(FILE * file) {
 	Data * data = malloc(sizeof(*data));
 	data->lines = lines;
 	data->numberOfLines = numberOfLines;
+
 	return data;
 }
 
-Data * getData(char * fname) {
+Data * getData(const char * fname) {
+	// printf("Opening file: %s\n", fname);
 	FILE * file = fopen(fname, "r");
 	if (file == NULL) {
 		fprintf(stderr, "%s is an invalid file", fname);
 		exit(0);
 	}
 
-	return getDataFromFile(file);
+	Data * data = get(file);
+
+	// printf("Closing file: %s\n", fname);
+  	if (fclose(file) != 0) {    
+    	perror("Failed to close the input file!");    
+    	exit(0);
+  	}
+
+	return data;
+}
+
+void freeData(Data * data) {
+	for (int lineIndex = 0; lineIndex < data->numberOfLines; lineIndex++) {
+		free(data->lines[lineIndex]);
+	}
+	free(data->lines);
+	free(data);
 }
