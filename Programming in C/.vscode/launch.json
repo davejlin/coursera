@@ -8,13 +8,14 @@
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Assignment 34 Put Together/count_values",
-            "args": ["kvs1.txt", "list1a.txt", "list1b.txt"],
+            "program": "${workspaceFolder}/c4prj1_deck/test",
+            "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/Assignment 34 Put Together/",
+            "cwd": "${workspaceFolder}/c4prj1_deck/",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "lldb",  
+            "preLaunchTask": "make"
         }
     ]
 }
