@@ -35,19 +35,45 @@ int main(int argc, char ** argv) {
     deck3->cards = NULL;
 
     card.suit = SPADES;
-    card.value = 2;
+    card.value = VALUE_KING;
 
     add_card_to(deck3, card);
 
-    card.suit = DIAMONDS;
+    card.suit = HEARTS;
+    card.value = VALUE_KING;
+
+    add_card_to(deck3, card);
+
+    card.suit = SPADES;
     card.value = VALUE_QUEEN;
 
     add_card_to(deck3, card);
 
-    card.suit = CLUBS;
-    card.value = 4;
+    card.suit = HEARTS;
+    card.value = VALUE_QUEEN;
 
     add_card_to(deck3, card);
+
+    card.suit = SPADES;
+    card.value = 10;
+
+    add_card_to(deck3, card);
+
+    card.suit = DIAMONDS;
+    card.value = 9;
+
+    add_card_to(deck3, card);
+
+    card.suit = CLUBS;
+    card.value = 9;
+
+    add_card_to(deck3, card);
+
+    card.suit = HEARTS;
+    card.value = 9;
+
+    add_card_to(deck3, card);
+
     free(add_empty_card(deck3));
     free(add_empty_card(deck3));
 
@@ -59,9 +85,17 @@ int main(int argc, char ** argv) {
     print_hand(remainingDeck);
     printf("\n");
 
+    unsigned * counts = get_match_counts(deck3);
+
+    for (int i = 0; i < deck3->n_cards; i++) {
+        printf("%u ", counts[i]);
+    }
+    printf("\n");
+
     free_deck(deck1);
     free_deck(deck2);
     free_deck(deck3);
     free(hands);
     free_deck(remainingDeck);
+    free(counts);
 }
