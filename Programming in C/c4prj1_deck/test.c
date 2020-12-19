@@ -22,7 +22,7 @@ int main(int argc, char ** argv) {
 
     add_card_to(deck1, card);
 
-    add_empty_card(deck1);
+    free(add_empty_card(deck1));
     print_hand(deck1);
     printf("\n");
 
@@ -30,7 +30,7 @@ int main(int argc, char ** argv) {
     print_hand(deck2);
     printf("\n");
 
-    deck_t * deck3 = malloc(sizeof(*deck1));
+    deck_t * deck3 = malloc(sizeof(*deck3));
     deck3->n_cards = 0;
     deck3->cards = NULL;
 
@@ -48,19 +48,20 @@ int main(int argc, char ** argv) {
     card.value = 4;
 
     add_card_to(deck3, card);
-    add_empty_card(deck3);
-    add_empty_card(deck3);
+    free(add_empty_card(deck3));
+    free(add_empty_card(deck3));
 
     deck_t ** hands = malloc(2*sizeof(*hands));
-    hands[0] = malloc(sizeof(deck1));
-    hands[0]->cards = deck1->cards;
-    hands[0]->n_cards = deck1->n_cards;
-
-    hands[1] = malloc(sizeof(deck3));
-    hands[1]->cards = deck3->cards;
-    hands[1]->n_cards = deck3->n_cards;
+    hands[0] = deck1;
+    hands[1] = deck3;
 
     deck_t * remainingDeck = build_remaining_deck(hands, 2);
     print_hand(remainingDeck);
     printf("\n");
+
+    free_deck(deck1);
+    free_deck(deck2);
+    free_deck(deck3);
+    free(hands);
+    free_deck(remainingDeck);
 }

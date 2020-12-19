@@ -10,7 +10,6 @@ void swapCards(card_t * c1, card_t * c2) {
 	*c2 = temp;
 }
 
-
 // This should print out the contents of a hand.
 // It should print each card (recall that
 // you wrote print_card in Course 2), and
@@ -114,10 +113,11 @@ void assert_full_deck(deck_t * d) {
 // Add the particular card to the given deck (which will
 // involve reallocing the array of cards in that deck).
 void add_card_to(deck_t * deck, card_t c) {
+	deck->cards = realloc(deck->cards, (deck->n_cards+1)*sizeof(*deck->cards));
+	deck->cards[deck->n_cards] = malloc(sizeof(*deck->cards));
+	deck->cards[deck->n_cards]->suit = c.suit;
+	deck->cards[deck->n_cards]->value = c.value;
 	deck->n_cards++;
-	deck->cards = realloc(deck->cards, deck->n_cards*sizeof(*deck->cards));
-	deck->cards[deck->n_cards - 1] = malloc(sizeof(*deck->cards[deck->n_cards - 1]));
-	*deck->cards[deck->n_cards - 1] = c;
 }
 
 // Add a card whose value and suit are both 0, and return a pointer
@@ -126,10 +126,11 @@ void add_card_to(deck_t * deck, card_t c) {
 // for an unknown card.
 card_t * add_empty_card(deck_t * deck) {
 	card_t * emptyCard = malloc(sizeof(*emptyCard));
+	emptyCard->suit = 0;
+	emptyCard->value = 0;
 	add_card_to(deck, *emptyCard);
 	return emptyCard;
 }
-
 
 // Create a deck that is full EXCEPT for all the cards
 // that appear in excluded_cards.  For example,
@@ -142,6 +143,7 @@ card_t * add_empty_card(deck_t * deck) {
 // in Course 3!  They might be useful here.
 deck_t * make_deck_exclude(deck_t * excluded_cards) {
 	deck_t * deck = malloc(sizeof(*deck));
+	deck->cards = NULL;
 	deck->n_cards = 0;
 
 	for (int i = 0; i < 52; i++) {
@@ -168,22 +170,34 @@ deck_t * make_deck_exclude(deck_t * excluded_cards) {
 deck_t * build_remaining_deck(deck_t ** hands, size_t n_hands) {
 	// make a deck with all the known cards in hands
 	deck_t * cardsToExclude = malloc(sizeof(*cardsToExclude));
-	cardsToExclude->n_cards = 0;
 	cardsToExclude->cards = NULL;
+	cardsToExclude->n_cards = 0;
 
 	for (int i = 0; i < n_hands; i++) {
 		deck_t * hand = hands[i];
 		for (int j = 0; j < hand->n_cards; j++) {
 			card_t * card = hand->cards[j];
 			if (card->value > 0) {
-				size_t currentSize = cardsToExclude->n_cards;
-				cardsToExclude->cards = realloc(cardsToExclude->cards, (currentSize+1)*sizeof(*cardsToExclude->cards));
-				cardsToExclude->cards[currentSize] = malloc(sizeof(*card));
-				cardsToExclude->cards[currentSize] = card;
-				cardsToExclude->n_cards++;
+				add_card_to(cardsToExclude, *card);
 			}
 		}
 	}
+	deck_t * deck = make_deck_exclude(cardsToExclude);
+	free_deck(cardsToExclude);
+	return deck;
+}
 
-	return make_deck_exclude(cardsToExclude);
+// Free the memory allocated to a deck of cards.
+// For example, if you do
+// 	deck_t * d = make_excluded_deck(something);
+// 	free_deck(d);
+// it should free all the memory allocated by make_excluded_deck.
+// Once you have written it, add calls to free_deck anywhere you
+// need to to avoid memory leaks.
+void free_deck(deck_t * deck) {
+	for (int i = 0; i < deck->n_cards; i++) {
+		free(deck->cards[i]);
+	}
+	free(deck->cards);
+	free(deck);
 }
