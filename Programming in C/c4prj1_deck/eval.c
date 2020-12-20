@@ -239,7 +239,7 @@ int compare_hands(deck_t * hand1, deck_t * hand2) {
 unsigned * get_match_counts(deck_t * hand) {
   int nCards = hand->n_cards;
   card_t ** cards = hand->cards;
-  unsigned * counts = calloc(nCards,sizeof(*counts));
+  unsigned * counts = calloc(nCards,sizeof(unsigned));
   unsigned countsMap[15] = {0};
 
   for (int i = 0; i < nCards; i++) {

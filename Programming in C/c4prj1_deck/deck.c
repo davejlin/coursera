@@ -113,8 +113,8 @@ void assert_full_deck(deck_t * d) {
 // Add the particular card to the given deck (which will
 // involve reallocing the array of cards in that deck).
 void add_card_to(deck_t * deck, card_t c) {
-	deck->cards = realloc(deck->cards, (deck->n_cards+1)*sizeof(*deck->cards));
-	deck->cards[deck->n_cards] = malloc(sizeof(*deck->cards));
+	deck->cards = realloc(deck->cards, (deck->n_cards+1)*sizeof(card_t*));
+	deck->cards[deck->n_cards] = malloc(sizeof(card_t*));
 	deck->cards[deck->n_cards]->suit = c.suit;
 	deck->cards[deck->n_cards]->value = c.value;
 	deck->n_cards++;
@@ -125,7 +125,7 @@ void add_card_to(deck_t * deck, card_t c) {
 // This will add an invalid card to use as a placeholder
 // for an unknown card.
 card_t * add_empty_card(deck_t * deck) {
-	card_t * emptyCard = malloc(sizeof(*emptyCard));
+	card_t * emptyCard = malloc(sizeof(card_t));
 	emptyCard->suit = 0;
 	emptyCard->value = 0;
 	add_card_to(deck, *emptyCard);
@@ -142,7 +142,7 @@ card_t * add_empty_card(deck_t * deck) {
 // in Course 2 and int deck_contains(deck_t * d, card_t c)
 // in Course 3!  They might be useful here.
 deck_t * make_deck_exclude(deck_t * excluded_cards) {
-	deck_t * deck = malloc(sizeof(*deck));
+	deck_t * deck = malloc(sizeof(deck_t));
 	deck->cards = NULL;
 	deck->n_cards = 0;
 
@@ -169,7 +169,7 @@ deck_t * make_deck_exclude(deck_t * excluded_cards) {
 // and then pass it to make_deck_exclude.
 deck_t * build_remaining_deck(deck_t ** hands, size_t n_hands) {
 	// make a deck with all the known cards in hands
-	deck_t * cardsToExclude = malloc(sizeof(*cardsToExclude));
+	deck_t * cardsToExclude = malloc(sizeof(deck_t));
 	cardsToExclude->cards = NULL;
 	cardsToExclude->n_cards = 0;
 
