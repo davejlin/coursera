@@ -14,7 +14,6 @@ void free_future_cards(future_cards_t * fc) {
         free(fc->decks[i].cards);
     }
     free(fc->decks);
-    free(fc);
 }
 
 // This adds ptr into the future cards for the given index (that is,
@@ -70,5 +69,16 @@ void add_future_card(future_cards_t * fc, size_t index, card_t * ptr) {
 // and so on. Think about a case where this function would need to
 // print an error message.
 void future_cards_from_deck(deck_t * deck, future_cards_t * fc) {
+    if (deck->n_cards != fc->n_decks) {
+        printf("Error: number of card in deck does not match number of decks in fc");
+        exit(EXIT_FAILURE);
+    }
 
+    for(int i = 0; i < deck->n_cards; i++) {
+        card_t card = *deck->cards[i];
+        deck_t * futureDeck = &fc->decks[i];
+        for (int j = 0; j < futureDeck->n_cards; j++) {
+            *futureDeck->cards[j] = card;
+        }
+    }
 }
