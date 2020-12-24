@@ -125,11 +125,12 @@ void add_card_to(deck_t * deck, card_t c) {
 // This will add an invalid card to use as a placeholder
 // for an unknown card.
 card_t * add_empty_card(deck_t * deck) {
-	card_t * emptyCard = malloc(sizeof(card_t));
-	emptyCard->suit = 0;
-	emptyCard->value = 0;
-	add_card_to(deck, *emptyCard);
-	return emptyCard;
+	card_t emptyCard;
+	emptyCard.suit = 0;
+	emptyCard.value = 0;
+	add_card_to(deck, emptyCard);
+	int index = deck->n_cards-1;
+	return deck->cards[index];
 }
 
 // Create a deck that is full EXCEPT for all the cards

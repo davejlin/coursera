@@ -10,6 +10,14 @@ void swapCards(card_t * c1, card_t * c2) {
 	*c2 = temp;
 }
 
+void print_hands(deck_t ** hands, size_t nHands) {
+	for (int i = 0; i < nHands; i++) {
+        printf("Hand %d: ", i);
+        print_hand(hands[i]);
+        printf("\n");
+    }
+}
+
 // This should print out the contents of a hand.
 // It should print each card (recall that
 // you wrote print_card in Course 2), and
@@ -115,8 +123,7 @@ void assert_full_deck(deck_t * d) {
 void add_card_to(deck_t * deck, card_t c) {
 	deck->cards = realloc(deck->cards, (deck->n_cards+1)*sizeof(card_t*));
 	deck->cards[deck->n_cards] = malloc(sizeof(card_t*));
-	deck->cards[deck->n_cards]->suit = c.suit;
-	deck->cards[deck->n_cards]->value = c.value;
+	*deck->cards[deck->n_cards] = c;
 	deck->n_cards++;
 }
 
@@ -125,11 +132,12 @@ void add_card_to(deck_t * deck, card_t c) {
 // This will add an invalid card to use as a placeholder
 // for an unknown card.
 card_t * add_empty_card(deck_t * deck) {
-	card_t * emptyCard = malloc(sizeof(card_t));
-	emptyCard->suit = 0;
-	emptyCard->value = 0;
-	add_card_to(deck, *emptyCard);
-	return emptyCard;
+	card_t emptyCard;
+	emptyCard.suit = 0;
+	emptyCard.value = 0;
+	add_card_to(deck, emptyCard);
+	int index = deck->n_cards-1;
+	return deck->cards[index];
 }
 
 // Create a deck that is full EXCEPT for all the cards
@@ -201,3 +209,4 @@ void free_deck(deck_t * deck) {
 	free(deck->cards);
 	free(deck);
 }
+

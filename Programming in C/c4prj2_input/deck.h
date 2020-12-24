@@ -1,6 +1,5 @@
 #ifndef DECK_H
 #define DECK_H
-#include <stdlib.h>
 #include "cards.h"
 struct deck_tag {
 	  card_t ** cards;
@@ -9,6 +8,7 @@ struct deck_tag {
 typedef struct deck_tag deck_t;
 
 void print_hand(deck_t * hand);
+void print_hands(deck_t ** hands, size_t nHands);
 int deck_contains(deck_t * d, card_t c) ;
 void shuffle(deck_t * d);
 void assert_full_deck(deck_t * d) ;
@@ -20,3 +20,4 @@ void free_deck(deck_t * deck);
 deck_t * build_remaining_deck(deck_t ** hands, size_t n_hands);
 #endif
 //
+

@@ -13,3 +13,4 @@ void future_cards_from_deck(deck_t * deck, future_cards_t * fc);
 void print_future_cards(future_cards_t * fc);
 void free_future_cards(future_cards_t * fc);
 #endif 
+

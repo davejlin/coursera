@@ -22,7 +22,7 @@ int main(int argc, char ** argv) {
 
     add_card_to(deck1, card);
 
-    free(add_empty_card(deck1));
+    add_empty_card(deck1);
     print_hand(deck1);
     printf("\n");
 
@@ -74,8 +74,8 @@ int main(int argc, char ** argv) {
 
     add_card_to(deck3, card);
 
-    free(add_empty_card(deck3));
-    free(add_empty_card(deck3));
+    add_empty_card(deck3);
+    add_empty_card(deck3);
 
     deck_t ** hands = malloc(2*sizeof(*hands));
     hands[0] = deck1;

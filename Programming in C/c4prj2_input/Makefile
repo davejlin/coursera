@@ -12,9 +12,4 @@ $(PROGRAM): $(OBJS)
 clean:
 	rm -f $(OBJS) $(PROGRAM) *~
 
-counts.o: counts.h
-outname.o: outname.h
-kv.o: kv.h
-main.o: kv.h
-main.o: outname.h
-main.o: counts.h
+

@@ -1,5 +1,6 @@
 #ifndef EVAL_H
 #define EVAL_H
+#include <stdlib.h>
 #include <stdio.h>
 #include "deck.h"
 struct hand_eval_tag {
@@ -19,3 +20,4 @@ int is_straight_at(deck_t * hand, size_t index, suit_t fs);
 hand_eval_t build_hand_from_match(deck_t * hand, unsigned n, hand_ranking_t what, size_t idx);
 unsigned * get_match_counts(deck_t * hand);
 #endif
+

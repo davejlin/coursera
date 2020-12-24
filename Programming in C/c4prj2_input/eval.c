@@ -1,6 +1,4 @@
 #include "eval.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 
 // helper to find straights of length n
@@ -390,3 +388,4 @@ hand_eval_t evaluate_hand(deck_t * hand) {
 //   }
 //   return build_hand_from_match(hand, 0, NOTHING, 0);
 }
+

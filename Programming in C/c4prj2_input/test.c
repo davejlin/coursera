@@ -1,7 +1,8 @@
-#include <stdio.h>
+#include <stdlib.h>
 #include "cards.h"
 #include "deck.h"
 #include "future.h"
+#include "input.h"
 
 void testAddFutureCard() {
     future_cards_t fc;
@@ -127,7 +128,93 @@ void testFutureCardsFromDeck() {
     free(deck.cards);
 }
 
+void testInput() {
+    char * fname = "test_input_1.txt";
+    FILE * file = fopen(fname, "r");
+	if (file == NULL) {
+		fprintf(stderr, "%s is an invalid file", fname);
+		exit(EXIT_FAILURE);
+	}
+
+    size_t nHands = 0;
+    future_cards_t futureCards;
+    futureCards.decks = NULL;
+    futureCards.n_decks = 0;
+
+    deck_t ** hands = read_input(file, &nHands, &futureCards);
+
+    printf("\nhands with unknown cards:\n\n");
+    print_hands(hands, nHands);
+    printf("\n");
+
+    printf("future cards:\n");
+    print_future_cards(&futureCards);
+    printf("\n\n");
+
+    // reveal unknown cards:
+    card_t card1;
+    card1.suit = SPADES;
+    card1.value = 10;
+
+    card_t card2;
+    card2.suit = DIAMONDS;
+    card2.value = VALUE_QUEEN;
+
+    card_t card3;
+    card3.suit = CLUBS;
+    card3.value = VALUE_ACE;
+
+    card_t card4;
+    card4.suit = HEARTS;
+    card4.value = 2;
+
+    card_t card5;
+    card5.suit = CLUBS;
+    card5.value = 8;
+
+    card_t card6;
+    card6.suit = HEARTS;
+    card6.value = VALUE_JACK;
+
+    size_t nCards = 6;
+    card_t * cards[nCards];
+    cards[0] = &card1;
+    cards[1] = &card2;
+    cards[2] = &card3;
+    cards[3] = &card4;
+    cards[4] = &card5;
+    cards[5] = &card6;
+
+    deck_t deck;
+    deck.cards = &cards[0];
+    deck.n_cards = nCards;
+
+    future_cards_from_deck(&deck, &futureCards);
+
+    printf("hands with unknown cards revealed:\n\n");
+    print_hands(hands, nHands);
+    printf("\n");
+
+    printf("future cards:\n");
+    print_future_cards(&futureCards);
+    printf("\n\n");
+
+  	if (fclose(file) != 0) {    
+    	perror("Failed to close the input file!");    
+    	exit(0);
+  	}
+
+    for (int i = 0; i < nHands; i++) {
+        free_deck(hands[i]);
+    }
+
+    free(hands);
+    free_future_cards(&futureCards);
+}
+
 int main(int argc, char ** argv) {
     testAddFutureCard();
     testFutureCardsFromDeck();
+    testInput();
 }
+
