@@ -1,0 +1,85 @@
+"You may have noticed that the type of c is int, not char. If we declared c as a char, our program would have a rather subtle bug. Can you spot it? Remember that we said fgetc returns an int so that it can return any possible character value read from the file, plus some distinct value for EOF. Assigning this return value to a char then inherently discards information—we are taking N + 1 possible values and assigning them to something that can hold N different bit patterns (in the case of char, N = 256). On most systems EOF is –1, so in this particular case, we would not be able to distinguish between reading character number 255 and the end of the file—if our input had character number 255 in it, our program would prematurely exit the loop, and ignore the rest of the input! You should aim to think of these sorts of corner cases when you write test cases."
+
+From https://www.coursera.org/learn/interacting-system-managing-memory/supplement/VMN46/reading-a-file
+
+The rotateMatrix1 test tests that the variable which holds the return value for the EOF check is typed as int and not char.  If it is typed as an 8-bit char, then if the file contains ASCII character 255, it would be mistaken as the EOF value (-1), since an 8-bit representation of number 255 and -1 is the same: 11111111 (8-bit because a char only has 8 bits whereas int has 32 bits).  
+
+https://www.prepressure.com/library/technology/ascii-binary-hex
+
+To create the ASCII charcter 255 (which is a non-printable, non-breaking space) in the test file, we need to toggle the text editor to Hex edit mode first.
+
+Here is the procedure in vi:
+
+1. vi ascii255.txt
+   (run vi, creating a file named "ascii255.txt")
+
+2. i 
+   (toggle insert mode, enter 10x10 of normal values, e.g. all "0"'s, etc)
+
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+
+3. esc
+   (leave insert mode)
+
+4. :set binary
+   (toggle to binary mode, otherwise, the Hex changes will be converted to Unicode upon returning to text editor mode)
+
+5. :%!xxd
+   (toggles Hex editor mode)
+
+00000000: 3030 3030 3030 3030 3030 0a30 3030 3030  0000000000.00000
+00000010: 3030 3030 300a 3030 3030 3030 3030 3030  00000.0000000000
+00000020: 0a30 3030 3030 3030 3030 300a 3030 3030  .0000000000.0000
+00000030: 3030 3030 3030 0a30 3030 3030 3030 3030  000000.000000000
+00000040: 300a 3030 3030 3030 3030 3030 0a30 3030  0.0000000000.000
+00000050: 3030 3030 3030 300a 3030 3030 3030 3030  0000000.00000000
+00000060: 3030 0a30 3030 3030 3030 3030 300a       00.0000000000.
+
+6. i
+   (toggle insert mode)
+
+7. (change any of the Hex pair of codes to "ff", which is the ASCII 255 character)
+
+00000000: ff30 3030 3030 3030 3030 0a30 3030 3030  0000000000.00000
+00000010: 3030 3030 300a 3030 3030 3030 3030 3030  00000.0000000000
+00000020: 0a30 3030 3030 3030 3030 300a 3030 3030  .0000000000.0000
+00000030: 3030 3030 3030 0a30 3030 3030 3030 3030  000000.000000000
+00000040: 300a 3030 3030 3030 3030 3030 0a30 3030  0.0000000000.000
+00000050: 3030 3030 3030 300a 3030 3030 3030 3030  0000000.00000000
+00000060: 3030 0a30 3030 3030 3030 3030 300a       00.0000000000.
+
+8. esc
+   (leave insert mode)
+
+9. :%!xxd -r
+   (returns to text editor mode, the changed character will appear as <ff> in a different color from the other text)
+
+<ff>000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+
+10. :x
+   (save changes and exit)
+
+Every step above is important.
+
+If you don't do ":set binary", the Hex changes will be coverted to Unicode upon returning to text editor mode
+
+If you don't do ":%!xxd -r" to return to text editor mode, the file will be saved as a textual representation of the Hex editor mode, not the desired 10x10 matrix of characters with one special ASCII 255 character
+
