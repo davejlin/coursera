@@ -288,69 +288,73 @@ int find_straight(deck_t * hand, suit_t fs, hand_eval_t * ans) {
 //This function is longer than we generally like to make functions,
 //and is thus not so great for readability :(
 hand_eval_t evaluate_hand(deck_t * hand) {
-  suit_t fs = flush_suit(hand);
-  hand_eval_t ans;
-  if (fs != NUM_SUITS) {
-    if(find_straight(hand, fs, &ans)) {
-      ans.ranking = STRAIGHT_FLUSH;
-      return ans;
-    }
-  }
-  unsigned * match_counts = get_match_counts(hand);
-  unsigned n_of_a_kind = get_largest_element(match_counts, hand->n_cards);
-  assert(n_of_a_kind <= 4);
-  size_t match_idx = get_match_index(match_counts, hand->n_cards, n_of_a_kind);
-  ssize_t other_pair_idx = find_secondary_pair(hand, match_counts, match_idx);
-  free(match_counts);
-  if (n_of_a_kind == 4) { //4 of a kind
-    return build_hand_from_match(hand, 4, FOUR_OF_A_KIND, match_idx);
-  }
-  else if (n_of_a_kind == 3 && other_pair_idx >= 0) {     //full house
-    ans = build_hand_from_match(hand, 3, FULL_HOUSE, match_idx);
-    ans.cards[3] = hand->cards[other_pair_idx];
-    ans.cards[4] = hand->cards[other_pair_idx+1];
-    return ans;
-  }
-  else if(fs != NUM_SUITS) { //flush
-    ans.ranking = FLUSH;
-    size_t copy_idx = 0;
-    for(size_t i = 0; i < hand->n_cards;i++) {
-      if (hand->cards[i]->suit == fs){
-	ans.cards[copy_idx] = hand->cards[i];
-	copy_idx++;
-	if (copy_idx >=5){
-	  break;
-	}
-      }
-    }
-    return ans;
-  }
-  else if(find_straight(hand,NUM_SUITS, &ans)) {     //straight
-    ans.ranking = STRAIGHT;
-    return ans;
-  }
-  else if (n_of_a_kind == 3) { //3 of a kind
-    return build_hand_from_match(hand, 3, THREE_OF_A_KIND, match_idx);
-  }
-  else if (other_pair_idx >=0) {     //two pair
-    assert(n_of_a_kind ==2);
-    ans = build_hand_from_match(hand, 2, TWO_PAIR, match_idx);
-    ans.cards[2] = hand->cards[other_pair_idx];
-    ans.cards[3] = hand->cards[other_pair_idx + 1];
-    if (match_idx > 0) {
-      ans.cards[4] = hand->cards[0];
-    }
-    else if (other_pair_idx > 2) {  //if match_idx is 0, first pair is in 01
-      //if other_pair_idx > 2, then, e.g. A A K Q Q
-      ans.cards[4] = hand->cards[2];
-    }
-    else {       //e.g., A A K K Q
-      ans.cards[4] = hand->cards[4];
-    }
-    return ans;
-  }
-  else if (n_of_a_kind == 2) {
-    return build_hand_from_match(hand, 2, PAIR, match_idx);
-  }
-  return build_hand_from_match(hand, 0, NOTHING, 0);
+    return build_hand_from_match(hand, 0, NOTHING, 0);
+
+// above is dummy implementation to allow local compile to succeed
+
+  // suit_t fs = flush_suit(hand);
+  // hand_eval_t ans;
+  // if (fs != NUM_SUITS) {
+  //   if(find_straight(hand, fs, &ans)) {
+  //     ans.ranking = STRAIGHT_FLUSH;
+  //     return ans;
+  //   }
+  // }
+  // unsigned * match_counts = get_match_counts(hand);
+  // unsigned n_of_a_kind = get_largest_element(match_counts, hand->n_cards);
+  // assert(n_of_a_kind <= 4);
+  // size_t match_idx = get_match_index(match_counts, hand->n_cards, n_of_a_kind);
+  // ssize_t other_pair_idx = find_secondary_pair(hand, match_counts, match_idx);
+  // free(match_counts);
+  // if (n_of_a_kind == 4) { //4 of a kind
+  //   return build_hand_from_match(hand, 4, FOUR_OF_A_KIND, match_idx);
+  // }
+  // else if (n_of_a_kind == 3 && other_pair_idx >= 0) {     //full house
+  //   ans = build_hand_from_match(hand, 3, FULL_HOUSE, match_idx);
+  //   ans.cards[3] = hand->cards[other_pair_idx];
+  //   ans.cards[4] = hand->cards[other_pair_idx+1];
+  //   return ans;
+  // }
+  // else if(fs != NUM_SUITS) { //flush
+  //   ans.ranking = FLUSH;
+  //   size_t copy_idx = 0;
+  //   for(size_t i = 0; i < hand->n_cards;i++) {
+  //     if (hand->cards[i]->suit == fs){
+	// ans.cards[copy_idx] = hand->cards[i];
+	// copy_idx++;
+	// if (copy_idx >=5){
+	//   break;
+	// }
+  //     }
+  //   }
+  //   return ans;
+  // }
+  // else if(find_straight(hand,NUM_SUITS, &ans)) {     //straight
+  //   ans.ranking = STRAIGHT;
+  //   return ans;
+  // }
+  // else if (n_of_a_kind == 3) { //3 of a kind
+  //   return build_hand_from_match(hand, 3, THREE_OF_A_KIND, match_idx);
+  // }
+  // else if (other_pair_idx >=0) {     //two pair
+  //   assert(n_of_a_kind ==2);
+  //   ans = build_hand_from_match(hand, 2, TWO_PAIR, match_idx);
+  //   ans.cards[2] = hand->cards[other_pair_idx];
+  //   ans.cards[3] = hand->cards[other_pair_idx + 1];
+  //   if (match_idx > 0) {
+  //     ans.cards[4] = hand->cards[0];
+  //   }
+  //   else if (other_pair_idx > 2) {  //if match_idx is 0, first pair is in 01
+  //     //if other_pair_idx > 2, then, e.g. A A K Q Q
+  //     ans.cards[4] = hand->cards[2];
+  //   }
+  //   else {       //e.g., A A K K Q
+  //     ans.cards[4] = hand->cards[4];
+  //   }
+  //   return ans;
+  // }
+  // else if (n_of_a_kind == 2) {
+  //   return build_hand_from_match(hand, 2, PAIR, match_idx);
+  // }
+  // return build_hand_from_match(hand, 0, NOTHING, 0);
 }
