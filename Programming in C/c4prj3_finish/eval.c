@@ -24,31 +24,34 @@ int is_n_length_straight_at(deck_t * hand, size_t index, suit_t fs, int n) {
   }
 
   for (int i = index; i < nCards; i++) {
-	  card_t card = *cards[i];
-	  if (card.value == nextRefValue) {
-		  if (fs != NUM_SUITS) {
-			if (card.suit == fs) {
-			  if (++qualifiedCount == n) { return 1;}
-			  nextRefValue--;
-			}
-		  } else {
-		  	if (++qualifiedCount == n) { return 1;}
-			nextRefValue--;
-		  }
-	  }
+    card_t card = *cards[i];
+    if (card.value == nextRefValue) {
+      if (fs != NUM_SUITS) {
+        if (card.suit == fs) {
+          if (++qualifiedCount == n) { return 1;}
+          nextRefValue--;
+        }
+      } else {
+        if (++qualifiedCount == n) { return 1;}
+        nextRefValue--;
+      }
+    }
   }
 
   return 0;
 }
 
 // helper to find Ace low straights
+// if fs = NUM_SUITS, any Ace low straight, otherwise a straight flush in the specified suit
 int is_ace_low_straight_at(deck_t * hand, size_t index, suit_t fs) {
   card_t * const * const cards = hand->cards;
   size_t const nCards = hand->n_cards;
 
   if (nCards-index < 5) { return 0; } // early escape: not enough cards left to form a straight
 
-  if (fs != NUM_SUITS) { return 0; }
+  if (fs != NUM_SUITS) {
+    if (cards[index]->suit != fs)  { return 0; }
+  }
 
   for (int i = index+1; i < nCards; i++) {
 	  card_t card = *cards[i];
@@ -296,19 +299,17 @@ int find_straight(deck_t * hand, suit_t fs, hand_eval_t * ans) {
     int x = is_straight_at(hand, i, fs);
     if (x != 0){
       if (x < 0) { //ace low straight
-	assert(hand->cards[i]->value == VALUE_ACE &&
-	       (fs == NUM_SUITS || hand->cards[i]->suit == fs));
-	ans->cards[4] = hand->cards[i];
-	size_t cpind = i+1;
-	while(hand->cards[cpind]->value != 5 ||
-	      !(fs==NUM_SUITS || hand->cards[cpind]->suit ==fs)){
-	  cpind++;
-	  assert(cpind < hand->n_cards);
-	}
-	copy_straight(ans->cards, hand, cpind, fs,4) ;
+        assert (hand->cards[i]->value == VALUE_ACE && (fs == NUM_SUITS || hand->cards[i]->suit == fs));
+        ans->cards[4] = hand->cards[i];
+        size_t cpind = i+1;
+        while(hand->cards[cpind]->value != 5 || !(fs==NUM_SUITS || hand->cards[cpind]->suit ==fs)){
+          cpind++;
+          assert(cpind < hand->n_cards);
+        }
+        copy_straight(ans->cards, hand, cpind, fs,4) ;
       }
       else {
-	copy_straight(ans->cards, hand, i, fs,5);
+        copy_straight(ans->cards, hand, i, fs,5);
       }
       return 1;
     }
@@ -321,10 +322,6 @@ int find_straight(deck_t * hand, suit_t fs, hand_eval_t * ans) {
 //This function is longer than we generally like to make functions,
 //and is thus not so great for readability :(
 hand_eval_t evaluate_hand(deck_t * hand) {
-// return build_hand_from_match(hand, 0, NOTHING, 0);
-
-// above is dummy implementation to allow local compile to succeed
-
   suit_t fs = flush_suit(hand);
   hand_eval_t ans;
   if (fs != NUM_SUITS) {
