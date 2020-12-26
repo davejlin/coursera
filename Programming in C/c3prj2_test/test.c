@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "cards.h"
 #include "deck.h"
-#include "../c3prj2_eval/eval.h"
+#include "eval.h"
 
 void test_card_ptr_comp() {
 	int const nCards = 52;
