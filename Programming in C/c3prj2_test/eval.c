@@ -26,29 +26,34 @@ int is_n_length_straight_at(deck_t * hand, size_t index, suit_t fs, int n) {
   }
 
   for (int i = index; i < nCards; i++) {
-	  card_t card = *cards[i];
-	  if (card.value == nextRefValue) {
-		  if (fs != NUM_SUITS) {
-			if (card.suit == fs) {
-			  if (++qualifiedCount == n) { return 1;}
-			  nextRefValue--;
-			}
-		  } else {
-		  	if (++qualifiedCount == n) { return 1;}
-			nextRefValue--;
-		  }
-	  }
+    card_t card = *cards[i];
+    if (card.value == nextRefValue) {
+      if (fs != NUM_SUITS) {
+        if (card.suit == fs) {
+          if (++qualifiedCount == n) { return 1;}
+          nextRefValue--;
+        }
+      } else {
+        if (++qualifiedCount == n) { return 1;}
+        nextRefValue--;
+      }
+    }
   }
 
   return 0;
 }
 
 // helper to find Ace low straights
+// if fs = NUM_SUITS, any Ace low straight, otherwise a straight flush in the specified suit
 int is_ace_low_straight_at(deck_t * hand, size_t index, suit_t fs) {
   card_t * const * const cards = hand->cards;
   size_t const nCards = hand->n_cards;
 
   if (nCards-index < 5) { return 0; } // early escape: not enough cards left to form a straight
+
+  if (fs != NUM_SUITS) {
+    if (cards[index]->suit != fs)  { return 0; }
+  }
 
   for (int i = index+1; i < nCards; i++) {
 	  card_t card = *cards[i];
@@ -166,20 +171,21 @@ hand_eval_t build_hand_from_match(deck_t * hand,
 
   hand_eval_t ans;
   ans.ranking = what;
-  
-  int index = idx;
 
   // fill in n of a kind:
   for (int i = 0; i < n; i++) {
-	  ans.cards[i] = hand->cards[index++];
+	  ans.cards[i] = hand->cards[idx + i];
   }
 
-  index = n;
+  int index = n;
 
   // fill in remaining tie breakers (i.e. highest remaining cards)
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < hand->n_cards; i++) {
 	  if (i >= idx && i < idx + n) { continue; } 
 	  ans.cards[index++] = hand->cards[i];
+    if (index == 5) {
+      break;
+    }
   }
 
   return ans;

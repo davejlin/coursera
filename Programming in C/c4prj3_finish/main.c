@@ -20,7 +20,7 @@ void free_cards_but_not_deck(deck_t * deck) {
 FILE * openFile(char * fileName) {
   FILE * file = fopen(fileName, "r");
   if (file == NULL) {
-    fprintf(stderr, "invalid file\n");
+    fprintf(stderr, "invalid file: %s\n", fileName);
     exit(EXIT_FAILURE);
   }
   return file;
@@ -86,11 +86,12 @@ void decideWinner(deck_t ** hands, size_t nHands, int ** results) {
       break;
       case -1:
         winner = i;
+        ties = 0; // reset ties to zero after a new winner to differentiate winning hands which tie from losing hands which tie
       break;
     }
   }
 
-  if (ties == nHands-1) {
+  if (ties > 0) {
     (*results)[nHands]++;
   } else {
     (*results)[winner]++;
