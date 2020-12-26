@@ -48,6 +48,8 @@ int is_ace_low_straight_at(deck_t * hand, size_t index, suit_t fs) {
 
   if (nCards-index < 5) { return 0; } // early escape: not enough cards left to form a straight
 
+  if (fs != NUM_SUITS) { return 0; }
+
   for (int i = index+1; i < nCards; i++) {
 	  card_t card = *cards[i];
 	  if (card.value == 5) {
@@ -164,20 +166,21 @@ hand_eval_t build_hand_from_match(deck_t * hand,
 
   hand_eval_t ans;
   ans.ranking = what;
-  
-  int index = idx;
 
   // fill in n of a kind:
   for (int i = 0; i < n; i++) {
-	  ans.cards[i] = hand->cards[index++];
+	  ans.cards[i] = hand->cards[idx + i];
   }
 
-  index = n;
+  int index = n;
 
   // fill in remaining tie breakers (i.e. highest remaining cards)
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < hand->n_cards; i++) {
 	  if (i >= idx && i < idx + n) { continue; } 
 	  ans.cards[index++] = hand->cards[i];
+    if (index == 5) {
+      break;
+    }
   }
 
   return ans;

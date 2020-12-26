@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "make",
             "options": {
-                "cwd": "${workspaceFolder}/c4prj2_input/",
+                "cwd": "${workspaceFolder}/c4prj3_finish/",
             },
         }
     ]

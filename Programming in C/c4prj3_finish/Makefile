@@ -1,13 +1,6 @@
-CFLAGS=-Wall -Werror -std=gnu99 -pedantic -ggdb3
-SRCS=$(wildcard *.c)
-OBJS=$(patsubst %.c, %.o, $(SRCS))
-PROGRAM=poker
-
-$(PROGRAM): $(OBJS)
-	gcc $(CFLAGS) -o $@ $(OBJS)
-
-%.o: %.c 
-	gcc -c $(CFLAGS) $<
-
+CC=gcc
+CFLAGS=-Wall -Werror -ggdb3 -std=gnu99 -pedantic $(OTHERFLAGS)
+poker: cards.o  deck.o  eval.o  future.o  input.o  main.o
+	gcc -o $@ $(CFLAGS) $^
 clean:
-	rm -f $(OBJS) $(PROGRAM) *~
+	rm -rf *.o poker *~
