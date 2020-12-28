@@ -1,6 +1,6 @@
-#Learn Object Oriented Programming With C++ Guided Project
+# Learn Object Oriented Programming With C++ Guided Project
 
-##To debug with console input:
+## To debug with console input:
 
 1.  In launch.json, set:
         "externalConsole": true,
