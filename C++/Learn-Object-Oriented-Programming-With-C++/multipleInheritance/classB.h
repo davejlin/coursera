@@ -5,7 +5,7 @@ using namespace std;
 
 class ClassB {
     protected:
-    int b;
+    int b1, b2;
     public:
     virtual void input();
 };

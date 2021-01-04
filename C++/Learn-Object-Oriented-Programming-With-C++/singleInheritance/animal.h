@@ -6,7 +6,7 @@ using namespace std;
 class Animal {
     public:
     virtual void eat();
-    virtual void sleep();
+    void sleep();
 };
 
 #endif

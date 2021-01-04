@@ -5,6 +5,7 @@
 class Dog : public Animal {
     public:
     virtual void sleep();
+    void eat();
     void bark();
 };
 
