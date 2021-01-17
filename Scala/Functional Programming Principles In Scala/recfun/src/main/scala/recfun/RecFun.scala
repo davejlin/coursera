@@ -2,7 +2,6 @@ package recfun
 import scala.math.{max, min}
 
 object RecFun extends RecFunInterface {
-  var n = 0
   def main(args: Array[String]): Unit = {
     println("Pascal's Triangle")
     for (row <- 0 to 30) {
@@ -18,8 +17,6 @@ object RecFun extends RecFunInterface {
       }
       println()
     }
-
-    print(s"\ntotal n: ${n}\n")
   }
 
   /**
@@ -31,17 +28,20 @@ object RecFun extends RecFunInterface {
   }
 
   def pascalTail(c: Int, r: Int): Int = {
+    var cOpt = c
     def loop(col: Int, row: Int, previous: Array[Int], current: Array[Int]): Int = {
-      n += 1
       current(col) = (if (col > 0) previous(col - 1) else 0) + (if (col < row) previous(col) else 0)
 
-      if ((col == c) && (row == r)) current(col)
+      if ((col == cOpt) && (row == r)) current(col)
       else if (col < row) loop(col + 1, row, previous, current)
       else loop(0, row + 1, current, new Array(_length = row + 2))
     }
 
     if (c == 0 || c == r) 1
-    else loop(0, 1, Array(1), new Array(_length = 2))
+    else {
+      if (c > r/2) cOpt = r - c
+      loop(0, 1, Array(1), new Array(_length = 2))
+    }
   }
 
   def pascalIter(c: Int, r: Int): Int = {
