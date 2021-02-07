@@ -55,6 +55,24 @@ class RecFunSuite {
   @Test def `countChange: unsorted CHF`: Unit =
     assertEquals(1022, countChange(300,List(500,5,50,100,20,200,10)))
 
+  @Test def `countChange: test5`: Unit =
+    assertEquals(5, countChange(100,List(25,5)))
+
+  @Test def `countChange: test6`: Unit =
+    assertEquals(6, countChange(15,List(10,5,1)))
+
+  @Test def `countChange: test7`: Unit =
+    assertEquals(18, countChange(30,List(5,25,10,1)))
+
+  @Test def `countChange: zero`: Unit =
+    assertEquals(0, countChange(0,List(5,25,10,1)))
+
+  @Test def `countChange: negative`: Unit =
+    assertEquals(0, countChange(-100,List(5,25,10,1)))
+
+  @Test def `countChange: no coins`: Unit =
+    assertEquals(0, countChange(100,List[Int]()))
+
   // ------ pascal tests ------------------------------------------------------
 
   @Test def `pascal: col=0,row=2`: Unit =
