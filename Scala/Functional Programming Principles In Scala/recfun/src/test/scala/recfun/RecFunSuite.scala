@@ -73,6 +73,9 @@ class RecFunSuite {
   @Test def `countChange: no coins`: Unit =
     assertEquals(0, countChange(100,List[Int]()))
 
+  @Test def `countChange: sorted CHF with 1`: Unit =
+    assertEquals(15280, countChange(300,List(1, 5,10,20,50,100,200,500)))
+
   // ------ pascal tests ------------------------------------------------------
 
   @Test def `pascal: col=0,row=2`: Unit =
