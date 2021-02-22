@@ -5,7 +5,7 @@ Note: If you have paid for the Certificate, please make sure you are submitting 
 Attention: You are allowed to submit a unlimited number of times for grade purposes. Once you have submitted your solution, you should see your grade and a feedback about your code on the Coursera website within 10 minutes. If you want to improve your grade, just submit an improved solution. The best of all your submissions will count as the final grade.
 Mechanics
 
-Download the recfun.zip handout archive file and extract it somewhere on your machine.
+Download the [recfun.zip](https://moocs.scala-lang.org/~dockermoocs/handouts-coursera-2.13/recfun.zip) handout archive file and extract it somewhere on your machine.
 
 This assignment counts towards your final grade. Please refer to the Grading Policy for more details.
 
