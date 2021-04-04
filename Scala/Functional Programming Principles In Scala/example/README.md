@@ -67,7 +67,8 @@ $ sbt
 ```
 
 SBT commands are executed inside the SBT shell. Don't try to execute them in the Scala REPL, because they won't work.
-Running the Scala Interpreter inside SBT
+
+### Running the Scala Interpreter inside SBT
 
 The Scala interpreter is different than the SBT command line. 
 
