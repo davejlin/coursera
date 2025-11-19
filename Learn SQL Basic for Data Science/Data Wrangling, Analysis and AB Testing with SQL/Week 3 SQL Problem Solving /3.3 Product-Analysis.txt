@@ -1,0 +1,296 @@
+Week 3 SQL Problem Solving
+Product Analysis
+Wednesday, August 2, 2023
+
+==============================
+Exercise 0: Count how many users we have
+==============================
+
+SELECT
+  COUNT(id) total_ids
+FROM
+  dsv1069.users
+
+Answer: 117,178
+
+==============================
+Exercise 1: Find out how many users have ever ordered
+==============================
+
+SELECT
+  COUNT (user_id) AS total_user_ids,
+  COUNT(DISTINCT user_id) AS total_distinct_user_ids
+FROM
+  dsv1069.orders
+
+Answer:
+
+total_user_ids    total_distinct_user_ids
+47402             17463
+
+==============================
+Exercise 2:
+Goal find how many users have reordered the same item
+==============================
+
+Query 1:
+
+SELECT
+  COUNT(user_id)
+FROM
+  (
+    SELECT
+      user_id,
+      COUNT(item_id) - COUNT(DISTINCT item_id) AS repeat_buy
+    FROM
+      dsv1069.orders
+    GROUP BY
+      user_id
+  ) repeat_table
+WHERE
+  repeat_buy > 0
+
+Answer: 211
+
+Query 2:
+
+SELECT
+  COUNT(DISTINCT user_id) users_who_reordered
+FROM
+  (
+    SELECT
+      user_id,
+      item_id,
+      COUNT(DISTINCT line_item_id) times_user_ordered
+    FROM
+      dsv1069.orders
+    GROUP BY
+      user_id,
+      item_id
+  ) subtable
+WHERE
+  times_user_ordered > 1
+
+Answer: 211
+
+==============================
+Exercise 3:
+Do users even order more than once?
+How many users order more than once?
+==============================
+
+SELECT
+  COUNT(DISTINCT user_id)
+FROM
+  (
+    SELECT
+      user_id,
+      COUNT(DISTINCT invoice_id) AS number_of_orders
+    FROM
+      dsv1069.orders
+    GROUP BY
+      user_id
+  ) repeat_table
+WHERE
+  number_of_orders > 1
+
+Anser: 1421
+
+==============================
+Exercise 4:
+How many orders per item?
+==============================
+
+Query 1:
+
+SELECT
+  item_id,
+  item_name,
+  COUNT(invoice_id) total_invoices,
+  COUNT(DISTINCT invoice_id) distinct_invoices
+FROM
+  dsv1069.orders
+GROUP BY
+  item_id,
+  item_name
+ORDER BY
+  distinct_invoices DESC
+
+SELECT
+  item_id,
+  COUNT(line_item_id) AS times_ordered
+FROM
+  dsv1069.orders
+GROUP BY
+  item_id
+ORDER BY times_ordered DESC
+
+Query 2;
+
+SELECT
+  item_id,
+  COUNT(DISTINCT line_item_id) AS times_ordered
+FROM
+  dsv1069.orders
+GROUP BY
+  item_id
+ORDER BY
+  times_ordered DESC
+
+(Answers slightly different)
+
+==============================
+Exercise 5:
+How many orders per category?
+==============================
+
+Query 1:
+
+SELECT
+  item_category,
+  COUNT(invoice_id) total_invoices,
+  COUNT(DISTINCT invoice_id) distinct_invoices
+FROM
+  dsv1069.orders
+GROUP BY
+  item_category
+ORDER BY
+  distinct_invoices DESC
+
+Answer:  
+
+item_category   total_invoices   distinct_invoices
+
+apparatus       4892             2046
+widget          4809             2040
+contraption     4700             2025
+module          4800             2022
+instrument      4767             2017
+device          4735             2016
+gadget          4695             1997
+mechanism       4706             1994
+tool            4633             1984
+dongle          4665             1982
+
+Query 2:
+
+SELECT
+  item_category,
+  COUNT(DISTINCT line_item_id) AS times_ordered
+FROM
+  dsv1069.orders
+GROUP BY
+  item_category
+ORDER BY
+  times_ordered DESC
+
+Answer:
+
+item_category   times_ordered
+
+apparatus       4892
+widget          4809
+module          4800
+instrument      4767
+device          4735
+mechanism       4706
+contraption     4700
+gadget          4695
+dongle          4665
+tool            4633
+
+==============================
+Exercise 6:
+Goal: Do users order multiple things from the same category?
+==============================
+
+Query 1:
+
+SELECT
+  COUNT(user_id) number_of_users
+FROM
+  (
+    SELECT
+      user_id,
+      COUNT(DISTINCT item_category) categories,
+      COUNT(item_id) items
+    FROM
+      dsv1069.orders
+    GROUP BY
+      user_id
+  ) main
+WHERE
+  categories <> items
+
+Answer: 
+
+12,879 who order things from the same category
+ 4,584 who order things which are all from different categories
+17,463 total users
+
+Query 2:
+
+SELECT
+  COUNT(user_id) number_of_users
+FROM
+  (
+    SELECT
+      user_id,
+      item_category,
+      COUNT(DISTINCT line_item_id) AS times_category_ordered
+    FROM
+      dsv1069.orders
+    GROUP BY
+      user_id,
+      item_category
+  ) subtable
+WHERE
+  times_category_ordered > 1
+
+Answer:
+
+13,662 who order more than 1 thing from the same category
+
+==============================
+Exercise 7:
+Goal: Find the average time between orders
+Decide if this analysis is necessary
+==============================
+
+WITH first_order AS (
+  SELECT
+    user_id,
+    created_at,
+    DENSE_RANK() OVER (
+      PARTITION BY user_id
+      ORDER BY
+        created_at ASC
+    )
+  FROM
+    dsv1069.orders
+),
+second_order AS (
+  SELECT
+    user_id,
+    created_at,
+    DENSE_RANK() OVER (
+      PARTITION BY user_id
+      ORDER BY
+        created_at ASC
+    )
+  FROM
+    dsv1069.orders
+)
+SELECT
+  DISTINCT date(first_order.created_at) AS first_order_date,
+  date(second_order.created_at) AS second_order_date,
+  date(second_order.created_at) - date(first_order.created_at) AS date_diff,
+  first_order.user_id
+FROM
+  first_order
+  JOIN second_order ON first_order.user_id = second_order.user_id
+WHERE
+  first_order.dense_rank = 1
+  AND second_order.dense_rank = 2
+ORDER BY
+  first_order.user_id, date_diff DESC

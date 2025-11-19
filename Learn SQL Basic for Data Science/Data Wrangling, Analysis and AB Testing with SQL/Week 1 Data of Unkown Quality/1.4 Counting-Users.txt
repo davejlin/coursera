@@ -1,0 +1,251 @@
+Week 1 Data of Unkown Quality
+Counting Users
+Sunday, July 30, 2023
+
+==============================
+Exercise 1: We’ll be using the users table to answer the question “How many new users are added each day?“. Start by making sure you understand the columns in the table.
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.users
+
+==============================
+Exercise 2: Without worrying about deleted user or merged users, count the number of users added each day.
+==============================
+
+SELECT
+  date(created_at) AS day,
+  count(id)
+FROM
+  dsv1069.users
+GROUP BY
+  day
+ORDER BY
+  day
+
+Accounting for deleted users or merged users:
+
+SELECT
+  date(created_at) AS DAY,
+  count(id)
+FROM
+  dsv1069.users
+WHERE
+  deleted_at IS NULL 
+  AND (
+    id <> parent_user_id
+    OR parent_user_id IS NULL
+  )
+GROUP BY
+  DAY
+ORDER BY
+  DAY
+
+==============================
+Exercise 3: Consider the following query. Is this the right way to count merged or deleted users? If all of our users were deleted tomorrow what would the result look like?
+==============================
+
+SELECT
+  date(created_at) AS DAY,
+  count(id)
+FROM
+  dsv1069.users
+WHERE
+  deleted_at IS NOT NULL 
+  OR (
+    id <> parent_user_id
+    OR parent_user_id IS NOT NULL
+  )
+GROUP BY
+  DAY
+ORDER BY
+  DAY
+
+==============================
+Exercise 4: Count the number of users deleted each day. Then count the number of users removed due to merging in a similar way.
+==============================
+
+Deleted:
+
+SELECT
+  date(created_at) AS DAY,
+  count(id)
+FROM
+  dsv1069.users
+WHERE
+  deleted_at IS NOT NULL 
+GROUP BY
+  DAY
+ORDER BY
+  DAY
+
+Merged:
+
+SELECT
+  date(created_at) AS DAY,
+  count(id)
+FROM
+  dsv1069.users
+WHERE
+  id <> parent_user_id
+  OR parent_user_id IS NOT NULL
+GROUP BY
+  DAY
+ORDER BY
+  DAY
+
+==============================
+Exercise 5: Use the pieces you’ve built as subtables and create a table that has a column for the date, the number of users created, the number of users deleted and the number of users merged that day.
+==============================
+
+WITH created AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  GROUP BY
+    DAY
+),
+deleted AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  WHERE
+    deleted_at IS NOT NULL
+  GROUP BY
+    DAY
+),
+merged AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  WHERE
+    id <> parent_user_id
+    OR parent_user_id IS NOT NULL
+  GROUP BY
+    DAY
+)
+SELECT
+  created.DAY,
+  created.count AS created_count,
+  deleted.count AS deleted_count,
+  merged.count AS merged_count
+FROM
+  created
+  LEFT JOIN deleted ON created.DAY = deleted.DAY
+  LEFT JOIN merged ON created.DAY = merged.Day
+ORDER BY
+  created.DAY
+
+==============================
+Exercise 6: Refine your query from #5 to have informative column names and so that null columns return 0.
+==============================
+
+WITH created AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  GROUP BY
+    DAY
+),
+deleted AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  WHERE
+    deleted_at IS NOT NULL
+  GROUP BY
+    DAY
+),
+merged AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  WHERE
+    id <> parent_user_id
+    OR parent_user_id IS NOT NULL
+  GROUP BY
+    DAY
+)
+SELECT
+  created.DAY,
+  COALESCE(created.count, 0) AS created_count,
+  COALESCE(deleted.count, 0) AS deleted_count,
+  COALESCE(merged.count, 0) AS merged_count,
+  COALESCE(created.count, 0) - COALESCE(deleted.count, 0) - COALESCE(merged.count, 0) AS net_added
+FROM
+  created
+  LEFT JOIN deleted ON created.DAY = deleted.DAY
+  LEFT JOIN merged ON created.DAY = merged.Day
+ORDER BY
+  created.DAY
+
+==============================
+Exercise 7:
+What if there were days where no users were created, but some users were deleted or merged. Does the previous query still work? No, it doesn’t. Use the dates_rollup as a backbone for this query, so that we won’t miss any dates.
+==============================
+
+WITH dates AS (
+  SELECT
+    date
+  FROM
+    dsv1069.dates_rollup
+),
+created AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  GROUP BY
+    DAY
+),
+deleted AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  WHERE
+    deleted_at IS NOT NULL
+  GROUP BY
+    DAY
+),
+merged AS (
+  SELECT
+    date(created_at) AS DAY,
+    count(id)
+  FROM
+    dsv1069.users
+  WHERE
+    id <> parent_user_id
+    OR parent_user_id IS NOT NULL
+  GROUP BY
+    DAY
+)
+SELECT
+  dates.date,
+  COALESCE(created.count, 0) AS created_count,
+  COALESCE(deleted.count, 0) AS deleted_count,
+  COALESCE(merged.count, 0) AS merged_count,
+  COALESCE(created.count, 0) - COALESCE(deleted.count, 0) - COALESCE(merged.count, 0) AS net_added
+FROM
+  dates
+  LEFT JOIN created ON dates.date = created.DAY
+  LEFT JOIN deleted ON dates.date = deleted.DAY
+  LEFT JOIN merged ON dates.date = merged.Day
+ORDER BY
+  dates.date

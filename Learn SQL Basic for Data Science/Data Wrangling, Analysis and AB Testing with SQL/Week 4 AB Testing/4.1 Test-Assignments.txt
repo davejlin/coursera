@@ -1,0 +1,201 @@
+Week 4 AB Testing
+Test Assignments
+Thursday, August 3, 2023
+
+==============================
+Exercise 1: Figure out how many tests we have running right now
+==============================
+
+SELECT
+  distinct parameter_name
+FROM
+  dsv1069.events
+WHERE
+  event_name = 'test_assignment'
+
+SELECT
+  distinct parameter_value
+FROM
+  dsv1069.events
+WHERE
+  event_name = 'test_assignment' and parameter_name = 'test_assignment'
+
+For the event_name = "test_assignment", there are two parameter names,
+"test_assignment" and "test_id" with the following values:
+
+parameter_name      parameter_values
+
+test_assignment     0, 1
+test_id             4, 5, 6, 7
+
+Notes: 
+
+- test_id identifies the test group number which the user is assigned to,
+so we have 4 different test groups
+
+- test_assignment identifies whether the user is in the control (0) or treatment (1) group.
+
+==============================
+Exercise 2: Check for potential problems with test assignments. For example Make sure there
+is no data obviously missing (This is an open ended question)
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.events
+WHERE
+  event_name = 'test_assignment'
+  AND (
+    event_id IS NULL
+    OR event_time IS NULL
+    OR user_id IS NULL
+    OR event_name IS NULL
+    OR platform IS NULL
+    OR parameter_name IS NULL
+    OR parameter_value IS NULL
+  )
+
+All test assignments have values in all columns
+
+event_id
+event_time
+user_id
+event_name
+platform
+parameter_name
+parameter_value
+
+==============================
+Exercise 3: Write a query that returns a table of assignment events.
+Please include all of the relevant parameters as columns 
+(Hint: A previous exercise as a template)
+==============================
+
+SELECT
+  event_time,
+  user_id,
+  parameter_name,
+  parameter_value
+FROM
+  dsv1069.events
+WHERE
+  event_name = 'test_assignment'
+ORDER BY
+  user_id
+
+==============================
+Exercise 4: Check for potential assignment problems with test_id 5. 
+Specifically, make sure users are assigned only one treatment group.
+==============================
+
+Note: If I am understanding correctly, the video solution by the instructor is flawed, 
+because by specifying test_id = 5 (or grouping by specific test_ids), the count
+will always be just 1. The query parameter should not be specific on 
+nor group by test_id.
+
+The following lists users with more than 1 test_id assignment:
+
+SELECT
+  *
+FROM
+  (
+    SELECT
+      user_id,
+      parameter_value,
+      ROW_NUMBER() OVER (
+        PARTITION BY user_id
+        ORDER BY
+          parameter_value
+      ) row_number
+    FROM
+      dsv1069.events
+    WHERE
+      event_name = 'test_assignment'
+      AND parameter_name = 'test_id'
+  ) subtable
+  WHERE row_number > 1
+
+==============================
+Exercise Extra 1: How many users are in each test_id group?
+==============================
+
+SELECT
+  parameter_value,
+  COUNT(DISTINCT user_id)
+FROM
+  dsv1069.events
+WHERE
+  event_name = 'test_assignment'
+  AND parameter_name = 'test_id'
+GROUP BY
+  parameter_value
+
+parameter_value   count  
+
+4                 11890
+5                 68563
+6                 43390
+7                 38647
+
+==============================
+Exercise Extra 2: Display the test_id and test_assignment status 
+(control or treatment) of each user.
+==============================
+
+Query 1:
+
+WITH test_ids AS (
+  SELECT
+    user_id,
+    parameter_value AS value
+  FROM
+    dsv1069.events
+  WHERE
+    event_name = 'test_assignment'
+    AND parameter_name = 'test_id'
+  ORDER BY
+    user_id
+),
+test_assignments AS (
+  SELECT
+    user_id,
+    parameter_value AS value
+  FROM
+    dsv1069.events
+  WHERE
+    event_name = 'test_assignment'
+    AND parameter_name = 'test_assignment'
+  ORDER BY
+    user_id
+)
+SELECT
+  test_ids.user_id,
+  test_ids.value AS test_id,
+  test_assignments.value AS test_assignment
+FROM
+  test_ids
+  JOIN test_assignments ON test_ids.user_id = test_assignments.user_id
+
+Query 2:
+
+SELECT
+  user_id,
+  MAX(
+    CASE
+      WHEN parameter_name = 'test_id' THEN parameter_value
+      ELSE NULL
+    END
+  ) test_id,
+  MAX(
+    CASE
+      WHEN parameter_name = 'test_assignment' THEN parameter_value
+      ELSE NULL
+    END
+  ) test_assignment
+FROM
+  dsv1069.events
+WHERE
+  event_name = 'test_assignment'
+GROUP BY
+  user_id

@@ -1,0 +1,111 @@
+Week 1 Data of Unkown Quality
+Identifying Unreliable Data + Nulls
+Sunday, July 30, 2023
+
+==============================
+Exercise 1: Using any methods you like determine if you can you trust this events table.
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.events_201701
+
+Appears to be events which occured in January 2017.
+
+==============================
+Exercise 2:
+Using any methods you like, determine if you can you trust this events table. (HINT: When did we start recording events on mobile)
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.events_ex2
+WHERE
+  platform LIKE '%mobile%'
+ORDER BY
+  event_time
+
+First event for mobile is 2013-01-13 21:10:30
+
+First event for all is 2012-11-23 00:07:10
+
+SELECT
+  date(event_time) as date,
+  platform,
+  COUNT(*)
+FROM
+  dsv1069.events_ex2
+GROUP BY date(event_time), platform
+
+Use chart to see that Android and iOS recording start after 2016.
+
+==============================
+Exercise 3: Imagine that you need to count item views by day. You found this table item_views_by_category_temp - should you use it to answer your question?
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.item_views_by_category_temp
+
+No, it does not break down views by day.
+
+	category  		users	view_events
+
+1	apparatus		   708		1725
+2	contraption		 668		1538
+3	device			   634		1551
+4	gadget			   650		1541
+5	instrument		 730		1700
+6	mechanism		   670		1588
+7	module			   682		1600
+8	tool			     682		1637
+9	widget			   682		1601
+
+==============================
+Exercise 4: Using any methods you like, decide if this table is ready to be used as a source of truth.
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.raw_events
+
+Error:
+
+ERROR: relation "dsv1069.raw_events" does not exist
+  Position: 19
+
+==============================
+Exercise 5: Is this the right way to join orders to users? Is this the right way this join.
+==============================
+
+SELECT
+  *
+FROM
+  dsv1069.orders
+  JOIN dsv1069.users ON orders.user_id = users.parent_user_id
+
+Corrected query:
+
+SELECT
+  *
+FROM
+  dsv1069.orders
+  JOIN dsv1069.users ON orders.user_id = users.id
+
+Many entries for users.parent_user_id are NULL.
+It does not appear to be the primary key of the table.
+Instead, the id referred to in orders.user_id appears to be users.id.
+
+Can use COALESCE to use another column if one is NULL:
+
+SELECT
+  *
+FROM
+  dsv1069.orders
+  JOIN dsv1069.users ON orders.user_id = COALESCE(users.parent_user_id, users.id)
+
+  

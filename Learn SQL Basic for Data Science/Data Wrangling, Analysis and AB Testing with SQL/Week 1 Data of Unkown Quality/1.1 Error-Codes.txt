@@ -1,0 +1,164 @@
+Week 1 Data of Unkown Quality
+Error Codes
+Saturday, July 29, 2023
+
+==============================
+Exercise 1:
+Goal: Here we use users table to pull a list of user email addresses. Edit the query to pull email addresses, but only for non-deleted users.
+==============================
+
+select email_address
+from dsv1069.users
+where deleted_at is not null
+
+==============================
+Exercise 2:
+Goal: Use the items table to count the number of items for sale in each category 
+==============================
+
+select category, count(*) as count
+from dsv1069.items
+group by category
+order by category
+
+	category	count
+
+1	apparatus	207
+2	contraption	206
+3	device		216
+4	dongle		211
+5	gadget		233
+6	instrument	239
+7	mechanism	225
+8	module		227
+9	tool		222
+10	widget		212
+
+==============================
+Exercise 3:
+Goal: Select all of the columns from the result when you JOIN the users table to the orders table
+==============================
+
+select *
+from dsv1069.users u
+join dsv1069.orders o
+on u.id = o.user_id
+
+==============================
+Exercise 4:
+Goal: Check out the query below. This is not the right way to count the number of viewed_item events. Determine what is wrong and correct the error.
+==============================
+
+(starter code did not have DISTINCT and had back ticks instead of apostrophes to enclose 'view_item')
+
+SELECT COUNT(DISTINCT event_id) AS events 
+FROM dsv1069.events
+WHERE event_name = 'view_item'
+
+select event_name, count(event_name) as count
+from dsv1069.events
+group by event_name
+order by count
+
+	event_name			count
+
+1	view_user_profile	3088
+2	test_assignment		324980
+3	view_item			525572
+
+==============================
+Exercise 5:
+Goal:Compute the number of items in the items table which have been ordered. The query below runs, but it isn’t right. Determine what is wrong and correct the error or start from scratch.
+==============================
+
+(starter code lacked "distinct" so was over-counting, and does not need to join on items)
+
+select count(distinct(item_id)) as item_count
+from dsv1069.orders
+
+Answer: 2198
+
+==============================
+Exercise 6:
+Goal: For each user figure out IF a user has ordered something, and when their first purchase was. The query below doesn’t return info for any of the users who haven’t ordered anything.
+==============================
+
+SELECT
+  users.id AS user_id,
+  min(orders.paid_at) AS min_paid_at
+FROM
+  dsv1069.users
+  LEFT JOIN dsv1069.orders ON orders.user_id = users.id
+GROUP BY
+  users.id
+
+==============================
+Exercise 7:
+Goal: Figure out what percent of users have ever viewed the user profile page, but this query isn’t right. Check to make sure the number of users adds up, and if not, fix the query.
+==============================
+
+Query 1:
+
+SELECT
+  100.00 * (
+    SELECT
+      COUNT(DISTINCT(user_id))
+    FROM
+      dsv1069.events
+    WHERE
+      event_name = 'view_user_profile'
+  ) / (
+    SELECT
+      COUNT(id)
+    FROM
+      dsv1069.users
+  ) AS percentage
+
+Answer: 
+
+  3,035 viewed user profile
+117,178 total users
+
+3035/117,178 = 2.509%
+
+Query 2:
+
+SELECT
+  (
+    CASE
+      WHEN first_view IS NULL THEN FALSE
+      ELSE TRUE
+    END
+  ) AS has_viewed_profile_page,
+  COUNT(user_id) AS users
+FROM
+  (
+    SELECT
+      users.id AS user_id,
+      MIN(event_time) AS first_view
+    FROM
+      dsv1069.users
+      LEFT OUTER JOIN dsv1069.events ON EVENTS.user_id = users.id
+    AND
+      event_name = 'view_user_profile'
+    GROUP BY
+      users.id
+  ) first_profie_views
+GROUP BY
+  (
+    CASE
+      WHEN first_view IS NULL THEN FALSE
+      ELSE TRUE
+    END
+  )
+
+
+Answer:
+
+	has_viewed_profile_page		users
+
+1	false						114,143
+2	true						  3,035
+
+total = 117,178
+percentage true = 3035/117,178 = 2.509%

@@ -1,0 +1,658 @@
+Data Scientist Role Play: Profiling and Analyzing the Yelp Dataset Coursera Worksheet
+By David Lin
+July 28, 2023
+
+This is a 2-part assignment. In the first part, you are asked a series of questions that will help you profile and understand the data just like a data scientist would. For this first part of the assignment, you will be assessed both on the correctness of your findings, as well as the code you used to arrive at your answer. You will be graded on how easy your code is to read, so remember to use proper formatting and comments where necessary.
+
+In the second part of the assignment, you are asked to come up with your own inferences and analysis of the data for a particular research question you want to answer. You will be required to prepare the dataset for the analysis you choose to do. As with the first part, you will be graded, in part, on how easy your code is to read, so use proper formatting and comments to illustrate and communicate your intent as required.
+
+For both parts of this assignment, use this "worksheet." It provides all the questions you are being asked, and your job will be to transfer your answers and SQL coding where indicated into this worksheet so that your peers can review your work. You should be able to use any Text Editor (Windows Notepad, Apple TextEdit, Notepad ++, Sublime Text, etc.) to copy and paste your answers. If you are going to use Word or some other page layout application, just be careful to make sure your answers and code are lined appropriately.
+In this case, you may want to save as a PDF to ensure your formatting remains intact for you reviewer.
+
+
+
+Part 1: Yelp Dataset Profiling and Understanding
+
+1. Profile the data by finding the total number of records for each of the tables below:
+
+-- count the distinct rows returned from the specified table
+
+	SELECT COUNT(*) FROM <name of table>
+	
+i. Attribute table =   10000
+ii. Business table =   10000
+iii. Category table =  10000
+iv. Checkin table =    10000
+v. elite_years table = 10000
+vi. friend table =     10000
+vii. hours table =     10000
+viii. photo table =    10000
+ix. review table =     10000
+x. tip table =         10000
+xi. user table =       10000
+	
+
+
+2. Find the total distinct records by either the foreign key or primary key for each table. If two foreign keys are listed in the table, please specify which foreign key.
+
+-- count the distinct ids in the specified table:
+
+	SELECT COUNT(DISTINCT(<name of primary or foreign key>)) FROM <name of table>
+
+i. Business =    10000 (id)
+ii. Hours =       1562 (business_id)
+iii. Category =   2643 (business_id)
+iv. Attribute =   1115 (business_id)
+v. Review =      10000 (id)
+                  8090 (business_id)
+                  9581 (user_id)
+vi. Checkin =      493 (business_id)
+vii. Photo =     10000 (id)
+                  6493 (business_id)
+viii. Tip =        537 (user_id)
+                  3979 (business_id)
+ix. User =       10000 (id)
+x. Friend =         11 (user_id)
+xi. Elite_years = 2780 (user_id)
+
+Note: Primary Keys are denoted in the ER-Diagram with a yellow key icon.	
+
+
+
+3. Are there any columns with null values in the Users table? Indicate "yes," or "no."
+
+	Answer:
+	
+	no
+
+	SQL code used to arrive at answer:
+	
+-- count the results where any column is NULL in the user table:
+
+	SELECT COUNT(*) 
+	FROM user
+	WHERE id is NULL OR
+	    name is NULL OR
+	    review_count IS NULL OR
+	    yelping_since IS NULL OR
+	    useful IS NULL OR 
+	    funny IS NULL OR 
+	    cool IS NULL OR 
+	    fans IS NULL OR 
+	    average_stars IS NULL OR 
+	    compliment_hot IS NULL OR 
+	    compliment_more IS NULL OR 
+	    compliment_profile IS NULL OR 
+	    compliment_cute IS NULL OR 
+	    compliment_list IS NULL OR 
+	    compliment_note IS NULL OR 
+	    compliment_plain IS NULL OR 
+	    compliment_cool IS NULL OR 
+	    compliment_funny IS NULL OR 
+	    compliment_writer IS NULL OR 
+	    compliment_photos IS NULL
+
+	
+4. For each table and column listed below, display the smallest (minimum), largest (maximum), and average (mean) value for the following fields:
+
+-- find the minimum, maximum, and average value for the specified talbe and column:
+
+	SELECT MIN(<name of column>), MAX(<name of column>), AVG(<name of column>)
+	FROM <name of table>
+
+	i. Table: Review, Column: Stars
+	
+		min: 1		max: 5		avg: 3.7082
+		
+	
+	ii. Table: Business, Column: Stars
+	
+		min: 1.0	max: 5.0	avg: 3.6549
+		
+	
+	iii. Table: Tip, Column: Likes
+	
+		min: 0		max: 2		avg: 0.0144
+		
+	
+	iv. Table: Checkin, Column: Count
+	
+		min: 1		max: 53		avg: 1.9414
+		
+	
+	v. Table: User, Column: Review_count
+	
+		min: 0		max: 2000	avg: 24.2995
+		
+
+
+5. List the cities with the most reviews in descending order:
+
+	SQL code used to arrive at answer:
+	
+-- list the cities with the most reviews in descending order:
+-- the total number of reviews is the sum of each city's review_count
+
+	SELECT city, SUM(review_count) as total_reviews
+	FROM business
+	GROUP BY city
+	ORDER BY total_reviews DESC
+	
+	Copy and Paste the Result Below:
+	
++-----------------+---------------+
+| city            | total_reviews |
++-----------------+---------------+
+| Las Vegas       |         82854 |
+| Phoenix         |         34503 |
+| Toronto         |         24113 |
+| Scottsdale      |         20614 |
+| Charlotte       |         12523 |
+| Henderson       |         10871 |
+| Tempe           |         10504 |
+| Pittsburgh      |          9798 |
+| Montréal        |          9448 |
+| Chandler        |          8112 |
+| Mesa            |          6875 |
+| Gilbert         |          6380 |
+| Cleveland       |          5593 |
+| Madison         |          5265 |
+| Glendale        |          4406 |
+| Mississauga     |          3814 |
+| Edinburgh       |          2792 |
+| Peoria          |          2624 |
+| North Las Vegas |          2438 |
+| Markham         |          2352 |
+| Champaign       |          2029 |
+| Stuttgart       |          1849 |
+| Surprise        |          1520 |
+| Lakewood        |          1465 |
+| Goodyear        |          1155 |
++-----------------+---------------+
+(Output limit exceeded, 25 of 362 total rows shown)
+
+	
+6. Find the distribution of star ratings to the business in the following cities:
+
+i. Avon
+
+SQL code used to arrive at answer:
+
+-- find the distribution of star ratings in Avon
+
+	SELECT stars, COUNT(review_count) as count
+	FROM business
+	WHERE city = "Avon"
+	GROUP BY stars
+	ORDER BY stars
+
+
+Copy and Paste the Resulting Table Below (2 columns â€“ star rating and count):
+
++-------+-------+
+| stars | count |
++-------+-------+
+|   1.5 |     1 |
+|   2.5 |     2 |
+|   3.5 |     3 |
+|   4.0 |     2 |
+|   4.5 |     1 |
+|   5.0 |     1 |
++-------+-------+
+
+ii. Beachwood
+
+SQL code used to arrive at answer:
+
+-- find the distribution of star ratings in Beachwood
+
+	SELECT stars, COUNT(review_count) as count
+	FROM business
+	WHERE city = "Beachwood"
+	GROUP BY stars
+	ORDER BY stars
+
+
+Copy and Paste the Resulting Table Below (2 columns â€“ star rating and count):
+		
++-------+-------+
+| stars | count |
++-------+-------+
+|   2.0 |     1 |
+|   2.5 |     1 |
+|   3.0 |     2 |
+|   3.5 |     2 |
+|   4.0 |     1 |
+|   4.5 |     2 |
+|   5.0 |     5 |
++-------+-------+
+
+7. Find the top 3 users based on their total number of reviews:
+		
+	SQL code used to arrive at answer:
+	
+
+-- find the top 3 users based on their total number of reviews
+
+	SELECT id, name, review_count
+	FROM user
+	ORDER BY review_count DESC
+	LIMIT 3
+		
+	Copy and Paste the Result Below:
+		
++------------------------+--------+--------------+
+| id                     | name   | review_count |
++------------------------+--------+--------------+
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald |         2000 |
+| -3s52C4zL_DHRK0ULG6qtg | Sara   |         1629 |
+| -8lbUNlXVSoXqaRRiHiSNg | Yuri   |         1339 |
++------------------------+--------+--------------+
+
+
+8. Does posing more reviews correlate with more fans?
+
+	Please explain your findings and interpretation of the results:
+	
+	No, posting more reviews does not correlate with more fans.
+
+	Based on a query comparing the number of reviews and the number of 
+	fans, it is clear that the two are not correlated.  
+
+	For example, Gerald has the highest review count at 2000 with 253 fans.
+
+	However, Mimi has only 968 reviews (less than half that of Gerald)
+	but with 497 fans (almost twice as many as Gerald).
+	
+	Likewise, Harad has 1153 reviews with 311 fans.
+	
+	Looking at the other users' statistics, I see no clear correlation 
+	between the review count and number of fans.
+
+-- compare a user's number of reviews and fans to see if they correlate
+
+	SELECT id, name, review_count, fans
+	FROM user
+	ORDER BY review_count DESC
+
++------------------------+-----------+--------------+------+
+| id                     | name      | review_count | fans |
++------------------------+-----------+--------------+------+
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald    |         2000 |  253 |
+| -3s52C4zL_DHRK0ULG6qtg | Sara      |         1629 |   50 |
+| -8lbUNlXVSoXqaRRiHiSNg | Yuri      |         1339 |   76 |
+| -K2Tcgh2EKX6e6HqqIrBIQ | .Hon      |         1246 |  101 |
+| -FZBTkAZEXoP7CYvRV2ZwQ | William   |         1215 |  126 |
+| --2vR0DIsmQ6WfcSzKWigw | Harald    |         1153 |  311 |
+| -gokwePdbXjfS0iF7NsUGA | eric      |         1116 |   16 |
+| -DFCC64NXgqrxlO8aLU5rg | Roanna    |         1039 |  104 |
+| -8EnCioUmDygAbsYZmTeRQ | Mimi      |          968 |  497 |
+| -0IiMAZI2SsQ7VmyzJjokQ | Christine |          930 |  173 |
+| -fUARDNuXAfrOn4WLSZLgA | Ed        |          904 |   38 |
+| -hKniZN2OdshWLHYuj21jQ | Nicole    |          864 |   43 |
+| -9da1xk7zgnnfO1uTVYGkA | Fran      |          862 |  124 |
+| -B-QEUESGWHPE_889WJaeg | Mark      |          861 |  115 |
+| -kLVfaJytOJY2-QdQoCcNQ | Christina |          842 |   85 |
+| -kO6984fXByyZm3_6z2JYg | Dominic   |          836 |   37 |
+| -lh59ko3dxChBSZ9U7LfUw | Lissa     |          834 |  120 |
+| -g3XIcCb2b-BD0QBCcq2Sw | Lisa      |          813 |  159 |
+| -l9giG8TSDBG1jnUBUXp5w | Alison    |          775 |   61 |
+| -dw8f7FLaUmWR7bfJ_Yf0w | Sui       |          754 |   78 |
+| -AaBjWJYiQxXkCMDlXfPGw | Tim       |          702 |   35 |
+| -jt1ACMiZljnBFvS6RRvnA | L         |          696 |   10 |
+| -IgKkE8JvYNWeGu8ze4P8Q | Angela    |          694 |  101 |
+| -hxUwfo3cMnLTv-CAaP69A | Crissy    |          676 |   25 |
+| -H6cTbVxeIRYR-atxdielQ | Lyn       |          675 |   45 |
++------------------------+-----------+--------------+------+
+(Output limit exceeded, 25 of 10000 total rows shown)
+
+	
+9. Are there more reviews with the word "love" or with the word "hate" in them?
+
+	Answer:
+
+
+	There are more reviews with the word "love" (1780) than "hate" (232).
+
+	
+	SQL code used to arrive at answer:
+
+-- compare the number of reviews with the word "love" vs "hate" in them
+
+	SELECT
+	(
+	    SELECT COUNT(id) 
+	    FROM review 
+	    WHERE text 
+	    LIKE "%love%"
+	) AS love_count,
+	(
+	    SELECT COUNT(id) 
+	    FROM review 
+	    WHERE text 
+	    LIKE "%hate%"
+	) AS hate_count
+
++------------+------------+
+| love_count | hate_count |
++------------+------------+
+|       1780 |        232 |
++------------+------------+
+
+	
+10. Find the top 10 users with the most fans:
+
+	SQL code used to arrive at answer:
+	
+
+-- find the top 10 users with the most fans
+
+	SELECT id, name, fans
+	FROM user
+	ORDER BY fans DESC
+	LIMIT 10
+
+	
+	Copy and Paste the Result Below:
+
++------------------------+-----------+------+
+| id                     | name      | fans |
++------------------------+-----------+------+
+| -9I98YbNQnLdAmcYfb324Q | Amy       |  503 |
+| -8EnCioUmDygAbsYZmTeRQ | Mimi      |  497 |
+| --2vR0DIsmQ6WfcSzKWigw | Harald    |  311 |
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald    |  253 |
+| -0IiMAZI2SsQ7VmyzJjokQ | Christine |  173 |
+| -g3XIcCb2b-BD0QBCcq2Sw | Lisa      |  159 |
+| -9bbDysuiWeo2VShFJJtcw | Cat       |  133 |
+| -FZBTkAZEXoP7CYvRV2ZwQ | William   |  126 |
+| -9da1xk7zgnnfO1uTVYGkA | Fran      |  124 |
+| -lh59ko3dxChBSZ9U7LfUw | Lissa     |  120 |
++------------------------+-----------+------+	
+		
+
+Part 2: Inferences and Analysis
+
+1. Pick one city and category of your choice and group the businesses in that city or category by their overall star rating. Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
+	
+i. Do the two groups you chose to analyze have a different distribution of hours?
+
+	In some cases, the distribution of hours is similar between the two groups, while different in others.
+	
+	For example, for the restaurants in the 2-3 stars group (99 Cent Sushi, Big Smoke Burger, Pizzaiolo), the 
+	hours are generally from morning to night every day of the week. 
+	
+	In the 4-5 stars group, one restaurant(Sushi Osaka) had similar hours from morning to night every day of the week. On the other hand, two restaurants (Edulis and Cabin Fever) had much shorter hours from evening to night, or past midnight in the case of Cabin Fever.
+	
+	Morever, Edulis is open only 5 days of the week.
+
+	The Kosher Gormet in the 2-3 stars group, and Mama Mia and Naniwa-Taro, both in the 4-5 stars group, 
+	did not have data for their hours of operation.
+
+	So, no clear correlation between the hours of operation and rating appears to exist.
+
+ii. Do the two groups you chose to analyze have a different number of reviews?
+         
+	The number of reviews does not appear to be correlated with the stars rating group of 2-3 or 4-5 stars.
+	
+	For example, 99 Cent Sushi (2-3 stars), The Kosher Gormet (2-3 stars), Mama Mia (4-5 stars), and Sushi Osaka (4-5 stars) 
+	all have less than 10 reviews.  
+	The other two restaurants which are 2-3 stars have 34 and 47 reviews, while the other 4-5 stars restaurants
+	have 26, 75, and 89 reviews.  While there is no general correlation, the data does suggest that restaurants with higher
+	than average number of reviews (e.g. over 50) have higher ratings.
+
+iii. Are you able to infer anything from the location data provided between these two groups? Explain.
+
+	I used Map Maker to plot the locations of each restaurant at https://maps.co/gis/ using the following data:
+
+	latitude, longitude, label name, color code
+
+	43.6614, -79.379, 99 Cent Sushi (2-3), #FF0000
+	43.6546, -79.3805, Big Smoke Burger (2-3), #FF0000
+	43.6479, -79.3901, Pizzaiolo (2-3), #FF0000
+	43.7175, -79.4291, The Kosher Gourmet (2-3), #FF0000
+	43.6419, -79.4066, Edulis (4-5), #0000FF
+	43.6809, -79.4302, Mama Mia (4-5), #0000FF
+	43.7766, -79.4142, Naniwa-Taro (4-5), #0000FF
+	43.6553, -79.4567, Cabin Fever (4-5), #0000FF
+	43.6452, -79.5324, Sushi Osaka (4-5), #0000FF
+
+	The resulting map of each restaurant is posted here:  https://ibb.co/SrccDnb
+
+	Based on the map, the restaurants in the 2-3 stars group appear to be mostly clustered close together 
+	in a region near Toronto's ocean front in the neighborhoods Downtown Core and Entertainment District.
+	
+	The exception is The Kosher Gormet, which is located more inland. However, its star rating is 3.5,
+	which is close to the next category of ratings and higher than the others in the 2-3 stars group, which
+	are all 3 or less.
+
+	On the other hand, the 4-5 star restaurants appear to all be located further inland or away from the
+	cluster of 2-3 star restaurants. These neighborhoods are Niagara, Willodale, High Park, and Etobicoke.
+
+	The exception is Edulis (4-5 star), which is in the general vicinity of the 2-3 star cluster
+	near the ocean front in the neighborhood Niagara. However, while it is physically close, it is noticeably 
+	removed from the cluster area.
+
+	So, a correlation between a restaurant's location and its star rating grouping does appear to exist.
+	Something about the area where the 2-3 star restaurants are clustered in the Downtown Core and
+	Entertainment District may be causing its lower rating.
+
+SQL code used for analysis:
+
+-- find all restaurants in Toronto with star ratings are 2-3 and 4-5
+
+	SELECT b.name,
+	       c.category,
+	       b.city,
+	       b.neighborhood,
+	       b.latitude || ' ' || b.longitude as geolocation, 
+	       b.review_count,
+           b.stars,
+	       CASE 
+	         WHEN b.stars >= 2 AND b.stars < 4 THEN '2-3 stars'
+	         WHEN b.stars >= 4 THEN '4-5 stars'
+	       END as stars_group
+	FROM business b
+	JOIN category c ON b.id = c.business_id
+	AND city = "Toronto"
+	AND category = "Restaurants"
+	AND stars_group IS NOT NULL
+	ORDER BY stars, name
+
++--------------------+-------------+---------+------------------------+------------------+--------------+-------+-------------+
+| name               | category    | city    | neighborhood           | geolocation      | review_count | stars | stars_group |
++--------------------+-------------+---------+------------------------+------------------+--------------+-------+-------------+
+| 99 Cent Sushi      | Restaurants | Toronto | Downtown Core          | 43.6614 -79.379  |            5 |   2.0 | 2-3 stars   |
+| Big Smoke Burger   | Restaurants | Toronto | Downtown Core          | 43.6546 -79.3805 |           47 |   3.0 | 2-3 stars   |
+| Pizzaiolo          | Restaurants | Toronto | Entertainment District | 43.6479 -79.3901 |           34 |   3.0 | 2-3 stars   |
+| The Kosher Gourmet | Restaurants | Toronto |                        | 43.7175 -79.4291 |            3 |   3.5 | 2-3 stars   |
+| Edulis             | Restaurants | Toronto | Niagara                | 43.6419 -79.4066 |           89 |   4.0 | 4-5 stars   |
+| Mama Mia           | Restaurants | Toronto |                        | 43.6809 -79.4302 |            8 |   4.0 | 4-5 stars   |
+| Naniwa-Taro        | Restaurants | Toronto | Willowdale             | 43.7766 -79.4142 |           75 |   4.0 | 4-5 stars   |
+| Cabin Fever        | Restaurants | Toronto | High Park              | 43.6553 -79.4567 |           26 |   4.5 | 4-5 stars   |
+| Sushi Osaka        | Restaurants | Toronto | Etobicoke              | 43.6452 -79.5324 |            8 |   4.5 | 4-5 stars   |
++--------------------+-------------+---------+------------------------+------------------+--------------+-------+-------------+
+
+-- find all restaurants in Toronto with star ratings are 2-3 and 4-5 with hours of operation
+-- in order of the days of the week
+
+	SELECT b.name,
+	       b.city,
+	       c.category,
+	       h.hours,
+	       b.latitude || ' ' || b.longitude as geolocation, 
+	       b.review_count,
+	       CASE 
+	         WHEN b.stars >= 2 AND b.stars < 4 THEN '2-3 stars'
+	         WHEN b.stars >= 4 THEN '4-5 stars'
+	       END as stars_group
+	FROM business b
+	JOIN hours h ON b.id = h.business_id
+	JOIN category c ON b.id = c.business_id
+	AND city = "Toronto"
+	AND category = "Restaurants"
+	AND stars_group IS NOT NULL
+	ORDER BY stars,
+             name, 
+             CASE
+	           WHEN hours LIKE 'Sunday%' THEN 1
+	           WHEN hours LIKE 'Monday%' THEN 2
+	           WHEN hours LIKE 'Tuesday%' THEN 3
+	           WHEN hours LIKE 'Wednesday%' THEN 4
+	           WHEN hours LIKE 'Thursday%' THEN 5
+	           WHEN hours LIKE 'Friday%' THEN 6
+	           WHEN hours LIKE 'Saturday%' THEN 7
+	         END
+             ASC
+
++------------------+-------------+---------+------------------------+-----------------------+------------------+--------------+-------------+
+| name             | category    | city    | neighborhood           | hours                 | geolocation      | review_count | stars_group |
++------------------+-------------+---------+------------------------+-----------------------+------------------+--------------+-------------+
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Sunday|11:00-23:00    | 43.6614 -79.379  |            5 | 2-3 stars   |
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Monday|11:00-23:00    | 43.6614 -79.379  |            5 | 2-3 stars   |
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Tuesday|11:00-23:00   | 43.6614 -79.379  |            5 | 2-3 stars   |
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Wednesday|11:00-23:00 | 43.6614 -79.379  |            5 | 2-3 stars   |
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Thursday|11:00-23:00  | 43.6614 -79.379  |            5 | 2-3 stars   |
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Friday|11:00-23:00    | 43.6614 -79.379  |            5 | 2-3 stars   |
+| 99 Cent Sushi    | Restaurants | Toronto | Downtown Core          | Saturday|11:00-23:00  | 43.6614 -79.379  |            5 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Sunday|11:00-19:00    | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Monday|10:30-21:00    | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Tuesday|10:30-21:00   | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Wednesday|10:30-21:00 | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Thursday|10:30-21:00  | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Friday|10:30-21:00    | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Big Smoke Burger | Restaurants | Toronto | Downtown Core          | Saturday|10:30-21:00  | 43.6546 -79.3805 |           47 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Sunday|10:00-23:00    | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Monday|9:00-23:00     | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Tuesday|9:00-23:00    | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Wednesday|9:00-23:00  | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Thursday|9:00-23:00   | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Friday|9:00-4:00      | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Pizzaiolo        | Restaurants | Toronto | Entertainment District | Saturday|10:00-4:00   | 43.6479 -79.3901 |           34 | 2-3 stars   |
+| Edulis           | Restaurants | Toronto | Niagara                | Sunday|12:00-16:00    | 43.6419 -79.4066 |           89 | 4-5 stars   |
+| Edulis           | Restaurants | Toronto | Niagara                | Wednesday|18:00-23:00 | 43.6419 -79.4066 |           89 | 4-5 stars   |
+| Edulis           | Restaurants | Toronto | Niagara                | Thursday|18:00-23:00  | 43.6419 -79.4066 |           89 | 4-5 stars   |
+| Edulis           | Restaurants | Toronto | Niagara                | Friday|18:00-23:00    | 43.6419 -79.4066 |           89 | 4-5 stars   |
+| Edulis           | Restaurants | Toronto | Niagara                | Saturday|18:00-23:00  | 43.6419 -79.4066 |           89 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Sunday|16:00-2:00     | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Monday|16:00-2:00     | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Tuesday|18:00-2:00    | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Wednesday|18:00-2:00  | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Thursday|18:00-2:00   | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Friday|18:00-2:00     | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Cabin Fever      | Restaurants | Toronto | High Park              | Saturday|16:00-2:00   | 43.6553 -79.4567 |           26 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Sunday|14:00-23:00    | 43.6452 -79.5324 |            8 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Monday|11:00-23:00    | 43.6452 -79.5324 |            8 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Tuesday|11:00-23:00   | 43.6452 -79.5324 |            8 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Wednesday|11:00-23:00 | 43.6452 -79.5324 |            8 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Thursday|11:00-23:00  | 43.6452 -79.5324 |            8 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Friday|11:00-23:00    | 43.6452 -79.5324 |            8 | 4-5 stars   |
+| Sushi Osaka      | Restaurants | Toronto | Etobicoke              | Saturday|11:00-23:00  | 43.6452 -79.5324 |            8 | 4-5 stars   |
++------------------+-------------+---------+------------------------+-----------------------+------------------+--------------+-------------+
+
+2. Group business based on the ones that are open and the ones that are closed. What differences can you find between the ones that are still open and the ones that are closed? List at least two differences and the SQL code you used to arrive at your answer.
+		
+i. Difference 1:
+
+	The number of closed businesses (1520) is far fewer than those that of open (8480).
+
+ii. Difference 2:
+
+	The number of states in which there are closed businesses (16) is fewer than that of open (23).
+
+iii. Difference 3:
+
+    The average number of reviews of closed businesses (23) is nearly 9 less than that of open (32).
+
+iv. Difference 4:
+
+	The average number of stars of closed businesses (3.52) is slighly less than that of open (3.68).   
+
+SQL code used for analysis:
+
+	SELECT CASE 
+         WHEN is_open = 0 THEN 'closed'
+         ELSE 'open'
+       END as 'status',
+        COUNT(DISTINCT(id)) as count,
+        COUNT(DISTINCT(state)) as 'number of states',
+        AVG(stars),
+        AVG(review_count)
+    FROM business
+    GROUP BY is_open
+
++--------+-------+------------------+---------------+-------------------+
+| status | count | number of states |    AVG(stars) | AVG(review_count) |
++--------+-------+------------------+---------------+-------------------+
+| closed |  1520 |               16 | 3.52039473684 |     23.1980263158 |
+| open   |  8480 |               23 | 3.67900943396 |     31.7570754717 |
++--------+-------+------------------+---------------+-------------------+
+	
+3. For this last part of your analysis, you are going to choose the type of analysis you want to conduct on the Yelp dataset and are going to prepare the data for analysis.
+
+Ideas for analysis include: Parsing out keywords and business attributes for sentiment analysis, clustering businesses to find commonalities or anomalies between them, predicting the overall star rating for a business, predicting the number of fans a user will have, and so on. These are just a few examples to get you started, so feel free to be creative and come up with your own problem you want to solve. Provide answers, in-line, to all of the following:
+	
+i. Indicate the type of analysis you chose to do:
+
+	My analyis examines how Yelp users' rating group might correlate with other statistics to better understand user metrics.  A user's rating is binned according to its most significant value, where the lower value is inclusive and the upper value is exclusive.  So, the 3-4 bin includes all ratings which are in the range from 3.0 to less than 4.0. For instance, a rating of 3.0 is binned in the 3-4 bin, as is 3.999, but a rating of 4.0 is binned in the 4-5 bin.  
+
+	Note that the 5 bin contains only 5.0 ratings, so differs from the other bins, which may contain many values in a range.  This difference should be kept in mind when interpretting the results.
+
+	The results show many correlations between users' rating and the number of their reviews, useful votes, funny votes, cool votes, fans, and years yelping. 
+
+	Some observations are:
+
+	- Users with higher ratings tend to have more reviews, useful votes, funny votes, cool votes, and fans.
+	- The number of reviews increases with higher rating groups, peaking in the middle (3-4).
+	- Reviews marked as useful, funny, and cool tend to be higher rated ones.
+	- The most useful, funny, and cool reviews peak in the 4-5 bin, and the second highest belongs to the 3-4 bin, suggesting
+	  that overall, higher ratings to be characterized with these positive characteristics.
+	- Higher rated users tend to have been yelping for a longer time, while those in the lowest (1-2) group have the least number
+	  of years.
+         
+ii. Write 1-2 brief paragraphs on the type of data you will need for your analysis and why you chose that data:
+                           
+	The data I will need for my analysis is the following:
+
+    - The rating group of users, which I find by binning each user's stars in the appropriate bin as expalined above.
+    - The total number of reviews, useful votes, funny votes, cool votes, and fans which are found by summing up the values in each bin.
+    - The average number of years that users have been Yelping for, found by averaging the value in each rating group
+
+	I chose this data because it is relevant to the question I am trying to answer, which is whether there is a correlation between the rating of users on Yelp and their number of reviews, useful votes, funny votes, cool votes, fans, and time yelping. This data will allow me to see how these metrics change depending on the rating group.
+
+
+iii. Output of your finished dataset:
+         
++--------------+-------+---------------+--------------+-------------+------------+------------+-------------------+
+| rating_group | count | avg # reviews | total useful | total funny | total cool | total fans | avg years yelping |
++--------------+-------+---------------+--------------+-------------+------------+------------+-------------------+
+| 1-2          |   818 | 2.47432762836 |          827 |         223 |        146 |         30 |     9.03303951906 |
+| 2-3          |  1103 | 11.4206708976 |         8139 |        2939 |       1434 |        290 |     10.2353216334 |
+| 3-4          |  3374 | 44.9075281565 |       171485 |       82860 |     103447 |       9298 |     10.9403920266 |
+| 4-5          |  2835 | 25.6596119929 |       198527 |      161599 |     167880 |       5180 |     10.6500371255 |
+| 5            |  1870 | 2.19839572193 |         1585 |         306 |        480 |         98 |      9.1396334626 |
++--------------+-------+---------------+--------------+-------------+------------+------------+-------------------+
+
+iv. Provide the SQL code you used to create your final dataset:
+
+-- categorize all users in bins according the their number of stars along with some
+-- relevant statistics
+
+	SELECT 
+	       CASE
+	         WHEN average_stars < 2 THEN '1-2'
+	         WHEN average_stars >=2 AND average_stars < 3 THEN '2-3' 
+	         WHEN average_stars >=3 AND average_stars < 4 THEN '3-4'
+	         WHEN average_stars >=4 AND average_stars < 5 THEN '4-5'
+	         ELSE '5'
+	       END as rating_group,
+	       COUNT(DISTINCT(id)) as count,
+	       AVG(review_count) 'avg # reviews',
+	       SUM(useful) 'total useful',
+	       SUM(funny) 'total funny',
+	       SUM(cool) 'total cool',
+	       SUM(fans) 'total fans',
+	       AVG(((JulianDay('now')) - JulianDay(yelping_since))/365.25) 'avg years yelping'
+	FROM user
+	GROUP BY rating_group
+	ORDER BY rating_group

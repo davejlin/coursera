@@ -1,0 +1,127 @@
+Week 3 SQL Problem Solving
+Promo Email
+Wednesday, August 2, 2023
+
+Learning Objectives
+
+Craft a query allowing your team to send an email reminding users to purchase 
+the last item they viewed.
+
+==============================
+Exercise 1:
+Create the right subtable for recently viewed events using the view_item_events table.
+==============================
+
+user_id         users/view_items
+email_address   users
+item_id         view_items/items 
+item_name       items 
+item_category   items 
+view_rank       computed
+
+SELECT
+  event_time,
+  user_id,
+  first_name,
+  last_name,
+  email_address,
+  dsv1069.items.id AS item_id,
+  name AS product_name,
+  category
+FROM
+  dsv1069.view_item_events
+  JOIN dsv1069.users ON view_item_events.user_id = users.id
+  JOIN dsv1069.items ON view_item_events.item_id = items.id
+ORDER BY
+  user_id,
+  event_time
+
+==============================
+Exercise 2: Check your joins. Join your tables together recent_views, users, items
+
+Exercise 3: Clean up your columns. The goal of all this is to return all of the 
+information we’ll need to send users an email about the item they viewed more recently. 
+Clean up this query outline from the outline in EX2 and pull only the columns you need. 
+Make sure they are named appropriately so that another human can read and understand 
+their contents.
+==============================
+
+SELECT
+  event_time,
+  user_id,
+  first_name,
+  last_name,
+  email_address,
+  dsv1069.items.id AS item_id,
+  name AS product_name,
+  category,
+  ROW_NUMBER() OVER (
+    PARTITION BY user_id
+    ORDER BY
+      event_time DESC
+  ) AS view_number
+FROM
+  dsv1069.view_item_events
+  JOIN dsv1069.users ON view_item_events.user_id = users.id
+  JOIN dsv1069.items ON view_item_events.item_id = items.id
+
+==============================
+Exercise 4: Consider any edge cases. If we sent an email to everyone in the results of 
+this query, what would we want to filter out. Add in any extra filtering that you think 
+would make this email better. For example should we include deleted users? 
+Should we send this email to users who already ordered the item they viewed most 
+recently?
+==============================
+
+WITH items_purchased AS (
+  SELECT
+    user_id,
+    item_name
+  FROM
+    dsv1069.orders
+),
+main AS (
+  SELECT
+    event_time,
+    user_id,
+    first_name,
+    last_name,
+    email_address,
+    dsv1069.items.id AS item_id,
+    name AS product_name,
+    (
+      CASE
+        WHEN name IN (
+          SELECT
+            item_name
+          FROM
+            items_purchased
+          WHERE
+            users.id = items_purchased.user_id
+        ) THEN 1
+        ELSE 0
+      END
+    ) did_purchase,
+    name AS product_name,
+    category,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY
+        event_time DESC
+    ) AS view_number
+  FROM
+    dsv1069.view_item_events
+    JOIN dsv1069.users ON view_item_events.user_id = users.id
+    JOIN dsv1069.items ON view_item_events.item_id = items.id
+  WHERE
+    users.deleted_at IS NULL
+)
+SELECT
+  *
+FROM
+  main
+WHERE
+  did_purchase = 0
+  AND view_number = 1
+
+

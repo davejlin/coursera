@@ -1,0 +1,437 @@
+Week 4 AB Testing
+Analyzing Results
+Tuesday, August 8, 2023
+
+==============================
+Exercise 1: Use the order_binary metric from the previous exercise, 
+count the number of users per treatment group for test_id = 7, 
+and count the number of users with orders (for test_id 7)
+==============================
+
+Query 1:
+
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(DISTINCT user_id) users_in_test,
+  COUNT(
+    DISTINCT(
+      CASE
+        WHEN main.orders_after_assignment > 0 THEN user_id
+        ELSE NULL
+      END
+    )
+  ) users_who_ordered
+FROM
+  (
+    SELECT
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id,
+      COUNT(
+        DISTINCT(
+          CASE
+            WHEN orders.created_at > assignments.event_time THEN invoice_id
+            ELSE NULL
+          END
+        )
+      ) orders_after_assignment,
+      COUNT(
+        DISTINCT (
+          CASE
+            WHEN orders.created_at > assignments.event_time THEN line_item_id
+            ELSE NULL
+          END
+        )
+      ) items_after_assignment,
+      SUM(
+        (
+          CASE
+            WHEN orders.created_at > assignments.event_time THEN price
+            ELSE 0
+          END
+        )
+      ) total_revenue
+    FROM
+      (
+        SELECT
+          event_id,
+          event_time,
+          user_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_id' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_assignment' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_assignment
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'test_assignment'
+        GROUP BY
+          event_id,
+          event_time,
+          user_id
+      ) assignments
+      LEFT JOIN dsv1069.orders ON orders.user_id = assignments.user_id
+    GROUP BY
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id
+  ) main
+GROUP BY
+  test_id,
+  test_assignment
+ORDER BY
+  test_id
+
+Query 2:
+
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(user_id) AS users,
+  SUM(did_order_after_assignment_binary)
+FROM
+  (
+    SELECT
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id,
+      MAX (
+        CASE
+          WHEN orders.created_at > assignments.event_time THEN 1
+          ELSE 0
+        END
+      ) did_order_after_assignment_binary
+    FROM
+      (
+        SELECT
+          event_id,
+          event_time,
+          user_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_id' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_assignment' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_assignment
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'test_assignment'
+        GROUP BY
+          event_id,
+          event_time,
+          user_id
+      ) assignments
+      LEFT JOIN dsv1069.orders ON orders.user_id = assignments.user_id
+    GROUP BY
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id
+  ) assignments
+GROUP BY
+  test_id,
+  test_assignment
+ORDER BY
+  test_id,
+  test_assignment
+
+==============================
+Exercise 2: Create a new item view binary metric. 
+Count the number of users per treatment group, 
+and count the number of users with views (for test_id 7)
+==============================
+
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(DISTINCT user_id) users_in_test,
+  SUM(views_after_assignment) views_count
+FROM
+  (
+    SELECT
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id,
+      MAX(
+        CASE
+          WHEN views.event_time > assignments.event_time THEN 1
+          ELSE 0
+        END
+      ) views_after_assignment
+    FROM
+      (
+        SELECT
+          event_id,
+          event_time,
+          user_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_id' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_assignment' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_assignment
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'test_assignment'
+        GROUP BY
+          event_id,
+          event_time,
+          user_id
+      ) assignments
+      LEFT JOIN (
+        SELECT
+          *
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'view_item'
+      ) views ON assignments.user_id = views.user_id
+    GROUP BY
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id
+  ) main
+GROUP BY
+  test_id,
+  test_assignment
+ORDER BY
+  test_id
+
+==============================
+Exercise 3: Alter the result from EX 2, 
+to compute the users who viewed an item WITHIN 30 days of their treatment event
+==============================
+
+Query 1:
+
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(DISTINCT user_id) users_in_test,
+  SUM(views_after_assignment) views_count,
+  SUM(views_within_30_days_after_assignment) views_within_30_days_count
+FROM
+  (
+    SELECT
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id,
+      MAX(
+        CASE
+          WHEN views.event_time > assignments.event_time THEN 1
+          ELSE 0
+        END
+      ) views_after_assignment,
+      MAX(
+        CASE
+          WHEN views.event_time > assignments.event_time
+          AND DATE(views.event_time) <= DATE(assignments.event_time) + 30 THEN 1
+          ELSE 0
+        END
+      ) views_within_30_days_after_assignment
+    FROM
+      (
+        SELECT
+          event_id,
+          event_time,
+          user_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_id' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_assignment' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_assignment
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'test_assignment'
+        GROUP BY
+          event_id,
+          event_time,
+          user_id
+      ) assignments
+      LEFT JOIN (
+        SELECT
+          *
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'view_item'
+      ) views ON assignments.user_id = views.user_id
+    GROUP BY
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id
+  ) main
+GROUP BY
+  test_id,
+  test_assignment
+ORDER BY
+  test_id
+
+Query 2:
+
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(DISTINCT user_id) users_in_test,
+  SUM(views_after_assignment) views_count,
+  SUM(views_within_30_days_after_assignment) views_within_30_days_count
+FROM
+  (
+    SELECT
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id,
+      MAX(
+        CASE
+          WHEN views.event_time > assignments.event_time THEN 1
+          ELSE 0
+        END
+      ) views_after_assignment,
+      MAX(
+        CASE
+          WHEN views.event_time > assignments.event_time
+          AND DATE_PART('day', views.event_time - assignments.event_time) <= 30 THEN 1
+          ELSE 0
+        END
+      ) views_within_30_days_after_assignment
+    FROM
+      (
+        SELECT
+          event_id,
+          event_time,
+          user_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_id' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_assignment' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_assignment
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'test_assignment'
+        GROUP BY
+          event_id,
+          event_time,
+          user_id
+      ) assignments
+      LEFT JOIN (
+        SELECT
+          *
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'view_item'
+      ) views ON assignments.user_id = views.user_id
+    GROUP BY
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id
+  ) main
+GROUP BY
+  test_id,
+  test_assignment
+ORDER BY
+  test_id
+
+==============================
+Exercise 4:
+Create the metric invoices (this is a mean metric, not a binary metric) 
+and for test_id = 7 
+The count of users per treatment group
+The average value of the metric per treatment group
+The standard deviation of the metric per treatment group
+==============================
+
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(user_id) user_count,
+  AVG(orders_after_assignment) average_invoices,
+  STDDEV(orders_after_assignment) std_dev_invoices
+FROM
+  (
+    SELECT
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id,
+      COUNT(
+        DISTINCT(
+          CASE
+            WHEN orders.created_at > assignments.event_time THEN invoice_id
+            ELSE NULL
+          END
+        )
+      ) orders_after_assignment
+    FROM
+      (
+        SELECT
+          event_id,
+          event_time,
+          user_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_id' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_id,
+          MAX(
+            CASE
+              WHEN parameter_name = 'test_assignment' THEN CAST(parameter_value AS INT)
+              ELSE NULL
+            END
+          ) test_assignment
+        FROM
+          dsv1069.events
+        WHERE
+          event_name = 'test_assignment'
+        GROUP BY
+          event_id,
+          event_time,
+          user_id
+      ) assignments
+      LEFT JOIN dsv1069.orders ON orders.user_id = assignments.user_id
+    GROUP BY
+      assignments.test_id,
+      assignments.test_assignment,
+      assignments.user_id
+  ) invoices
+GROUP BY
+  test_id,
+  test_assignment
