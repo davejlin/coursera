@@ -82,3 +82,6 @@ fastlane/test_output
 
 # VisualStudio
 # **/.vscode/
+
+# Compiled Object files
+a.out
