@@ -40,7 +40,7 @@ void Download(String &file) {
 int main() {
     String file;
     cout << "[Main] Starting download task\n";
-    thread downloadThread(Download, ref(file));
+    thread downloadThread(Download, ref(file)); // <-- Pass by reference using std::ref to avoid copying
     downloadThread.detach();
     cout << "[Main] Download task completed\n";
 
