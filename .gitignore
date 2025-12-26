@@ -85,3 +85,4 @@ fastlane/test_output
 
 # Compiled Object files
 a.out
+main
