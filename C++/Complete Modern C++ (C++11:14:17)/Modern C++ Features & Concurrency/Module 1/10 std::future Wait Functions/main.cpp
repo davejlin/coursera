@@ -17,7 +17,6 @@ int Operation(const int count) {
 
 int main() {
     using namespace chrono_literals;
-    // if launch::deferred is used, the operation will synchronously run only when get() or wait() is called on the future
     future<int> result = async(launch::async, Operation, 10);
     this_thread::sleep_for(1s);
     cout << "[Main] Thread continues execution ... \n";
