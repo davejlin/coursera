@@ -27,7 +27,7 @@ public:
     }
 };
 
-void Download(String &file) {
+void Download(const String &file) {
     cout << "[Download] Started download of file:" << file << "\n";
 
     for (int i = 0; i < SIZE; ++i) {
@@ -40,7 +40,7 @@ void Download(String &file) {
 int main() {
     String file;
     cout << "[Main] Starting download task\n";
-    thread downloadThread(Download, ref(file)); // <-- Pass by reference using std::ref to avoid copying
+    thread downloadThread(Download, cref(file)); // <-- Pass by reference using std::ref to avoid copying, or cref for const reference
     downloadThread.detach();
     cout << "[Main] Download task completed\n";
 
