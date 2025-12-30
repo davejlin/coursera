@@ -40,6 +40,19 @@ public:
 		
 	}
 };
+
+/*
+In C++17, lambda expressions are constexpr by default if they meet the requirements for being constexpr.
+
+This means that if a lambda does not capture any non-constexpr variables and its body consists of constexpr operations,
+it can be evaluated at compile time.
+
+To demonstrate this, we define a class `Product` with member functions that use constexpr lambdas.
+To test the behavior, compile and run this code with C++17 standard.
+
+g++ -std=c++17 ./constexpr_lambda.cpp
+*/
+
 int main() {
 	Product *p = new Product { "Watch", 500 };
 	//p.AssignFinalPrice();

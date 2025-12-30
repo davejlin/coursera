@@ -9,6 +9,13 @@
 #	endif
 #endif
 
+/*
+In C++17, feature test macros provide a standardized way to check for the presence of language and library features.
+
+These macros are defined in the standard and can be used to write portable code that adapts to
+different compiler capabilities.
+*/
+
 int main() {
 	fs::path p{"C:"} ;
 	

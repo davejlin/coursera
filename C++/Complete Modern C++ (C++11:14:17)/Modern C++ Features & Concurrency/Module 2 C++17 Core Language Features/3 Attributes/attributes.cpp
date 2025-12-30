@@ -30,6 +30,11 @@ namespace [[deprecated("This namespace is deprecated")]] DeprecatedNamespace {
     }
 }
 
+/*
+In C++17, attributes provide a standardized way to specify additional information about the behavior of code elements.
+These attributes can be used to indicate deprecation, optimization hints, and other metadata.
+*/
+
 int main() {
     int* myArray = CreateIntArray(10);
     // Use the array...

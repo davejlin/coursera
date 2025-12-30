@@ -67,6 +67,10 @@ void Operate(const FileInfo::Type &type) {
     }
 }
 
+/*
+In C++17, both if and switch statements can include an initialization statement.
+*/
+
 int main() {
     Alloc();
     Write("Hello, World!");

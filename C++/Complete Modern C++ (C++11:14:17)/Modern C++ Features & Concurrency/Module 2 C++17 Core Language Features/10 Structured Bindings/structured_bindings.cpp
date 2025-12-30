@@ -24,6 +24,13 @@ struct S1 {
     }
 };
 
+/*
+In C++17, structured bindings allow you to unpack elements from containers and aggregate types.
+To test the behavior, compile and run this code with C++17 standard.
+
+g++ -std=c++17 ./structured_bindings.cpp
+*/
+
 int main() {
     S1 s(42123, "abc xyz");
     auto [s1, s2] = s; // Structured binding to array and char array
