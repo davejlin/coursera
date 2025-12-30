@@ -26,7 +26,7 @@ void Foo(Number n) {
     // Function body
 }
 
-Number CreateNumber(int value) {
+Number CreateNumberWithTemp(int value) {
     return Number(value); // Mandatory copy elision in C++17
 }
 
@@ -49,8 +49,8 @@ the code will fail to compile.
 */
 
 int main() {
-    Number num = CreateNumber(42); // No copy or move constructor called
-    Foo(CreateNumber(100)); // No copy or move constructor called
-    auto num2 = CreateNumber(200); // No copy or move constructor called
+    Number num = CreateNumberWithTemp(42); // No copy or move constructor called
+    Foo(CreateNumberWithTemp(100)); // No copy or move constructor called
+    auto num2 = CreateNumberWithTemp(200); // No copy or move constructor called
     return 0;
 }
