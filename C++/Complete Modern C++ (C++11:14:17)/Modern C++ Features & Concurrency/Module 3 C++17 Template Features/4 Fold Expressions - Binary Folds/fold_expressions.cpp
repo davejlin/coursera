@@ -67,6 +67,12 @@ Operators which can be used in fold expressions:
     Comma Operator: ,
 */
 
+/*
+    Fold Expressions for Logical Operations
+    Fold expressions can also be used for logical operations.
+    The fold expressions (... || (args % 2 == 0)) and (... && (args % 2 == 0))
+    check if any or all arguments are even, respectively.
+*/
 template<typename...Args>
 bool AnyOfEven(Args...args) {
     return (... || (args % 2 == 0));
@@ -77,6 +83,12 @@ bool AllOfEven(Args...args) {
     return (... && (args % 2 == 0));
 }
 
+/*
+    Fold Expressions with Predicate Functions
+    We can also use fold expressions with predicate functions.
+    The following functions take a predicate and apply it to all arguments
+    using logical OR and AND operations.
+*/
 template<typename...Args, typename Predicate>
 bool AnyOf(Predicate p, Args...args) {
     return (... || p(args));

@@ -1,0 +1,7 @@
+Hi, I want to show you again how Variadic Templates and Fold Expressions are expanded. We will see the expansion through this website, cppinsights.io. This shows you what happens to your source code when it is compiled. So, for example, if you put a land expression here, it will show you how it is entirely expanded to a function object. With templates, it shows how the templates are instantiated. First, we will see how the variadic template sum is expanded. This is the sum function. 
+
+Let's invoke it with these arguments. We will run it and this is the expansion. First, we invoke sum with five arguments and this is what it expands to. And then here four arguments are passed into the sum. And this is the expansion. And then subsequent calls to sum will call sum function with zero arguments. And we have already written a sum function for this case. That is this function. 
+
+Now, let's see the expansion of fold expressions. This is Unary Left Fold and you can see the expansion here. This is what it is expanded to. The elements are reduced starting from the left side. This is same as what I explained in the earlier lectures. This is a Unary Left Fold. Let's see the expansion of the binary folds. We are using Binary Right Fold. 
+
+Let's run. The reduction will start from the right side. And you can see that here. This is what I explained in the previous lecture. This is the Binary Right Fold. I hope you have now understood how the fold expressions work. That's all for now, I'll see you in the next lecture, goodbye. 
