@@ -1,0 +1,7 @@
+Hi and welcome back. 
+
+In this lecture, I want to give a quick introduction to the stood function class. This class was added in C++ 11. It is called a general purpose function wrapper because it can store any entity that can be invoked like a function. So we can store function pointers or function objects inside stood function. The stored object is called the target. And this target can be invoked just like a normal function through the object of stood function. 
+
+If the stood function has no target and you try to invoke it, then it will throw a bad function call Exception. Stood function is a class template and because it has to invoke the target, it has to know its type and the type must be specified as a template argument. Here here are some examples of the usage of stood function. In the first example, F one will hold the address of the square function and then we can invoke the square function through the stood function object just like a normal function call. In the second example, F two stores the address of the alloc function. And this is how it is involved. And finally, F three stores a Lambda function and invokes the Lambda function just like a normal function here. 
+
+Let's see a few more examples in visual studio. 
