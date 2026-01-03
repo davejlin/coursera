@@ -30,6 +30,10 @@ int accumulate(int a, int b, int c) {
     return a + b + c;
 }
 
+void greet(std::string_view name, std::string_view greeting) {
+    std::cout << greeting << ", " << name << "!" << std::endl;
+}
+
 /*
     This demonstrates the use of std::bind to create function wrappers with fixed and reordered arguments.
     std::bind allows you to bind specific arguments of a function to fixed values or placeholders,
@@ -82,6 +86,9 @@ int main() {
     };
 
     cout << "Bind Square (C++20): " << f5(5) << endl; // Should output 25
+
+    auto f = std::bind(greet, std::placeholders::_2, std::placeholders::_1);
+    f("Alice", "Hello");
 
     return 0;
 }
