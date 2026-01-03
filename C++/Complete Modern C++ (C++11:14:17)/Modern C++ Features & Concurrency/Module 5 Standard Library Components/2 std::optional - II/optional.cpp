@@ -83,8 +83,10 @@ int main() {
         cout << "Value2 is absent" << endl;
     }
 
+    // Using value_or to provide a default value if value2 is absent
     cout << value2.value_or("Sorry, value2 has no value") << endl;
 
+    // Attempting to access the value of an empty optional will throw an exception
     try {
         cout << value2.value() << endl;
     } catch (const bad_optional_access& e) {
