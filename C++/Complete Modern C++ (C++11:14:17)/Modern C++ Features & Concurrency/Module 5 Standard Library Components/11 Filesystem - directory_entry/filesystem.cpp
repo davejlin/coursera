@@ -67,7 +67,43 @@ void TraversingDirectory(string_view file) {
 	}
 }
 
-int main() {
+void DirectoryOperations(string_view file) {
+	fs::path currentPath{file} ;
+	if(!fs::exists(currentPath)) {
+		cout << "Path does not exist = >" << currentPath.string() << endl ;
+		return ;
+	}
+	
+	currentPath /= "NewDir" ;
+
+	if(!fs::create_directory(currentPath)) {
+		cout << "Could not create a directory\n" ;
+	}else {
+		cout << "Directory created successfully\n" ;
+	}
+	
+	if(!fs::remove(currentPath)) {
+		cout << "Could not delete the directory\n" ;
+	}else {
+		cout << "Directory removed successfully\n" ;
+	}
+
+	try {
+		cout << fs::current_path() << endl;
+		cout << "Changing path\n";
+		error_code ec{} ;
+		fs::current_path(currentPath, ec);
+		if(ec) {
+			cout << "Error:" << ec.message() << endl;
+			return ;
+		}
+		cout << fs::current_path() << endl;
+	}
+	catch (exception& ex) {
+		cout << "Exception:" << ex.what() << endl ;
+	}
+}int main() {
 	UsingPath();
     TraversingDirectory("/Users/davilin/Documents/Projects/coursera/");
+	DirectoryOperations("/Users/davilin/Documents/Projects/coursera/");
 }
